@@ -26,7 +26,11 @@ const adminSettingsSchema = new mongoose.Schema({
   currentRoundOutcome: {
     roundId: { type: Number },
     outcome: { type: String }
-  }
+  },
+  roundOutcomes: [{
+    roundId: { type: Number },
+    outcome: { type: String }
+  }]
 });
 
 export const User = mongoose.models.User || mongoose.model('User', userSchema);

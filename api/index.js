@@ -129,71 +129,90 @@ app.post('/api/admin/transactions/:txId/action', async (req, res) => {
   res.json(tx);
 });
 
-// SETTINGS (Forced Outcomes Queue)
+// SETTINGS
 app.get('/api/admin/settings', async (req, res) => {
   let settings = await AdminSettings.findOne({ id: 'global' });
   if (!settings) {
-    settings = new AdminSettings({ id: 'global', forcedOutcomes: [], lastConsumedRound: 0 });
+    settings = new AdminSettings({ id: 'global', forcedOutcomes: [], lastConsumedRound: 0, roundOutcomes: [] });
     await settings.save();
   }
   res.json(settings);
 });
 
-app.post('/api/admin/settings/queue', async (req, res) => {
-  const { outcome } = req.body;
+// Get all round outcomes
+app.get('/api/admin/round-outcomes', async (req, res) => {
   let settings = await AdminSettings.findOne({ id: 'global' });
-  if (!settings) {
-    settings = new AdminSettings({ id: 'global', forcedOutcomes: [], lastConsumedRound: 0 });
-  }
-  settings.forcedOutcomes.push(outcome);
-  if (settings.forcedOutcomes.length > 5) settings.forcedOutcomes = settings.forcedOutcomes.slice(-5);
-  await settings.save();
-  res.json(settings);
+  res.json(settings ? (settings.roundOutcomes || []) : []);
 });
 
-app.delete('/api/admin/settings/queue/:index', async (req, res) => {
-  const index = parseInt(req.params.index);
-  let settings = await AdminSettings.findOne({ id: 'global' });
-  if (settings && settings.forcedOutcomes) {
-    settings.forcedOutcomes.splice(index, 1);
-    await settings.save();
-  }
-  res.json(settings);
-});
-
-// Admin sets outcome for a SPECIFIC round
-app.post('/api/admin/settings/set-round-outcome', async (req, res) => {
+// Set outcome for ANY specific round
+app.post('/api/admin/round-outcomes', async (req, res) => {
   const { roundId, outcome } = req.body;
+  if (!roundId || !outcome) return res.status(400).json({ error: 'roundId and outcome required' });
+  
   let settings = await AdminSettings.findOne({ id: 'global' });
   if (!settings) {
-    settings = new AdminSettings({ id: 'global', forcedOutcomes: [], lastConsumedRound: 0 });
+    settings = new AdminSettings({ id: 'global', forcedOutcomes: [], lastConsumedRound: 0, roundOutcomes: [] });
   }
-  // Store as object: { roundId, outcome }
-  settings.currentRoundOutcome = { roundId, outcome };
+  if (!settings.roundOutcomes) settings.roundOutcomes = [];
+  
+  // Replace if same roundId already exists
+  const idx = settings.roundOutcomes.findIndex(r => r.roundId === roundId);
+  if (idx !== -1) {
+    settings.roundOutcomes[idx].outcome = outcome;
+  } else {
+    settings.roundOutcomes.push({ roundId, outcome });
+  }
+  settings.markModified('roundOutcomes');
   await settings.save();
-  res.json({ success: true, roundId, outcome });
+  res.json({ success: true, roundOutcomes: settings.roundOutcomes });
 });
 
+// Delete outcome for a specific round
+app.delete('/api/admin/round-outcomes/:roundId', async (req, res) => {
+  const roundId = parseInt(req.params.roundId);
+  let settings = await AdminSettings.findOne({ id: 'global' });
+  if (settings && settings.roundOutcomes) {
+    settings.roundOutcomes = settings.roundOutcomes.filter(r => r.roundId !== roundId);
+    settings.markModified('roundOutcomes');
+    await settings.save();
+  }
+  res.json({ success: true, roundOutcomes: settings ? settings.roundOutcomes : [] });
+});
+
+// Consume outcome for a round (called by frontend when dealing)
 app.post('/api/admin/settings/consume', async (req, res) => {
   const { roundId } = req.body;
   let settings = await AdminSettings.findOne({ id: 'global' });
   
-  // Check if admin set a specific outcome for THIS round
+  // 1. Check roundOutcomes array for this specific roundId
+  if (settings && settings.roundOutcomes && settings.roundOutcomes.length > 0) {
+    const idx = settings.roundOutcomes.findIndex(r => r.roundId === roundId);
+    if (idx !== -1) {
+      const outcome = settings.roundOutcomes[idx].outcome;
+      settings.roundOutcomes.splice(idx, 1);
+      settings.markModified('roundOutcomes');
+      await settings.save();
+      return res.json({ outcome });
+    }
+  }
+  
+  // 2. Check legacy currentRoundOutcome
   if (settings && settings.currentRoundOutcome && settings.currentRoundOutcome.roundId === roundId) {
     const outcome = settings.currentRoundOutcome.outcome;
-    // Clear it so it doesn't apply again
     settings.currentRoundOutcome = null;
     await settings.save();
     return res.json({ outcome });
   }
   
-  // Otherwise consume from queue
-  if (settings && settings.lastConsumedRound !== roundId && settings.forcedOutcomes.length > 0) {
+  // 3. Consume from legacy queue
+  if (settings && settings.lastConsumedRound !== roundId && settings.forcedOutcomes && settings.forcedOutcomes.length > 0) {
     const outcome = settings.forcedOutcomes.shift();
     settings.lastConsumedRound = roundId;
     await settings.save();
     return res.json({ outcome });
   }
+  
   res.json({ outcome: 'none' });
 });
 

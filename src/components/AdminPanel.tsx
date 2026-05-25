@@ -13,7 +13,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [users, setUsers] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'users' | 'game' | 'transactions'>('users');
-  const [forcedOutcomes, setForcedOutcomes] = useState<string[]>([]);
   const [simPhase, setSimPhase] = useState<'betting' | 'dealing' | 'result'>('betting');
   const [simTimer, setSimTimer] = useState<number>(15);
   const [simRoundId, setSimRoundId] = useState<number>(0);
@@ -24,9 +23,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [selectedUserHistory, setSelectedUserHistory] = useState<string | null>(null);
   const [editBalanceUser, setEditBalanceUser] = useState<string | null>(null);
   const [newBalance, setNewBalance] = useState<string>('');
-  const [liveBets, setLiveBets] = useState<{ dragon: number; tiger: number; tie: number }>({ dragon: 0, tiger: 0, tie: 0 });
-  const [currentRoundOutcome, setCurrentRoundOutcome] = useState<string>('');
-  const [outcomeSetMsg, setOutcomeSetMsg] = useState<string>('');
+  const [liveBets] = useState<{ dragon: number; tiger: number; tie: number }>({ dragon: 0, tiger: 0, tie: 0 });
+
+  // Round outcome control
+  const [roundOutcomes, setRoundOutcomes] = useState<{ roundId: number; outcome: string }[]>([]);
+  const [targetRoundId, setTargetRoundId] = useState<string>('');
+  const [saveMsg, setSaveMsg] = useState<string>('');
 
   useEffect(() => {
     fetch('/api/admin/users')
@@ -39,9 +41,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
       .then(data => { if (Array.isArray(data)) setTransactions(data); })
       .catch(console.error);
 
-    fetch('/api/admin/settings')
+    fetch('/api/admin/round-outcomes')
       .then(res => res.json())
-      .then(data => { if (data.forcedOutcomes) setForcedOutcomes(data.forcedOutcomes); })
+      .then(data => { if (Array.isArray(data)) setRoundOutcomes(data); })
       .catch(console.error);
   }, []);
 
@@ -57,8 +59,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
           setSimDragonCard(null);
           setSimTigerCard(null);
           setSimResult(null);
-          setCurrentRoundOutcome('');
-          setOutcomeSetMsg('');
           return 'betting';
         }
         if (global.phase === 'betting') {
@@ -85,43 +85,31 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     return () => { if (simTimerRef.current) clearInterval(simTimerRef.current); };
   }, []);
 
-  const addToQueue = async (outcome: string) => {
+  // ── Set outcome for ANY round ──
+  const setRoundOutcome = async (roundId: number, outcome: string) => {
     try {
-      const res = await fetch('/api/admin/settings/queue', {
+      const res = await fetch('/api/admin/round-outcomes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ outcome })
+        body: JSON.stringify({ roundId, outcome })
       });
       if (res.ok) {
-        const settings = await res.json();
-        setForcedOutcomes(settings.forcedOutcomes);
+        const data = await res.json();
+        setRoundOutcomes(data.roundOutcomes || []);
+        setSaveMsg(`✅ Round #${roundId} → ${outcome.toUpperCase()} set ho gaya!`);
+        setTargetRoundId('');
+        setTimeout(() => setSaveMsg(''), 4000);
       }
     } catch(e) { console.error(e); }
   };
 
-  const removeFromQueue = async (index: number) => {
+  // ── Remove outcome for a round ──
+  const removeRoundOutcome = async (roundId: number) => {
     try {
-      const res = await fetch(`/api/admin/settings/queue/${index}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin/round-outcomes/${roundId}`, { method: 'DELETE' });
       if (res.ok) {
-        const settings = await res.json();
-        setForcedOutcomes(settings.forcedOutcomes);
-      }
-    } catch(e) { console.error(e); }
-  };
-
-  // ── Set outcome for CURRENT round immediately ──
-  const setCurrentRoundWinner = async (outcome: string) => {
-    const global = getGlobalGameState();
-    try {
-      const res = await fetch('/api/admin/settings/set-round-outcome', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ roundId: global.roundId, outcome })
-      });
-      if (res.ok) {
-        setCurrentRoundOutcome(outcome);
-        setOutcomeSetMsg(`✅ Round #${global.roundId} ka result set hua: ${outcome.toUpperCase()}`);
-        setTimeout(() => setOutcomeSetMsg(''), 5000);
+        const data = await res.json();
+        setRoundOutcomes(data.roundOutcomes || []);
       }
     } catch(e) { console.error(e); }
   };
@@ -284,97 +272,113 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: '20px', padding: '20px',
                   background: 'linear-gradient(135deg, rgba(241,196,15,0.15), rgba(0,0,0,0))',
-                  border: '1px solid rgba(241,196,15,0.4)', borderRadius: '12px', marginBottom: '24px'
+                  border: '2px solid rgba(241,196,15,0.5)', borderRadius: '14px', marginBottom: '24px'
                 }}>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '12px', color: '#aaa', textTransform: 'uppercase' }}>Current Round</div>
-                    <div style={{ fontSize: '48px', fontWeight: '900', color: '#f1c40f', lineHeight: 1 }}>#{simRoundId}</div>
-                    <div style={{ fontSize: '11px', color: '#aaa' }}>of 2000</div>
+                  <div style={{ textAlign: 'center', minWidth: '100px' }}>
+                    <div style={{ fontSize: '11px', color: '#aaa', textTransform: 'uppercase', letterSpacing: '1px' }}>Live Round</div>
+                    <div style={{ fontSize: '54px', fontWeight: '900', color: '#f1c40f', lineHeight: 1 }}>#{simRoundId}</div>
+                    <div style={{ fontSize: '11px', color: '#888' }}>of 2000</div>
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{
-                      padding: '10px 16px', borderRadius: '8px',
+                      padding: '10px 16px', borderRadius: '8px', marginBottom: '8px',
                       background: simPhase === 'betting' ? 'rgba(243,156,18,0.2)' : simPhase === 'dealing' ? 'rgba(52,152,219,0.2)' : 'rgba(46,204,113,0.2)',
-                      border: `1px solid ${phaseColor}`, color: phaseColor, fontWeight: 'bold', fontSize: '16px'
+                      border: `1px solid ${phaseColor}`, color: phaseColor, fontWeight: 'bold', fontSize: '15px'
                     }}>
                       {phaseLabel}
                     </div>
                     {simPhase === 'betting' && (
-                      <div style={{ marginTop: '8px', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
+                      <div style={{ height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
                         <div style={{
                           height: '100%', borderRadius: '3px',
-                          background: 'linear-gradient(90deg, #f39c12, #e74c3c)',
-                          width: `${(simTimer / 15) * 100}%`,
-                          transition: 'width 0.2s ease'
+                          background: 'linear-gradient(90deg, #27ae60, #f39c12, #e74c3c)',
+                          width: `${(simTimer / 15) * 100}%`, transition: 'width 0.2s ease'
                         }} />
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* ── CURRENT ROUND OUTCOME CONTROL ── */}
+                {/* ── ANY ROUND WIN CONTROL ── */}
                 <div style={{
-                  padding: '20px', background: 'rgba(231,76,60,0.08)', border: '2px solid rgba(231,76,60,0.4)',
-                  borderRadius: '12px', marginBottom: '24px'
+                  padding: '20px', background: 'rgba(155,89,182,0.08)', border: '2px solid rgba(155,89,182,0.5)',
+                  borderRadius: '14px', marginBottom: '24px'
                 }}>
-                  <h3 style={{ color: '#e74c3c', margin: '0 0 8px 0' }}>⚡ Current Round Control</h3>
-                  <p className="text-muted" style={{ margin: '0 0 16px 0' }}>
-                    Abhi chal rahe Round #{simRoundId} ka result set karein. Betting band hone se pehle set karein.
+                  <h3 style={{ color: '#9b59b6', margin: '0 0 6px 0' }}>🎯 Kisi Bhi Round Ka Result Set Karein</h3>
+                  <p className="text-muted" style={{ margin: '0 0 16px 0', fontSize: '13px' }}>
+                    Round number daalo (1–2000) aur choose karo Dragon / Tiger / Tie — agle us round mein wahi result aayega.
                   </p>
-                  
-                  {outcomeSetMsg && (
-                    <div style={{ padding: '10px 16px', background: 'rgba(46,204,113,0.2)', border: '1px solid #2ecc71', borderRadius: '8px', color: '#2ecc71', marginBottom: '12px', fontWeight: 'bold' }}>
-                      {outcomeSetMsg}
+
+                  {saveMsg && (
+                    <div style={{ padding: '10px 16px', background: 'rgba(46,204,113,0.2)', border: '1px solid #2ecc71', borderRadius: '8px', color: '#2ecc71', marginBottom: '14px', fontWeight: 'bold', fontSize: '14px' }}>
+                      {saveMsg}
                     </div>
                   )}
 
-                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                    <button
-                      onClick={() => setCurrentRoundWinner('dragon')}
-                      style={{
-                        flex: 1, minWidth: '100px', padding: '14px 20px', border: '2px solid #e74c3c',
-                        background: currentRoundOutcome === 'dragon' ? '#e74c3c' : 'rgba(231,76,60,0.15)',
-                        color: '#fff', borderRadius: '10px', fontWeight: 'bold', fontSize: '16px',
-                        cursor: simPhase !== 'betting' ? 'not-allowed' : 'pointer', opacity: simPhase !== 'betting' ? 0.5 : 1
-                      }}
-                      disabled={simPhase !== 'betting'}
-                    >
-                      🐉 Dragon Win
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px', padding: '8px 14px' }}>
+                      <span style={{ color: '#f1c40f', fontWeight: 'bold', fontSize: '16px' }}>#</span>
+                      <input
+                        type="number"
+                        min={1}
+                        max={2000}
+                        value={targetRoundId}
+                        onChange={e => setTargetRoundId(e.target.value)}
+                        placeholder={`Current: ${simRoundId}`}
+                        style={{
+                          width: '100px', background: 'transparent', border: 'none', outline: 'none',
+                          color: '#fff', fontWeight: 'bold', fontSize: '18px'
+                        }}
+                      />
+                    </div>
+                    <button onClick={() => { const r = parseInt(targetRoundId) || simRoundId; setRoundOutcome(r, 'dragon'); }}
+                      style={{ flex: 1, minWidth: '90px', padding: '12px 16px', border: '2px solid #e74c3c', background: 'rgba(231,76,60,0.2)', color: '#e74c3c', borderRadius: '10px', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer' }}>
+                      🐉 Dragon
                     </button>
-                    <button
-                      onClick={() => setCurrentRoundWinner('tiger')}
-                      style={{
-                        flex: 1, minWidth: '100px', padding: '14px 20px', border: '2px solid #3498db',
-                        background: currentRoundOutcome === 'tiger' ? '#3498db' : 'rgba(52,152,219,0.15)',
-                        color: '#fff', borderRadius: '10px', fontWeight: 'bold', fontSize: '16px',
-                        cursor: simPhase !== 'betting' ? 'not-allowed' : 'pointer', opacity: simPhase !== 'betting' ? 0.5 : 1
-                      }}
-                      disabled={simPhase !== 'betting'}
-                    >
-                      🐯 Tiger Win
+                    <button onClick={() => { const r = parseInt(targetRoundId) || simRoundId; setRoundOutcome(r, 'tiger'); }}
+                      style={{ flex: 1, minWidth: '90px', padding: '12px 16px', border: '2px solid #3498db', background: 'rgba(52,152,219,0.2)', color: '#3498db', borderRadius: '10px', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer' }}>
+                      🐯 Tiger
                     </button>
-                    <button
-                      onClick={() => setCurrentRoundWinner('tie')}
-                      style={{
-                        flex: 1, minWidth: '100px', padding: '14px 20px', border: '2px solid #27ae60',
-                        background: currentRoundOutcome === 'tie' ? '#27ae60' : 'rgba(39,174,96,0.15)',
-                        color: '#fff', borderRadius: '10px', fontWeight: 'bold', fontSize: '16px',
-                        cursor: simPhase !== 'betting' ? 'not-allowed' : 'pointer', opacity: simPhase !== 'betting' ? 0.5 : 1
-                      }}
-                      disabled={simPhase !== 'betting'}
-                    >
+                    <button onClick={() => { const r = parseInt(targetRoundId) || simRoundId; setRoundOutcome(r, 'tie'); }}
+                      style={{ flex: 1, minWidth: '90px', padding: '12px 16px', border: '2px solid #27ae60', background: 'rgba(39,174,96,0.2)', color: '#27ae60', borderRadius: '10px', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer' }}>
                       🤝 Tie
                     </button>
                   </div>
-                  {simPhase !== 'betting' && (
-                    <p style={{ color: '#e74c3c', fontSize: '12px', marginTop: '8px', textAlign: 'center' }}>
-                      ⚠️ Betting band ho gayi hai. Agla round aane par control milega.
+
+                  {/* Set Rounds Table */}
+                  {roundOutcomes.length > 0 && (
+                    <div>
+                      <div style={{ fontSize: '13px', color: '#aaa', marginBottom: '8px' }}>📋 Set kiye gaye rounds:</div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                        {roundOutcomes.sort((a,b) => a.roundId - b.roundId).map(ro => (
+                          <div key={ro.roundId} style={{
+                            display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 14px',
+                            background: ro.outcome === 'dragon' ? 'rgba(231,76,60,0.2)' : ro.outcome === 'tiger' ? 'rgba(52,152,219,0.2)' : 'rgba(39,174,96,0.2)',
+                            border: `1px solid ${ro.outcome === 'dragon' ? '#e74c3c' : ro.outcome === 'tiger' ? '#3498db' : '#27ae60'}`,
+                            borderRadius: '8px'
+                          }}>
+                            <span style={{ color: '#f1c40f', fontWeight: 'bold' }}>#{ro.roundId}</span>
+                            <span style={{ textTransform: 'capitalize', fontWeight: 'bold', color: '#fff' }}>
+                              {ro.outcome === 'dragon' ? '🐉' : ro.outcome === 'tiger' ? '🐯' : '🤝'} {ro.outcome}
+                            </span>
+                            <button onClick={() => removeRoundOutcome(ro.roundId)}
+                              style={{ background: 'rgba(255,0,0,0.3)', color: 'white', border: '1px solid #e74c3c', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '10px', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {roundOutcomes.length === 0 && (
+                    <p style={{ color: '#666', fontSize: '13px', textAlign: 'center', margin: 0 }}>
+                      Abhi kisi round ke liye koi outcome set nahi hai.
                     </p>
                   )}
                 </div>
 
-                {/* ── Live Sim Cards ── */}
-                <h3 style={{ marginBottom: '8px' }}>Live Game Preview</h3>
+                {/* ── Live Game Preview ── */}
+                <h3 style={{ marginBottom: '8px' }}>🃏 Live Game Preview</h3>
                 <div style={{ transform: 'scale(0.85)', transformOrigin: 'top center', minHeight: '200px' }}>
                   <div className="table-area" style={{ pointerEvents: 'none' }}>
                     <div className="cards-arena" id="cards-arena">
@@ -397,42 +401,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   </div>
                 </div>
 
-                {/* ── Live Betting Stats ── */}
-                <h3 style={{ marginTop: '24px' }}>📊 Live Bets This Round</h3>
-                <div style={{ display: 'flex', gap: '12px', marginTop: '12px', marginBottom: '24px' }}>
-                  <div style={{ flex: 1, background: 'rgba(231,76,60,0.1)', border: '1px solid #e74c3c', padding: '12px', borderRadius: '8px', textAlign: 'center' }}>
-                    <div style={{ color: '#e74c3c', fontWeight: 'bold' }}>🐉 Dragon</div>
-                    <div style={{ fontSize: '22px', fontWeight: 'bold' }}>₹{liveBets.dragon}</div>
-                  </div>
-                  <div style={{ flex: 1, background: 'rgba(52,152,219,0.1)', border: '1px solid #3498db', padding: '12px', borderRadius: '8px', textAlign: 'center' }}>
-                    <div style={{ color: '#3498db', fontWeight: 'bold' }}>🐯 Tiger</div>
-                    <div style={{ fontSize: '22px', fontWeight: 'bold' }}>₹{liveBets.tiger}</div>
-                  </div>
-                  <div style={{ flex: 1, background: 'rgba(39,174,96,0.1)', border: '1px solid #27ae60', padding: '12px', borderRadius: '8px', textAlign: 'center' }}>
-                    <div style={{ color: '#27ae60', fontWeight: 'bold' }}>🤝 Tie</div>
-                    <div style={{ fontSize: '22px', fontWeight: 'bold' }}>₹{liveBets.tie}</div>
-                  </div>
-                </div>
-
-                {/* ── Next Rounds Queue ── */}
-                <h3>📋 Next Rounds Queue</h3>
-                <p className="text-muted">Agle rounds ke liye outcome pehle se set karein (max 5).</p>
-                <div className="outcome-selector" style={{ marginTop: '12px' }}>
-                  <button className="outcome-btn dragon" onClick={() => addToQueue('dragon')} disabled={forcedOutcomes.length >= 5}>+ Dragon</button>
-                  <button className="outcome-btn tiger" onClick={() => addToQueue('tiger')} disabled={forcedOutcomes.length >= 5}>+ Tiger</button>
-                  <button className="outcome-btn tie" onClick={() => addToQueue('tie')} disabled={forcedOutcomes.length >= 5}>+ Tie</button>
-                  <button className="outcome-btn none" onClick={() => addToQueue('none')} disabled={forcedOutcomes.length >= 5}>+ Random</button>
-                </div>
-                <div style={{ marginTop: '12px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  {forcedOutcomes.map((outcome, idx) => (
-                    <div key={idx} style={{ padding: '8px 12px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '12px', color: '#aaa' }}>#{idx + 1}</span>
-                      <span style={{ textTransform: 'capitalize', fontWeight: 'bold' }}>{outcome}</span>
-                      <button onClick={() => removeFromQueue(idx)} style={{ background: '#e74c3c', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '10px' }}>✕</button>
-                    </div>
-                  ))}
-                  {forcedOutcomes.length === 0 && <span className="text-muted">Queue khali hai. Agle rounds random honge.</span>}
-                </div>
               </div>
             </div>
           )}
