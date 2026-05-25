@@ -77,8 +77,7 @@ const App: React.FC = () => {
   const handleLogin = (user: UserAccount) => {
     sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify(user));
     setCurrentUser(user);
-    const globalRound = parseInt(localStorage.getItem('dragonTigerGlobalRound') || '1');
-    setState(prev => ({ ...prev, balance: user.balance, history: [], roundNumber: globalRound, bets: {}, totalBet: 0 }));
+    setState(prev => ({ ...prev, balance: user.balance, history: [], roundNumber: getGlobalGameState().roundId, bets: {}, totalBet: 0 }));
     setIsAuthenticated(true);
   };
 
@@ -150,10 +149,7 @@ const App: React.FC = () => {
         }
       }
       
-      if (e.key === 'dragonTigerGlobalRound') {
-        const globalRound = parseInt(e.newValue || '1');
-        setState(prev => ({ ...prev, roundNumber: globalRound }));
-      }
+      
     };
     window.addEventListener('storage', handleStorage);
     return () => window.removeEventListener('storage', handleStorage);
@@ -212,7 +208,7 @@ const App: React.FC = () => {
         
         // Time to deal
         if (global.phase === 'dealing' && prev.phase === 'betting') {
-          setTimeout(() => handleDeal(global.roundId), 0);
+          setTimeout(() => handleDeal(global.roundId, global.rawRoundId), 0);
           return { ...prev, phase: 'dealing', timer: 0 };
         }
         
@@ -294,7 +290,7 @@ const App: React.FC = () => {
   }, []);
 
   
-  const handleDeal = async (roundId?: number) => {
+  const handleDeal = async (roundId?: number, seed?: number) => {
     if (!roundId) return;
     
     // Attempt to consume forced outcome from server
@@ -317,7 +313,7 @@ const App: React.FC = () => {
     });
 
     setTimeout(() => {
-      let { dragonCard, tigerCard } = getDeterministicCards(roundId);
+      let { dragonCard, tigerCard } = getDeterministicCards(roundId, seed);
       let result = determineResult(dragonCard, tigerCard);
       
       // Override if forced
@@ -375,33 +371,7 @@ const App: React.FC = () => {
   };
 
 
-  const handleNextRound = useCallback(() => {
-    setState(prev => {
-      const nextRound = prev.roundNumber >= 1500 ? 1 : prev.roundNumber + 1;
-      localStorage.setItem('dragonTigerGlobalRound', nextRound.toString());
-      
-      return {
-        ...prev,
-        phase: 'betting',
-        dragonCard: null,
-        tigerCard: null,
-        result: null,
-        bets: {},
-        totalBet: 0,
-        lastWin: prev.lastWin,
-        timer: BETTING_TIMER,
-        roundNumber: nextRound,
-        dealerMessage: DEALER_MESSAGES.nextRound,
-      };
-    });
-  }, []);
-
-  useEffect(() => {
-    if (state.phase === 'result') {
-      const t = setTimeout(() => handleNextRound(), 5000);
-      return () => clearTimeout(t);
-    }
-  }, [state.phase, handleNextRound]);
+  
 
   const { phase, dragonCard, tigerCard, result, bets, balance, selectedChip, lastWin, totalBet, history, timer, roundNumber, dealerMessage } = state;
 
@@ -488,7 +458,7 @@ const App: React.FC = () => {
             lastWin={lastWin}
             dealerMessage={dealerMessage}
             onDeal={handleDeal}
-            onNextRound={handleNextRound}
+            onNextRound={() => {}}
           />
         </div>
 

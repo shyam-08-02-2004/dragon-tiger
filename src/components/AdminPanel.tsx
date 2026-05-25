@@ -106,7 +106,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
         // Transition to dealing
         if (global.phase === 'dealing' && prevPhase === 'betting') {
           setTimeout(() => {
-             const { dragonCard, tigerCard } = getDeterministicCards(global.roundId);
+             const { dragonCard, tigerCard } = getDeterministicCards(global.roundId, global.rawRoundId);
              setSimDragonCard(dragonCard);
              setSimTigerCard(tigerCard);
              

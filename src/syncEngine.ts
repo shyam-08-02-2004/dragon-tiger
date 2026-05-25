@@ -11,8 +11,8 @@ function seededRandom(a: number) {
 }
 
 // Draw a specific card deterministically based on seed
-export function getDeterministicCards(roundId: number): { dragonCard: Card, tigerCard: Card } {
-  const rng = seededRandom(roundId);
+export function getDeterministicCards(roundId: number, seed?: number): { dragonCard: Card, tigerCard: Card } {
+  const rng = seededRandom(seed || roundId);
   const deck = createDeck();
   
   const dIndex = Math.floor(rng() * deck.length);
@@ -64,7 +64,8 @@ export function getGlobalGameState() {
   const BETTING_DURATION_MS = 15000;
   
   const now = Date.now();
-  const roundId = Math.floor(now / ROUND_DURATION_MS);
+  const rawRoundId = Math.floor(now / ROUND_DURATION_MS);
+  const roundId = (rawRoundId % 2000) + 1;
   const timeInRound = now % ROUND_DURATION_MS;
   
   const timer = Math.max(0, Math.ceil((BETTING_DURATION_MS - timeInRound) / 1000));
@@ -72,6 +73,7 @@ export function getGlobalGameState() {
   
   return {
     roundId,
+    rawRoundId,
     timer,
     phase
   };
