@@ -10,7 +10,7 @@ import GameControls from './components/GameControls';
 import RoadMap from './components/RoadMap';
 import WalletModal from './components/WalletModal';
 import type { GameState, BetType, GameResult } from './types/game';
-import { getGlobalGameState, getDeterministicCards } from './syncEngine';
+import { getGlobalGameState, getDeterministicCards, setTimeOffset } from './syncEngine';
 import {
   drawCard, determineResult, calculateWinnings,
 } from './types/game';
@@ -61,6 +61,7 @@ const App: React.FC = () => {
   });
   const [showWallet, setShowWallet] = useState(false);
   const [isAdminView, setIsAdminView] = useState(true);
+  const [isTimeSynced, setIsTimeSynced] = useState(false);
   const [state, setState] = useState<GameState>(() => {
     const saved = sessionStorage.getItem('dragonTigerCurrentUser');
     let startingBalance = initialState.balance;
@@ -95,6 +96,42 @@ const App: React.FC = () => {
   const stateRef = useRef<GameState>(state);
   useEffect(() => { stateRef.current = state; }, [state]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    fetch('/api/time')
+      .then(res => res.json())
+      .then(data => {
+        const offset = data.serverTime - Date.now();
+        setTimeOffset(offset);
+        
+        const globalState = getGlobalGameState();
+        let initialPhase = globalState.phase as GameState['phase'];
+        let initialDragon = null;
+        let initialTiger = null;
+        let initialResult = null;
+        if (globalState.phase !== 'betting') {
+          const cards = getDeterministicCards(globalState.roundId, globalState.rawRoundId);
+          initialDragon = cards.dragonCard;
+          initialTiger = cards.tigerCard;
+          initialResult = determineResult(cards.dragonCard, cards.tigerCard);
+        }
+        
+        setState(prev => ({
+          ...prev,
+          roundNumber: globalState.roundId,
+          phase: initialPhase,
+          timer: globalState.timer,
+          dragonCard: initialDragon,
+          tigerCard: initialTiger,
+          result: initialResult
+        }));
+        setIsTimeSynced(true);
+      })
+      .catch(e => {
+        console.error('Time sync failed', e);
+        setIsTimeSynced(true);
+      });
+  }, []);
   const msgIdx = useRef(0);
 
   const handleLogin = (user: UserAccount) => {
@@ -400,6 +437,10 @@ const App: React.FC = () => {
 
   const dragonWins = phase === 'result' && (result === 'dragon');
   const tigerWins = phase === 'result' && (result === 'tiger');
+
+  if (!isTimeSynced) {
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#000', color: 'gold' }}><h2>Syncing with Server...</h2></div>;
+  }
 
   if (!isAuthenticated || !currentUser) {
     return <Auth onLogin={handleLogin} />;

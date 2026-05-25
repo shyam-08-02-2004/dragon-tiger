@@ -59,11 +59,17 @@ export function getDeterministicCards(roundId: number, seed?: number): { dragonC
   return { dragonCard, tigerCard };
 }
 
+let timeOffset = 0;
+
+export function setTimeOffset(offset: number) {
+  timeOffset = offset;
+}
+
 export function getGlobalGameState() {
   const ROUND_DURATION_MS = 20000;
   const BETTING_DURATION_MS = 15000;
   
-  const now = Date.now();
+  const now = Date.now() + timeOffset;
   const rawRoundId = Math.floor(now / ROUND_DURATION_MS);
   const roundId = (rawRoundId % 2000) + 1;
   const timeInRound = now % ROUND_DURATION_MS;

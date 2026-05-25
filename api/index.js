@@ -68,6 +68,8 @@ app.post('/api/auth/reset', async (req, res) => {
   res.json(user);
 });
 
+app.get('/api/time', (req, res) => { res.json({ serverTime: Date.now() }); });
+
 // USER ROUTES
 app.get('/api/users/:id', async (req, res) => {
   const user = await User.findOne({ id: req.params.id });
