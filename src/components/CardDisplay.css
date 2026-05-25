@@ -1,0 +1,235 @@
+.card-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  padding: 20px;
+  border-radius: 16px;
+  transition: var(--transition);
+  position: relative;
+}
+
+.card-slot.dragon {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(192, 57, 43, 0.08) 0%,
+    transparent 70%
+  );
+}
+
+.card-slot.tiger {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(26, 111, 171, 0.08) 0%,
+    transparent 70%
+  );
+}
+
+.card-slot.winner.dragon {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(192, 57, 43, 0.2) 0%,
+    rgba(192, 57, 43, 0.05) 70%
+  );
+  animation: winnerGlow 1s ease-in-out 3;
+}
+
+.card-slot.winner.tiger {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(26, 111, 171, 0.2) 0%,
+    rgba(26, 111, 171, 0.05) 70%
+  );
+  animation: winnerGlow 1s ease-in-out 3;
+}
+
+.card-label {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.card-label.dragon {
+  color: #e74c3c;
+  text-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+}
+
+.card-label.tiger {
+  color: #3498db;
+  text-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+}
+
+.playing-card {
+  width: 130px;
+  height: 185px;
+  border-radius: 12px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  transition: transform 0.3s ease;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.playing-card.revealed {
+  background: linear-gradient(145deg, #fff 0%, #f5f0e8 100%);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  animation: dealCard 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.playing-card.red-card .card-rank,
+.playing-card.red-card .card-suit,
+.playing-card.red-card .card-center-suit {
+  color: #c0392b !important;
+}
+
+.playing-card.black-card .card-rank,
+.playing-card.black-card .card-suit,
+.playing-card.black-card .card-center-suit {
+  color: #1a1a2e !important;
+}
+
+.playing-card.hidden-back {
+  background: linear-gradient(145deg, #1a1a3e 0%, #0d0d1f 100%);
+  border: 2px solid rgba(212, 160, 23, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.playing-card.winner-card {
+  animation:
+    dealCard 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards,
+    pulse-gold 1.5s ease-in-out 0.6s infinite;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(212, 160, 23, 0.6) !important;
+}
+
+.playing-card.flipping {
+  animation: cardFlip 0.5s ease-out forwards;
+}
+
+.card-corner {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  z-index: 2;
+  transform: translateZ(1px);
+  backface-visibility: hidden;
+}
+
+.card-corner.top-left {
+  top: 8px;
+  left: 10px;
+}
+
+.card-corner.bottom-right {
+  bottom: 8px;
+  right: 10px;
+  transform: rotate(180deg);
+}
+
+.card-rank {
+  font-size: 20px;
+  font-weight: 900;
+  font-family: var(--font-display);
+  line-height: 1;
+}
+
+.card-suit {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.card-center-suit {
+  font-size: 56px;
+  line-height: 1;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+  position: relative;
+  transform: translateZ(1px);
+  backface-visibility: hidden;
+}
+
+.card-back-design {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0d1b3e 0%, #1a1a4e 50%, #0d1b3e 100%);
+  border: 6px solid rgba(212, 160, 23, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-back-design::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 2px solid rgba(212, 160, 23, 0.15);
+  border-radius: 8px;
+}
+
+.card-back-pattern {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  opacity: 0.2;
+}
+
+.back-symbol {
+  color: var(--gold);
+  font-size: 16px;
+  text-align: center;
+}
+
+.card-back-center {
+  font-size: 40px;
+  opacity: 0.3;
+  color: var(--gold);
+}
+
+.winner-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  border-radius: 12px;
+  animation: shimmer 2s ease-in-out infinite;
+  background-size: 200% 100%;
+}
+
+.card-value-label {
+  font-family: var(--font-tech);
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.card-value-label strong {
+  color: var(--gold);
+}
+
+@media (max-width: 480px) {
+  .playing-card { width: 90px; height: 130px; }
+  .card-center-suit { font-size: 36px; }
+  .card-rank { font-size: 16px; }
+  .card-slot { padding: 10px; }
+}

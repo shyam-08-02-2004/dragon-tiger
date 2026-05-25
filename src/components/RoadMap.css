@@ -1,0 +1,87 @@
+.roadmap {
+  padding: 16px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(17, 17, 24, 0.5) 100%
+  );
+  border-top: 1px solid rgba(212, 160, 23, 0.15);
+}
+
+.roadmap-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.roadmap-title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 2px;
+}
+
+.roadmap-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-family: var(--font-ui);
+}
+
+.empty-icon {
+  font-size: 28px;
+  opacity: 0.4;
+}
+
+.simple-history {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow-x: auto;
+  align-items: center;
+}
+
+.history-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
+}
+
+.history-badge.dragon {
+  background: linear-gradient(135deg, #ff4757, #ff6b81);
+  color: white;
+  border-color: #ff7f50;
+}
+
+.history-badge.tiger {
+  background: linear-gradient(135deg, #1e90ff, #70a1ff);
+  color: white;
+  border-color: #7bed9f;
+}
+
+.history-badge.tie,
+.history-badge.suited-tie {
+  background: linear-gradient(135deg, #2ed573, #7bed9f);
+  color: white;
+  border-color: #2f3542;
+  font-size: 11px;
+}

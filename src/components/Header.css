@@ -1,0 +1,253 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #0a0a0f 0%, #111118 50%, #0a0a0f 100%);
+  border-bottom: 1px solid rgba(212, 160, 23, 0.3);
+  box-shadow:
+    0 2px 20px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(212, 160, 23, 0.1);
+  position: relative;
+  z-index: 100;
+  animation: slideDown 0.5s ease;
+}
+
+.header::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #d4a017,
+    #f5c842,
+    #d4a017,
+    transparent
+  );
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-dragon,
+.logo-tiger-icon {
+  font-size: 28px;
+  animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(212, 160, 23, 0.6));
+}
+
+.logo-tiger-icon {
+  animation-delay: 1.5s;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.logo-main {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 900;
+  color: #e74c3c;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+}
+
+.logo-separator {
+  font-family: var(--font-display);
+  font-size: 10px;
+  color: var(--gold);
+  letter-spacing: 4px;
+  text-align: center;
+  opacity: 0.8;
+}
+
+.logo-tiger {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 900;
+  color: #3498db;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+}
+
+.live-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(231, 76, 60, 0.15);
+  border: 1px solid rgba(231, 76, 60, 0.4);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #e74c3c;
+  letter-spacing: 2px;
+  font-family: var(--font-tech);
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  background: #e74c3c;
+  border-radius: 50%;
+  animation: pulse-red 1.5s ease-in-out infinite;
+}
+
+.header-center {
+  text-align: center;
+}
+
+.round-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.round-label {
+  font-family: var(--font-tech);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 3px;
+}
+
+.round-number {
+  font-family: var(--font-tech);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gold);
+  text-shadow: 0 0 10px rgba(212, 160, 23, 0.4);
+  animation: fireFlicker 3s ease-in-out infinite;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 8px 4px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.username-badge {
+  font-family: var(--font-tech);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 1px;
+}
+
+.logout-btn {
+  background: rgba(231, 76, 60, 0.1);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 12px;
+}
+
+.logout-btn:hover {
+  background: rgba(231, 76, 60, 0.8);
+  transform: scale(1.1);
+}
+
+.stat-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.stat-label {
+  font-family: var(--font-tech);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+}
+
+.stat-value {
+  font-family: var(--font-tech);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.stat-value.gold {
+  color: var(--gold);
+  text-shadow: 0 0 8px rgba(212, 160, 23, 0.4);
+}
+
+.stat-value.green {
+  color: var(--green-light);
+  text-shadow: 0 0 8px rgba(46, 204, 113, 0.5);
+}
+
+.win-flash {
+  animation: countUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 10px 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .logo-dragon,
+  .logo-tiger-icon {
+    font-size: 20px;
+  }
+  .logo-main,
+  .logo-tiger {
+    font-size: 14px;
+  }
+  .stat-value {
+    font-size: 14px;
+  }
+  .round-number {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    flex-direction: column;
+    padding: 8px;
+    gap: 12px;
+  }
+  .header-left,
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .header-center {
+    width: 100%;
+  }
+}

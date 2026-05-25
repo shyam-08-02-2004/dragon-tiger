@@ -1,0 +1,120 @@
+.history-popup {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 900;
+  width: 90%;
+  max-width: 420px;
+  background: rgba(10, 8, 20, 0.95);
+  border: 1px solid rgba(212, 160, 23, 0.4);
+  border-radius: 14px;
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.8),
+    0 0 20px rgba(212, 160, 23, 0.15);
+  backdrop-filter: blur(20px);
+  animation: slideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+.hp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(212, 160, 23, 0.08);
+  border-bottom: 1px solid rgba(212, 160, 23, 0.2);
+}
+
+.hp-title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffd700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.hp-close {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.2s;
+}
+.hp-close:hover {
+  color: #fff;
+}
+
+.hp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+}
+
+.hp-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.hp-latest {
+  border-color: rgba(212, 160, 23, 0.3);
+  background: rgba(212, 160, 23, 0.07);
+}
+
+.hp-dragon {
+  border-left: 3px solid #e74c3c;
+}
+.hp-tiger {
+  border-left: 3px solid #3498db;
+}
+.hp-tie {
+  border-left: 3px solid #27ae60;
+}
+.hp-stie {
+  border-left: 3px solid #9b59b6;
+}
+
+.hp-round {
+  font-family: var(--font-tech);
+  font-size: 10px;
+  color: #666;
+  min-width: 60px;
+}
+
+.hp-result {
+  font-weight: 700;
+  color: #f0e6c8;
+  flex: 1;
+  text-align: center;
+}
+
+.hp-cards {
+  font-family: var(--font-tech);
+  font-size: 10px;
+  color: #888;
+  min-width: 100px;
+  text-align: right;
+}
+
+.hp-footer {
+  text-align: center;
+  padding: 8px;
+  font-size: 10px;
+  color: #555;
+  font-family: var(--font-tech);
+  background: rgba(0, 0, 0, 0.3);
+  letter-spacing: 1px;
+}
