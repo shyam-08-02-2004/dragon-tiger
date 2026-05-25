@@ -22,7 +22,11 @@ const transactionSchema = new mongoose.Schema({
 const adminSettingsSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true, default: 'global' },
   forcedOutcomes: { type: [String], default: [] },
-  lastConsumedRound: { type: Number, default: 0 }
+  lastConsumedRound: { type: Number, default: 0 },
+  currentRoundOutcome: {
+    roundId: { type: Number },
+    outcome: { type: String }
+  }
 });
 
 export const User = mongoose.models.User || mongoose.model('User', userSchema);

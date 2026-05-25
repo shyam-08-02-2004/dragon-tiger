@@ -58,6 +58,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
           setSimTigerCard(null);
           setSimResult(null);
           setCurrentRoundOutcome('');
+          setOutcomeSetMsg('');
           return 'betting';
         }
         if (global.phase === 'betting') {
@@ -110,19 +111,17 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
   // ── Set outcome for CURRENT round immediately ──
   const setCurrentRoundWinner = async (outcome: string) => {
+    const global = getGlobalGameState();
     try {
-      // Clear existing queue and set only current round
-      const res = await fetch('/api/admin/settings/queue', {
+      const res = await fetch('/api/admin/settings/set-round-outcome', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ outcome, immediate: true })
+        body: JSON.stringify({ roundId: global.roundId, outcome })
       });
       if (res.ok) {
-        const settings = await res.json();
-        setForcedOutcomes(settings.forcedOutcomes);
         setCurrentRoundOutcome(outcome);
-        setOutcomeSetMsg(`✅ Current round will result in: ${outcome.toUpperCase()}`);
-        setTimeout(() => setOutcomeSetMsg(''), 4000);
+        setOutcomeSetMsg(`✅ Round #${global.roundId} ka result set hua: ${outcome.toUpperCase()}`);
+        setTimeout(() => setOutcomeSetMsg(''), 5000);
       }
     } catch(e) { console.error(e); }
   };
