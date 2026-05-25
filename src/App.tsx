@@ -17,7 +17,7 @@ import {
 import './App.css';
 
 const BETTING_TIMER = 15;
-const INITIAL_BALANCE = 10000;
+const INITIAL_BALANCE = 50;
 
 const DEALER_MESSAGES = {
   betting: [
