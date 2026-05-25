@@ -67,7 +67,30 @@ const App: React.FC = () => {
     if (saved) {
       try { startingBalance = JSON.parse(saved).balance; } catch(e){}
     }
-    return { ...initialState, balance: startingBalance };
+    
+    const globalState = getGlobalGameState();
+    let initialPhase = globalState.phase;
+    let initialDragon = null;
+    let initialTiger = null;
+    let initialResult = null;
+    
+    if (globalState.phase !== 'betting') {
+      const cards = getDeterministicCards(globalState.roundId, globalState.rawRoundId);
+      initialDragon = cards.dragonCard;
+      initialTiger = cards.tigerCard;
+      initialResult = determineResult(cards.dragonCard, cards.tigerCard);
+    }
+    
+    return { 
+      ...initialState, 
+      balance: startingBalance,
+      roundNumber: globalState.roundId,
+      phase: initialPhase,
+      timer: globalState.timer,
+      dragonCard: initialDragon,
+      tigerCard: initialTiger,
+      result: initialResult
+    };
   });
   const stateRef = useRef<GameState>(state);
   useEffect(() => { stateRef.current = state; }, [state]);
