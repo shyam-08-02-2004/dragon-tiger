@@ -69,7 +69,7 @@ const App: React.FC = () => {
     }
     
     const globalState = getGlobalGameState();
-    let initialPhase = globalState.phase as GamePhase;
+    let initialPhase = globalState.phase as GameState['phase'];
     let initialDragon = null;
     let initialTiger = null;
     let initialResult = null;
