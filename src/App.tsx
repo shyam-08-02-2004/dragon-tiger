@@ -234,14 +234,9 @@ const App: React.FC = () => {
     }
   }, [isAuthenticated, currentUser, state.phase, state.balance, state.totalBet]);
 
-  // Countdown timer during betting
+  // Global continuous game loop timer
   useEffect(() => {
-    if (state.phase !== 'betting') {
-      if (timerRef.current) clearInterval(timerRef.current);
-      return;
-    }
-
-    timerRef.current = setInterval(() => {
+    const timer = setInterval(() => {
       const global = getGlobalGameState();
       
       setState(prev => {
@@ -277,9 +272,9 @@ const App: React.FC = () => {
     }, 200);
 
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      clearInterval(timer);
     };
-  }, [state.phase]);
+  }, []);
 
   
   const syncBalanceToServer = (newBal: number) => {
