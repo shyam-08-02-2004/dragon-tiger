@@ -13,13 +13,29 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [users, setUsers] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch('/api/users')
+    fetch('/api/admin/users')
       .then(res => res.json())
-      .then(data => setUsers(data))
+      .then(data => {
+        if (Array.isArray(data)) {
+          setUsers(data);
+        } else {
+          console.error("Expected array of users, got:", data);
+        }
+      })
       .catch(console.error);
       
-    const freshTxsStr = localStorage.getItem('dragonTigerTransactions') || '[]';
-    setTransactions(JSON.parse(freshTxsStr));
+    fetch('/api/admin/transactions')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setTransactions(data);
+        }
+      })
+      .catch(e => {
+        console.error(e);
+        const freshTxsStr = localStorage.getItem('dragonTigerTransactions') || '[]';
+        setTransactions(JSON.parse(freshTxsStr));
+      });
   }, []);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'users' | 'game' | 'transactions'>('users');
@@ -146,53 +162,26 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   };
 
 
-  const handleTransactionAction = (txId: string, action: 'approve' | 'reject') => {
-    const txs = [...transactions];
-    const txIndex = txs.findIndex(t => t.id === txId);
-    if (txIndex === -1) return;
-
-    const tx = txs[txIndex];
-    if (tx.status !== 'pending') return;
-
-    if (action === 'approve') {
-      const freshUsersStr = localStorage.getItem('dragonTigerUsers') || '{}';
-      const freshUsers = JSON.parse(freshUsersStr);
-
-      // Fetching the user to update their balance in DB
-      const userToUpdate = users.find(u => u.username === tx.username || u.id === tx.username);
-      if (userToUpdate) {
-        let newBalance = userToUpdate.balance;
-        if (tx.type === 'deposit') {
-          newBalance += tx.amount;
-        } else if (tx.type === 'withdraw') {
-          if (newBalance < tx.amount) {
-            alert(`User balance ₹${newBalance} is less than withdraw amount ₹${tx.amount}!`);
-            return;
-          }
-          newBalance -= tx.amount;
-        }
-        
-        fetch(`/api/users/${userToUpdate.id}/balance`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ balance: newBalance })
-        }).then(res => {
-          if (res.ok) {
-            setUsers(users.map(u => u.id === userToUpdate.id ? { ...u, balance: newBalance } : u));
-          }
-        }).catch(console.error);
+  const handleTransactionAction = async (txId: string, action: 'approve' | 'reject') => {
+    try {
+      const res = await fetch(`/api/admin/transactions/${txId}/action`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action })
+      });
+      if (res.ok) {
+        // Refetch users and transactions
+        fetch('/api/admin/users').then(r => r.json()).then(data => {
+          if (Array.isArray(data)) setUsers(data);
+        });
+        fetch('/api/admin/transactions').then(r => r.json()).then(data => {
+          if (Array.isArray(data)) setTransactions(data);
+        });
+      } else {
+        const err = await res.json();
+        alert(err.error || "Failed to process transaction");
       }
-    }
-
-    const freshTxsStr = localStorage.getItem('dragonTigerTransactions') || '[]';
-    const freshTxs = JSON.parse(freshTxsStr);
-    const latestTxIndex = freshTxs.findIndex((t: any) => t.id === txId);
-    
-    if (latestTxIndex !== -1) {
-      freshTxs[latestTxIndex].status = action;
-      setTransactions(freshTxs);
-      localStorage.setItem('dragonTigerTransactions', JSON.stringify(freshTxs));
-    }
+    } catch(e) { console.error(e); }
   };
 
   return (
