@@ -377,14 +377,15 @@
   }
 }
 
+
 /* ======================================
    MOBILE RESPONSIVENESS (Admin)
    ====================================== */
 @media (max-width: 768px) {
   .admin-layout {
     flex-direction: column;
-    height: 100%;
-    overflow-y: auto;
+    height: 100vh;
+    overflow: hidden;
   }
   
   .admin-sidebar {
@@ -393,42 +394,70 @@
     border-right: none;
     border-bottom: 1px solid var(--dark-border);
     padding: 10px;
+    align-items: center;
+    justify-content: space-between;
     overflow-x: auto;
     white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
   }
   
-  .sidebar-header {
-    display: none;
+  .admin-brand {
+    margin-bottom: 0;
+    margin-right: 15px;
   }
   
-  .sidebar-nav {
+  .admin-brand h2 {
+    display: none; /* Hide text, keep emoji on mobile */
+  }
+  
+  .admin-nav {
     flex-direction: row;
     gap: 10px;
-    width: 100%;
+    flex: 1;
+    margin-right: 15px;
   }
 
-  .nav-item {
-    flex: 1;
+  .nav-btn {
+    padding: 8px 12px;
+    font-size: 12px;
     justify-content: center;
-    padding: 10px;
+  }
+  
+  .admin-logout-btn {
+    margin-top: 0;
+    padding: 8px 12px;
+    font-size: 12px;
   }
   
   .admin-main {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .admin-header {
     height: auto;
-    overflow-y: visible;
+    padding: 15px;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  
+  .admin-header h1 {
+    font-size: 20px;
   }
 
   .admin-content {
-    padding: 15px;
+    padding: 10px;
   }
 
-  .data-table-container {
+  .table-responsive {
     overflow-x: auto;
-    margin-bottom: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--dark-border);
   }
   
-  .data-table {
-    min-width: 600px;
+  .admin-table {
+    min-width: 800px; /* Ensure table doesn't squish too much */
   }
 
   .live-game-section {
@@ -441,7 +470,7 @@
   }
   
   .sim-card-spot {
-    min-height: 140px;
+    min-height: 120px;
   }
   
   .queue-section {
@@ -452,3 +481,4 @@
     flex-wrap: wrap;
   }
 }
+

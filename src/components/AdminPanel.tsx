@@ -216,26 +216,30 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
             <div className="admin-card">
               <h3>Registered Players</h3>
               <div className="table-responsive">
+                
                 <table className="admin-table">
                   <thead>
                     <tr>
+                      <th>Mobile Number</th>
                       <th>Username</th>
                       <th>Password</th>
                       <th>Balance</th>
+                      <th>Deposited</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {Object.entries(users).map(([username, data]) => {
-                      if (username === 'babu') return null; // Hide admin account
+                    {users.map((user: any) => {
+                      if (user.id === 'babu') return null; // Hide admin account
                       return (
-                        <tr key={username}>
-                          <td className="fw-bold">{username}</td>
+                        <tr key={user.id}>
+                          <td className="fw-bold">{user.id}</td>
+                          <td>{user.username}</td>
                           <td>
-                            <span className="password-mask">{data.password}</span>
+                            <span className="password-mask">{user.password}</span>
                           </td>
                           <td>
-                            {editBalanceUser === username ? (
+                            {editBalanceUser === user.id ? (
                               <div className="edit-balance-group">
                                 <span className="currency-symbol">₹</span>
                                 <input 
@@ -245,22 +249,27 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                                   className="balance-input"
                                   autoFocus
                                 />
-                                <button className="save-btn" onClick={() => handleUpdateBalance(username)}>✓</button>
+                                <button className="save-btn" onClick={() => handleUpdateBalance(user.id)}>✓</button>
                                 <button className="cancel-btn" onClick={() => setEditBalanceUser(null)}>✕</button>
                               </div>
                             ) : (
                               <span className="balance-display gold">
-                                ₹{data.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                                ₹{user.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                               </span>
                             )}
+                          </td>
+                          <td>
+                            <span style={{ color: user.hasDeposited ? '#2ecc71' : '#e74c3c', fontWeight: 'bold' }}>
+                              {user.hasDeposited ? 'YES' : 'NO'}
+                            </span>
                           </td>
                           <td>
                             <div className="action-buttons">
                               <button 
                                 className="action-btn edit" 
                                 onClick={() => {
-                                  setEditBalanceUser(username);
-                                  setNewBalance(data.balance.toString());
+                                  setEditBalanceUser(user.id);
+                                  setNewBalance(user.balance.toString());
                                 }}
                                 title="Edit Balance"
                               >
@@ -268,15 +277,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                               </button>
                               <button 
                                 className="action-btn" 
-                                onClick={() => setSelectedUserHistory(username)}
-                                title="View History"
-                                style={{ background: '#3498db' }}
-                              >
-                                📜
-                              </button>
-                              <button 
-                                className="action-btn" 
-                                onClick={() => setSelectedUserHistory(username)}
+                                onClick={() => setSelectedUserHistory(user.id)}
                                 title="View History"
                                 style={{ background: '#3498db' }}
                               >
@@ -284,7 +285,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                               </button>
                               <button 
                                 className="action-btn delete" 
-                                onClick={() => handleDeleteUser(username)}
+                                onClick={() => handleDeleteUser(user.id)}
                                 title="Delete User"
                               >
                                 🗑️
@@ -294,13 +295,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                         </tr>
                       );
                     })}
-                    {Object.keys(users).length <= 1 && (
+                    {users.filter((u: any) => u.id !== 'babu').length === 0 && (
                       <tr>
-                        <td colSpan={4} className="text-center text-muted">No registered players yet.</td>
+                        <td colSpan={6} className="text-center text-muted">No registered players yet.</td>
                       </tr>
                     )}
                   </tbody>
                 </table>
+
               </div>
             </div>
           )}
