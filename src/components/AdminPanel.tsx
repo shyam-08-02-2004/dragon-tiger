@@ -10,7 +10,17 @@ interface AdminPanelProps {
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
-  const [users, setUsers] = useState<Record<string, any>>({});
+  const [users, setUsers] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch('/api/users')
+      .then(res => res.json())
+      .then(data => setUsers(data))
+      .catch(console.error);
+      
+    const freshTxsStr = localStorage.getItem('dragonTigerTransactions') || '[]';
+    setTransactions(JSON.parse(freshTxsStr));
+  }, []);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'users' | 'game' | 'transactions'>('users');
   const [forcedOutcomes, setForcedOutcomes] = useState<string[]>([]);
@@ -101,22 +111,26 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     return () => { if (simTimerRef.current) clearInterval(simTimerRef.current); };
   }, [activeTab]);
 
-  const handleUpdateBalance = (username: string) => {
+  const handleUpdateBalance = async (id: string) => {
     const amount = parseFloat(newBalance);
     if (isNaN(amount) || amount < 0) {
       alert("Invalid balance amount");
       return;
     }
     
-    const freshUsersStr = localStorage.getItem('dragonTigerUsers') || '{}';
-    const freshUsers = JSON.parse(freshUsersStr);
-    
-    if (freshUsers[username]) {
-      freshUsers[username].balance = amount;
-      setUsers(freshUsers);
-      localStorage.setItem('dragonTigerUsers', JSON.stringify(freshUsers));
-      setEditBalanceUser(null);
-      setNewBalance('');
+    try {
+      const res = await fetch(`/api/users/${id}/balance`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ balance: amount })
+      });
+      if (res.ok) {
+        setUsers(users.map(u => u.id === id ? { ...u, balance: amount } : u));
+        setEditBalanceUser(null);
+        setNewBalance('');
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -144,19 +158,29 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
       const freshUsersStr = localStorage.getItem('dragonTigerUsers') || '{}';
       const freshUsers = JSON.parse(freshUsersStr);
 
-      if (freshUsers[tx.username]) {
+      // Fetching the user to update their balance in DB
+      const userToUpdate = users.find(u => u.username === tx.username || u.id === tx.username);
+      if (userToUpdate) {
+        let newBalance = userToUpdate.balance;
         if (tx.type === 'deposit') {
-          freshUsers[tx.username].balance += tx.amount;
-          freshUsers[tx.username].hasDeposited = true;
+          newBalance += tx.amount;
         } else if (tx.type === 'withdraw') {
-          if (freshUsers[tx.username].balance < tx.amount) {
-            alert(`User ka balance ₹${freshUsers[tx.username].balance} hai, withdraw amount ₹${tx.amount} se kam hai!`);
+          if (newBalance < tx.amount) {
+            alert(`User balance ₹${newBalance} is less than withdraw amount ₹${tx.amount}!`);
             return;
           }
-          freshUsers[tx.username].balance -= tx.amount;
+          newBalance -= tx.amount;
         }
-        setUsers(freshUsers);
-        localStorage.setItem('dragonTigerUsers', JSON.stringify(freshUsers));
+        
+        fetch(`/api/users/${userToUpdate.id}/balance`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ balance: newBalance })
+        }).then(res => {
+          if (res.ok) {
+            setUsers(users.map(u => u.id === userToUpdate.id ? { ...u, balance: newBalance } : u));
+          }
+        }).catch(console.error);
       }
     }
 
