@@ -147,7 +147,8 @@ app.get('/api/admin/round-outcomes', async (req, res) => {
 
 // Set outcome for ANY specific round
 app.post('/api/admin/round-outcomes', async (req, res) => {
-  const { roundId, outcome } = req.body;
+  const roundId = Number(req.body.roundId);
+  const { outcome } = req.body;
   if (!roundId || !outcome) return res.status(400).json({ error: 'roundId and outcome required' });
   
   let settings = await AdminSettings.findOne({ id: 'global' });
@@ -157,7 +158,7 @@ app.post('/api/admin/round-outcomes', async (req, res) => {
   if (!settings.roundOutcomes) settings.roundOutcomes = [];
   
   // Replace if same roundId already exists
-  const idx = settings.roundOutcomes.findIndex(r => r.roundId === roundId);
+  const idx = settings.roundOutcomes.findIndex(r => Number(r.roundId) === roundId);
   if (idx !== -1) {
     settings.roundOutcomes[idx].outcome = outcome;
   } else {
@@ -182,12 +183,12 @@ app.delete('/api/admin/round-outcomes/:roundId', async (req, res) => {
 
 // Consume outcome for a round (called by frontend when dealing)
 app.post('/api/admin/settings/consume', async (req, res) => {
-  const { roundId } = req.body;
+  const roundId = Number(req.body.roundId);
   let settings = await AdminSettings.findOne({ id: 'global' });
   
-  // 1. Check roundOutcomes array for this specific roundId
+  // Check roundOutcomes array for this specific roundId
   if (settings && settings.roundOutcomes && settings.roundOutcomes.length > 0) {
-    const idx = settings.roundOutcomes.findIndex(r => r.roundId === roundId);
+    const idx = settings.roundOutcomes.findIndex(r => Number(r.roundId) === roundId);
     if (idx !== -1) {
       const outcome = settings.roundOutcomes[idx].outcome;
       settings.roundOutcomes.splice(idx, 1);
@@ -195,22 +196,6 @@ app.post('/api/admin/settings/consume', async (req, res) => {
       await settings.save();
       return res.json({ outcome });
     }
-  }
-  
-  // 2. Check legacy currentRoundOutcome
-  if (settings && settings.currentRoundOutcome && settings.currentRoundOutcome.roundId === roundId) {
-    const outcome = settings.currentRoundOutcome.outcome;
-    settings.currentRoundOutcome = null;
-    await settings.save();
-    return res.json({ outcome });
-  }
-  
-  // 3. Consume from legacy queue
-  if (settings && settings.lastConsumedRound !== roundId && settings.forcedOutcomes && settings.forcedOutcomes.length > 0) {
-    const outcome = settings.forcedOutcomes.shift();
-    settings.lastConsumedRound = roundId;
-    await settings.save();
-    return res.json({ outcome });
   }
   
   res.json({ outcome: 'none' });
