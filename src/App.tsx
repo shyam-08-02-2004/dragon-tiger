@@ -414,7 +414,7 @@ const App: React.FC = () => {
 
   if (currentUser.username === 'babu' && isAdminView) {
     return (
-      <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <div style={{ position: 'relative', width: '100%', minHeight: '100vh', overflowX: 'hidden' }}>
         <AdminPanel onLogout={handleLogout} />
         <button 
           onClick={() => setIsAdminView(false)}
