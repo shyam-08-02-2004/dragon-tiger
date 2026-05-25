@@ -201,6 +201,17 @@ const App: React.FC = () => {
     };
   }, [state.phase]);
 
+  
+  const syncBalanceToServer = (newBal: number) => {
+    if (currentUser && currentUser.id !== 'babu') {
+      fetch(`/api/users/${currentUser.id}/balance`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ balance: newBal })
+      }).catch(e => console.error(e));
+    }
+  };
+
   const handlePlaceBet = useCallback((type: BetType) => {
     setState(prev => {
       if (prev.phase !== 'betting') return prev;
@@ -209,12 +220,14 @@ const App: React.FC = () => {
       const current = prev.bets[type] || 0;
       const newBets = { ...prev.bets, [type]: current + cost };
       const totalBet = Object.values(newBets).reduce((a, b) => a + (b || 0), 0);
-      return {
+      const newState = {
         ...prev,
         bets: newBets,
         balance: prev.balance - cost,
         totalBet,
       };
+      syncBalanceToServer(newState.balance);
+      return newState;
     });
   }, []);
 
@@ -225,12 +238,14 @@ const App: React.FC = () => {
   const handleClearBets = useCallback(() => {
     setState(prev => {
       if (prev.phase !== 'betting') return prev;
-      return {
+      const newState = {
         ...prev,
         balance: prev.balance + prev.totalBet,
         bets: {},
         totalBet: 0,
       };
+      syncBalanceToServer(newState.balance);
+      return newState;
     });
   }, []);
 
@@ -243,12 +258,14 @@ const App: React.FC = () => {
       for (const [k, v] of Object.entries(prev.bets)) {
         newBets[k as BetType] = (v || 0) * 2;
       }
-      return {
+      const newState = {
         ...prev,
         bets: newBets,
         balance: prev.balance - cost,
         totalBet: cost * 2,
       };
+      syncBalanceToServer(newState.balance);
+      return newState;
     });
   }, []);
 
@@ -308,7 +325,7 @@ const App: React.FC = () => {
         
         const newBalance = prev.balance + winnings;
         // Update balance on server if won
-        if (winnings > 0 && currentUser && currentUser.id !== 'babu') {
+        if (currentUser && currentUser.id !== 'babu') {
            fetch(`/api/users/${currentUser.id}/balance`, {
              method: 'PUT',
              headers: { 'Content-Type': 'application/json' },
