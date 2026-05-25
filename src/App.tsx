@@ -60,7 +60,15 @@ const App: React.FC = () => {
     return saved ? JSON.parse(saved) : null;
   });
   const [showWallet, setShowWallet] = useState(false);
-  const [state, setState] = useState<GameState>(initialState);
+  const [isAdminView, setIsAdminView] = useState(true);
+  const [state, setState] = useState<GameState>(() => {
+    const saved = sessionStorage.getItem('dragonTigerCurrentUser');
+    let startingBalance = initialState.balance;
+    if (saved) {
+      try { startingBalance = JSON.parse(saved).balance; } catch(e){}
+    }
+    return { ...initialState, balance: startingBalance };
+  });
   const stateRef = useRef<GameState>(state);
   useEffect(() => { stateRef.current = state; }, [state]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -79,6 +87,22 @@ const App: React.FC = () => {
     setIsAuthenticated(false);
     setCurrentUser(null);
   };
+
+  // Fetch real balance from DB once on load
+  useEffect(() => {
+    if (isAuthenticated && currentUser && currentUser.id !== 'babu') {
+      fetch(`/api/users/${currentUser.id}`)
+        .then(res => res.json())
+        .then(user => {
+          if (user.balance !== undefined) {
+            setCurrentUser(prev => prev ? { ...prev, balance: user.balance } : null);
+            setState(prev => ({ ...prev, balance: user.balance }));
+            sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify(user));
+          }
+        })
+        .catch(console.error);
+    }
+  }, [isAuthenticated, currentUser?.id]);
 
   // Sync balance to localStorage
   useEffect(() => {
@@ -388,12 +412,30 @@ const App: React.FC = () => {
     return <Auth onLogin={handleLogin} />;
   }
 
-  if (currentUser.username === 'babu') {
-    return <AdminPanel onLogout={handleLogout} />;
+  if (currentUser.username === 'babu' && isAdminView) {
+    return (
+      <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+        <AdminPanel onLogout={handleLogout} />
+        <button 
+          onClick={() => setIsAdminView(false)}
+          style={{ position: 'fixed', bottom: '20px', right: '20px', background: 'var(--gold)', color: '#000', border: 'none', padding: '12px 24px', borderRadius: '24px', fontWeight: 'bold', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', cursor: 'pointer', zIndex: 9999 }}
+        >
+          🎮 Play Game
+        </button>
+      </div>
+    );
   }
 
   return (
     <div className="app" id="app-root">
+      {currentUser.username === 'babu' && !isAdminView && (
+        <button 
+          onClick={() => setIsAdminView(true)}
+          style={{ position: 'fixed', top: '80px', right: '20px', background: 'rgba(0,0,0,0.8)', color: 'var(--gold)', border: '1px solid var(--gold)', padding: '10px 20px', borderRadius: '20px', fontWeight: 'bold', zIndex: 9999, cursor: 'pointer' }}
+        >
+          🛡️ Admin Panel
+        </button>
+      )}
       {/* Background ambiance */}
       <div className="bg-decoration">
         <div className="bg-dragon">🐉</div>
