@@ -2,91 +2,100 @@ import fs from 'fs';
 
 let content = fs.readFileSync('src/components/AdminPanel.css', 'utf8');
 
-const newMobileCSS = `
-/* ======================================
-   MOBILE RESPONSIVENESS (Admin)
-   ====================================== */
-@media (max-width: 768px) {
+const regex = /@media\s*\(\s*max-width:\s*768px\s*\)\s*\{[\s\S]*/;
+
+const cleanMedia = `@media (max-width: 768px) {
   .admin-layout {
     flex-direction: column;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
+    height: auto;
+    overflow-x: hidden;
   }
   
   .admin-sidebar {
     width: 100%;
-    flex-direction: row;
+    padding: 15px;
+    flex-direction: column;
     border-right: none;
-    border-bottom: 1px solid var(--dark-border);
-    padding: 10px;
-    align-items: center;
-    justify-content: space-between;
-    overflow-x: auto;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    align-items: stretch;
+    box-sizing: border-box;
   }
   
-  .admin-brand {
-    margin-bottom: 0;
-    margin-right: 15px;
-  }
-  
-  .admin-brand h2 {
-    display: none; /* Hide text, keep emoji on mobile */
+  .admin-brand { 
+    margin-bottom: 15px; 
+    width: 100%;
+    justify-content: center;
   }
   
   .admin-nav {
     flex-direction: row;
+    overflow-x: auto;
+    width: 100%;
     gap: 10px;
-    flex: 1;
-    margin-right: 15px;
+    padding-bottom: 10px;
   }
 
   .nav-btn {
-    padding: 8px 12px;
-    font-size: 12px;
-    justify-content: center;
-  }
-  
-  .admin-logout-btn {
-    margin-top: 0;
-    padding: 8px 12px;
-    font-size: 12px;
-  }
-  
-  .admin-main {
+    white-space: nowrap;
+    padding: 10px 15px;
     flex: 1;
-    overflow-y: auto;
+    justify-content: center;
+    font-size: 14px;
   }
 
+  .admin-logout-btn {
+    margin-top: 10px;
+    padding: 10px;
+    width: 100%;
+  }
+  
   .admin-header {
     height: auto;
     padding: 15px;
     flex-direction: column;
     gap: 10px;
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
   }
   
   .admin-header h1 {
     font-size: 20px;
   }
 
-  .admin-content {
-    padding: 10px;
+  .admin-content { 
+    padding: 10px; 
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+  
+  .admin-card {
+    padding: 15px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .table-responsive {
+    width: 100%;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 8px;
-    border: 1px solid var(--dark-border);
   }
   
   .admin-table {
-    min-width: 800px; /* Ensure table doesn't squish too much */
+    min-width: 800px;
   }
 
-  .live-game-section {
-    padding: 15px;
+  .outcome-selector { 
+    grid-template-columns: 1fr; 
+    gap: 10px;
+  }
+  
+  .edit-balance-group { 
+    flex-wrap: wrap; 
+    margin-top: 8px;
   }
 
   .sim-arena {
@@ -103,11 +112,10 @@ const newMobileCSS = `
   }
 
   .queue-list {
-    flex-wrap: wrap;
+    flex-direction: column;
   }
 }
 `;
 
-content = content.replace(/\/\* ======================================\r?\n\s*MOBILE RESPONSIVENESS \(Admin\)\r?\n\s*====================================== \*\/[\s\S]*?\@media \(max-width: 768px\) \{[\s\S]*?\}\r?\n\}/m, newMobileCSS);
-
+content = content.replace(regex, cleanMedia);
 fs.writeFileSync('src/components/AdminPanel.css', content);
