@@ -73,6 +73,25 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
       setActiveMenuMsgId(null);
     } catch(e) { console.error(e); }
   };
+  const [editingChatId, setEditingChatId] = useState<string | null>(null);
+  const [editingChatText, setEditingChatText] = useState('');
+
+  const handleEditMessage = async (msgId: string, newMsg: string) => {
+    if (newMsg && newMsg.trim() !== '') {
+      try {
+        const res = await fetch(`/api/chat/message/${msgId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: newMsg })
+        });
+        if (res.ok) {
+          setMessages(prev => prev.map(m => m.id === msgId ? { ...m, message: newMsg } : m));
+        }
+      } catch(e) { console.error(e); }
+    }
+    setEditingChatId(null);
+    setEditingChatText('');
+  };
 
 
   const handleSend = async () => {
@@ -124,25 +143,46 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
                   onMouseUp={() => endHold(msg.id)}
                   onMouseLeave={() => endHold(msg.id)}
                 >
-                  {msg.message}
-                  <div className="hc-timestamp" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
-                    <span>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                    {msg.sender === 'user' && activeMenuMsgId === msg.id && (
-                      <div style={{ animation: 'hcFadeIn 0.3s ease' }}>
-                        <button 
-                          onClick={() => handleDeleteMessage(msg.id)}
-                          style={{
-                            background: 'none', border: 'none', color: '#e74c3c', 
-                            fontSize: '12px', cursor: 'pointer', padding: '0 4px',
-                            marginLeft: '8px'
-                          }}
-                          title="Delete message"
-                        >
-                          🗑️ Delete
-                        </button>
+                  {editingChatId === msg.id ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+                      <input 
+                        type="text" 
+                        value={editingChatText} 
+                        onChange={e => setEditingChatText(e.target.value)} 
+                        style={{ width: '100%', padding: '6px', borderRadius: '4px', border: 'none', color: '#000' }}
+                        autoFocus
+                      />
+                      <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                        <button onClick={() => setEditingChatId(null)} style={{ background: '#ccc', color: '#000', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', fontSize: '12px' }}>Cancel</button>
+                        <button onClick={() => handleEditMessage(msg.id, editingChatText)} style={{ background: '#2ecc71', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', fontSize: '12px' }}>Save</button>
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    <>
+                      {msg.message}
+                      <div className="hc-timestamp" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
+                        <span>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        {msg.sender === 'user' && activeMenuMsgId === msg.id && (
+                          <div style={{ display: 'flex', gap: '8px', animation: 'hcFadeIn 0.3s ease' }}>
+                            <button 
+                              onClick={() => { setEditingChatId(msg.id); setEditingChatText(msg.message); setActiveMenuMsgId(null); }}
+                              style={{ background: 'none', border: 'none', color: '#f1c40f', fontSize: '12px', cursor: 'pointer', padding: 0 }}
+                              title="Edit message"
+                            >
+                              ✏️ Edit
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteMessage(msg.id)}
+                              style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: '12px', cursor: 'pointer', padding: 0 }}
+                              title="Delete message"
+                            >
+                              🗑️ Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             ))
