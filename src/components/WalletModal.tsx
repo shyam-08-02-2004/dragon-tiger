@@ -104,7 +104,7 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
     }
 
     if (tab === 'withdraw') {
-      showMsg('Payment pending me chala gaya 5-6 din me wallet me aa jayega', 'pending');
+      showMsg('Withdrawal request sent to Admin for approval.', 'pending');
       if (onWithdrawSuccess) onWithdrawSuccess(val);
     } else {
       showMsg(`Your deposit request for ₹${val} has been sent for approval.`, 'success');

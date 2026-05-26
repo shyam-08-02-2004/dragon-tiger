@@ -143,7 +143,7 @@ app.post('/api/transactions', async (req, res) => {
     const notif = new Notification({
       id: 'notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
       username: req.body.username,
-      message: 'Payment pending me chala gaya 5-6 din me wallet me aa jayega',
+      message: 'Withdrawal request sent to Admin for approval.',
       type: 'info'
     });
     await notif.save();
@@ -189,10 +189,14 @@ app.post('/api/admin/transactions/:txId/action', async (req, res) => {
 
   // Create a notification for the user on approval
   if (action === 'approve') {
+    let msg = `Request Successful`;
+    if (tx.type === 'withdraw') {
+      msg = 'Payment pending me chala gaya 5-6 din me wallet me aa jayega';
+    }
     const notif = new Notification({
       id: 'notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
       username: tx.username,
-      message: `Request Successful`,
+      message: msg,
       type: 'success'
     });
     await notif.save();
