@@ -28,12 +28,15 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
         .then(data => {
           if (Array.isArray(data)) {
             const now = new Date().getTime();
+            const pendingWithdrawal = data.find(tx => tx.type === 'withdraw' && tx.status === 'pending');
             const recentApproved = data.find(tx => 
               tx.type === 'withdraw' && 
               tx.status === 'approved' && 
               (now - new Date(tx.timestamp).getTime() < 24 * 60 * 60 * 1000)
             );
-            if (recentApproved) {
+            if (pendingWithdrawal) {
+              setPendingMessage('Withdrawal request sent to Admin for approval. Please wait.');
+            } else if (recentApproved) {
               setPendingMessage('Payment pending me chala gaya 5-6 din me wallet me aa jayega');
             } else {
               setPendingMessage(null);
@@ -227,12 +230,11 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
 
               {tab === 'withdraw' && (
                 <>
-                  {pendingMessage && (
+                  {pendingMessage ? (
                     <div className="wallet-message pending" style={{ textAlign: 'center', padding: '15px', marginBottom: '15px' }}>
                       {pendingMessage}
                     </div>
-                  )}
-                  {balance < 600 ? (
+                  ) : balance < 600 ? (
                     <div className="wallet-message error" style={{ textAlign: 'center', padding: '20px' }}>
                       <strong>Insufficient Balance</strong><br/><br/>
                       Aapke wallet me ₹{balance} hain. <br/>
