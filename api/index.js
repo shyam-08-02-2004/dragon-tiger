@@ -79,7 +79,8 @@ app.get('/api/users/:id', async (req, res) => {
 
 app.put('/api/users/:id/balance', async (req, res) => {
   const { balance } = req.body;
-  const user = await User.findOneAndUpdate({ id: req.params.id }, { balance }, { new: true });
+  const numBalance = Number(balance) || 0;
+  const user = await User.findOneAndUpdate({ id: req.params.id }, { balance: numBalance }, { new: true });
   res.json(user);
 });
 

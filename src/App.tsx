@@ -151,7 +151,7 @@ const App: React.FC = () => {
   const handleLogin = (user: UserAccount) => {
     sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify(user));
     setCurrentUser(user);
-    setState(prev => ({ ...prev, balance: user.balance, history: [], roundNumber: getGlobalGameState().roundId, bets: {}, totalBet: 0 }));
+    setState(prev => ({ ...prev, balance: Number(user.balance) || 0, history: [], roundNumber: getGlobalGameState().roundId, bets: {}, totalBet: 0 }));
     setIsAuthenticated(true);
   };
 
@@ -172,14 +172,14 @@ const App: React.FC = () => {
               // Skip updating from poll if we just updated locally within the last 4 seconds
               if (Date.now() - lastLocalBalanceUpdate.current < 4000) return;
 
-              setCurrentUser(prev => prev ? { ...prev, balance: user.balance, hasDeposited: user.hasDeposited } : null);
-              setState(prev => prev.balance !== user.balance ? { ...prev, balance: user.balance } : prev);
+              setCurrentUser(prev => prev ? { ...prev, balance: Number(user.balance), hasDeposited: user.hasDeposited } : null);
+              setState(prev => prev.balance !== Number(user.balance) ? { ...prev, balance: Number(user.balance) } : prev);
               
               const savedStr = sessionStorage.getItem('dragonTigerCurrentUser');
               if (savedStr) {
                  const saved = JSON.parse(savedStr);
-                 if (saved.balance !== user.balance || saved.hasDeposited !== user.hasDeposited) {
-                    sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify({ ...saved, balance: user.balance, hasDeposited: user.hasDeposited }));
+                 if (saved.balance !== Number(user.balance) || saved.hasDeposited !== user.hasDeposited) {
+                    sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify({ ...saved, balance: Number(user.balance), hasDeposited: user.hasDeposited }));
                  }
               }
             }
@@ -227,10 +227,10 @@ const App: React.FC = () => {
           // User was deleted by admin
           handleLogout();
         } else if (users[userId]) {
-          const newBalance = users[userId].balance;
+          const newBalance = Number(users[userId].balance);
           const newHasDeposited = users[userId].hasDeposited;
           
-          if (newBalance !== undefined && newBalance !== stateRef.current.balance) {
+          if (!isNaN(newBalance) && newBalance !== stateRef.current.balance) {
             setState(prev => ({ ...prev, balance: newBalance }));
           }
           if (newHasDeposited !== undefined && newHasDeposited !== currentUser.hasDeposited) {
@@ -360,7 +360,7 @@ const App: React.FC = () => {
       const newState = {
         ...prev,
         bets: newBets,
-        balance: prev.balance - cost,
+        balance: Number(prev.balance) - cost,
         totalBet,
       };
       lastLocalBalanceUpdate.current = Date.now();
@@ -389,7 +389,7 @@ const App: React.FC = () => {
       if (prev.phase !== 'betting') return prev;
       const newState = {
         ...prev,
-        balance: prev.balance + prev.totalBet,
+        balance: Number(prev.balance) + prev.totalBet,
         bets: {},
         totalBet: 0,
       };
@@ -411,7 +411,7 @@ const App: React.FC = () => {
       const newState = {
         ...prev,
         bets: newBets,
-        balance: prev.balance - cost,
+        balance: Number(prev.balance) - cost,
         totalBet: cost * 2,
       };
       lastLocalBalanceUpdate.current = Date.now();
@@ -477,7 +477,7 @@ const App: React.FC = () => {
         
         if (newHistory.length > 100) newHistory.shift();
         
-        const newBalance = prev.balance + winnings;
+        const newBalance = Number(prev.balance) + winnings;
         lastLocalBalanceUpdate.current = Date.now();
         if (currentUser && currentUser.id !== 'babu') {
            syncBalanceToServer(newBalance);
