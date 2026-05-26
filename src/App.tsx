@@ -148,19 +148,32 @@ const App: React.FC = () => {
     setCurrentUser(null);
   };
 
-  // Fetch real balance from DB once on load
+  // Fetch real balance from DB once on load and poll every 5s
   useEffect(() => {
     if (isAuthenticated && currentUser && currentUser.id !== 'babu') {
-      fetch(`/api/users/${currentUser.id}`)
-        .then(res => res.json())
-        .then(user => {
-          if (user.balance !== undefined) {
-            setCurrentUser(prev => prev ? { ...prev, balance: user.balance } : null);
-            setState(prev => ({ ...prev, balance: user.balance }));
-            sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify(user));
-          }
-        })
-        .catch(console.error);
+      const fetchBalance = () => {
+        fetch(`/api/users/${currentUser.id}`)
+          .then(res => res.json())
+          .then(user => {
+            if (user.balance !== undefined) {
+              setCurrentUser(prev => prev ? { ...prev, balance: user.balance, hasDeposited: user.hasDeposited } : null);
+              setState(prev => prev.balance !== user.balance ? { ...prev, balance: user.balance } : prev);
+              
+              const savedStr = sessionStorage.getItem('dragonTigerCurrentUser');
+              if (savedStr) {
+                 const saved = JSON.parse(savedStr);
+                 if (saved.balance !== user.balance || saved.hasDeposited !== user.hasDeposited) {
+                    sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify({ ...saved, balance: user.balance, hasDeposited: user.hasDeposited }));
+                 }
+              }
+            }
+          })
+          .catch(console.error);
+      };
+      
+      fetchBalance();
+      const interval = setInterval(fetchBalance, 5000);
+      return () => clearInterval(interval);
     }
   }, [isAuthenticated, currentUser?.id]);
 

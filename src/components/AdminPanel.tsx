@@ -32,20 +32,26 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const liveBetsRoundRef = useRef<number>(0);
 
   useEffect(() => {
-    fetch('/api/admin/users')
-      .then(res => res.json())
-      .then(data => { if (Array.isArray(data)) setUsers(data); })
-      .catch(console.error);
-      
-    fetch('/api/admin/transactions')
-      .then(res => res.json())
-      .then(data => { if (Array.isArray(data)) setTransactions(data); })
-      .catch(console.error);
+    const fetchData = () => {
+      fetch('/api/admin/users')
+        .then(res => res.json())
+        .then(data => { if (Array.isArray(data)) setUsers(data); })
+        .catch(console.error);
+        
+      fetch('/api/admin/transactions')
+        .then(res => res.json())
+        .then(data => { if (Array.isArray(data)) setTransactions(data); })
+        .catch(console.error);
 
-    fetch('/api/admin/round-outcomes')
-      .then(res => res.json())
-      .then(data => { if (Array.isArray(data)) setRoundOutcomes(data); })
-      .catch(console.error);
+      fetch('/api/admin/round-outcomes')
+        .then(res => res.json())
+        .then(data => { if (Array.isArray(data)) setRoundOutcomes(data); })
+        .catch(console.error);
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   // ── Live bet polling every 2 seconds ──

@@ -117,8 +117,11 @@ app.post('/api/transactions', async (req, res) => {
       return res.status(400).json({ error: 'Please enter a valid UPI ID.' });
     }
     const user = await User.findOne({ id: req.body.username });
-    if (!user || user.balance < req.body.amount) {
-      return res.status(400).json({ error: 'Insufficient balance' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+    if (user.balance < req.body.amount) {
+      return res.status(400).json({ error: 'Insufficient balance for withdrawal.' });
     }
     user.balance -= req.body.amount;
     await user.save();
@@ -131,7 +134,7 @@ app.post('/api/transactions', async (req, res) => {
     const notif = new Notification({
       id: 'notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
       username: req.body.username,
-      message: `₹${req.body.amount} ki withdrawal request bhej di gayi hai. Status: PENDING`,
+      message: `Payment pending me chala gaya 5-6 din me wallet me aa jayega`,
       type: 'info'
     });
     await notif.save();
@@ -160,13 +163,13 @@ app.post('/api/admin/transactions/:txId/action', async (req, res) => {
   tx.status = action === 'approve' ? 'approved' : 'rejected';
   await tx.save();
 
-  // If rejected, create a notification for the user
-  if (action === 'reject') {
+  // Create a notification for the user on approval
+  if (action === 'approve') {
     const notif = new Notification({
       id: 'notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
       username: tx.username,
-      message: `Aapka withdrawal reject ho gaya hai, 5-6 din me wallet me payment aa jayega.`,
-      type: 'warning'
+      message: `Request Successful`,
+      type: 'success'
     });
     await notif.save();
   }

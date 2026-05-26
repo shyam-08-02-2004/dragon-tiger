@@ -18,25 +18,13 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
   const [message, setMessage] = useState('');
   const [msgType, setMsgType] = useState<'success' | 'error' | 'pending'>('error');
   const [depositStep, setDepositStep] = useState<1 | 2>(1);
-  const [rejectedMsg, setRejectedMsg] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (tab === 'withdraw') {
       fetch('/api/transactions/' + username)
         .then(res => res.json())
-        .then(data => {
-          if (Array.isArray(data)) {
-            const lastWithdraw = data.find((t: any) => t.type === 'withdraw');
-            if (lastWithdraw && lastWithdraw.status === 'rejected') {
-              setRejectedMsg('Status Pending: Payment 5-6 din me wallet me aa jayega');
-            } else {
-              setRejectedMsg('');
-            }
-          }
-        })
         .catch(console.error);
-    } else {
-      setRejectedMsg('');
     }
   }, [tab, username]);
 
@@ -47,37 +35,39 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     const val = parseInt(amount);
 
-    if (isNaN(val)) { showMsg('Please enter a valid amount.', 'error'); return; }
+    if (isNaN(val)) { showMsg('Please enter a valid amount.', 'error'); setIsSubmitting(false); return; }
 
     if (tab === 'deposit' && val < 300) {
-      showMsg('Minimum deposit is ₹300.', 'error'); return;
+      showMsg('Minimum deposit is ₹300.', 'error'); setIsSubmitting(false); return;
     }
 
     if (tab === 'withdraw' && !hasDeposited) {
-      showMsg('Pehle real payment karein. Withdrawal tab unlock hoga.', 'error'); return;
+      showMsg('Pehle real payment karein. Withdrawal tab unlock hoga.', 'error'); setIsSubmitting(false); return;
     }
 
     if (tab === 'withdraw' && val < 600) {
-      showMsg('Minimum withdrawal is ₹600.', 'error'); return;
+      showMsg('Minimum withdrawal is ₹600.', 'error'); setIsSubmitting(false); return;
     }
 
     if (tab === 'withdraw' && val > balance) {
-      showMsg('Insufficient balance.', 'error'); return;
+      showMsg('Insufficient balance.', 'error'); setIsSubmitting(false); return;
     }
 
     if (tab === 'deposit') {
       const utrStr = utr.trim();
       if (!/^\d{12}$/.test(utrStr)) {
-        showMsg('UTR must be exactly 12 digits (numbers only).', 'error'); return;
+        showMsg('UTR must be exactly 12 digits (numbers only).', 'error'); setIsSubmitting(false); return;
       }
     }
 
     if (tab === 'withdraw') {
       const upiStr = upiId.trim();
       if (!/^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(upiStr)) {
-        showMsg('Please enter a valid UPI ID (e.g., name@ybl).', 'error'); return;
+        showMsg('Please enter a valid UPI ID (e.g., name@ybl).', 'error'); setIsSubmitting(false); return;
       }
     }
 
@@ -103,21 +93,24 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
       if (!res.ok) {
         const err = await res.json();
         showMsg(err.error || 'Transaction failed', 'error');
+        setIsSubmitting(false);
         return;
       }
     } catch(e) {
       console.error(e);
+      setIsSubmitting(false);
     }
 
 
     if (tab === 'withdraw') {
-      showMsg('✅ Withdrawal Request Successful!', 'pending');
+      showMsg('✅ Payment pending me chala gaya 5-6 din me wallet me aa jayega', 'pending');
       if (onWithdrawSuccess) onWithdrawSuccess(val);
     } else {
       showMsg(`Your deposit request for ₹${val} has been sent for approval.`, 'success');
     }
 
     setAmount(''); setUtr(''); setUpiId('');
+    setIsSubmitting(false);
     setTimeout(() => onClose(), 2500);
   };
 
@@ -218,11 +211,6 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
 
               {tab === 'withdraw' && (
                 <>
-                  {rejectedMsg && (
-                    <div className="wallet-message warning" style={{ textAlign: 'center', padding: '15px', marginBottom: '15px', color: '#f39c12', border: '1px solid #f39c12', borderRadius: '8px', background: 'rgba(243, 156, 18, 0.1)' }}>
-                      ⚠️ {rejectedMsg}
-                    </div>
-                  )}
                   {balance < 600 ? (
                     <div className="wallet-message error" style={{ textAlign: 'center', padding: '20px' }}>
                       <strong>Insufficient Balance</strong><br/><br/>
@@ -251,8 +239,8 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
                         />
                         <small className="wallet-help">Aapka UPI ID jahan payment receive hogi.</small>
                       </div>
-                      <button type="submit" className="wallet-submit-btn">
-                        📥 Request Withdrawal
+                      <button type="submit" className="wallet-submit-btn" disabled={isSubmitting}>
+                        {isSubmitting ? 'Processing...' : '📥 Request Withdrawal'}
                       </button>
                     </>
                   )}
