@@ -23,12 +23,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [selectedUserHistory, setSelectedUserHistory] = useState<string | null>(null);
   const [editBalanceUser, setEditBalanceUser] = useState<string | null>(null);
   const [newBalance, setNewBalance] = useState<string>('');
-  const [liveBets] = useState<{ dragon: number; tiger: number; tie: number }>({ dragon: 0, tiger: 0, tie: 0 });
+  const [liveBets, setLiveBets] = useState<{ dragon: number; tiger: number; tie: number; total: number; betCount: number }>({ dragon: 0, tiger: 0, tie: 0, total: 0, betCount: 0 });
 
   // Round outcome control
   const [roundOutcomes, setRoundOutcomes] = useState<{ roundId: number; outcome: string }[]>([]);
   const [targetRoundId, setTargetRoundId] = useState<string>('');
   const [saveMsg, setSaveMsg] = useState<string>('');
+  const liveBetsRoundRef = useRef<number>(0);
 
   useEffect(() => {
     fetch('/api/admin/users')
@@ -45,6 +46,25 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
       .then(res => res.json())
       .then(data => { if (Array.isArray(data)) setRoundOutcomes(data); })
       .catch(console.error);
+  }, []);
+
+  // ── Live bet polling every 2 seconds ──
+  useEffect(() => {
+    const pollBets = () => {
+      const global = getGlobalGameState();
+      const roundId = global.roundId;
+      if (liveBetsRoundRef.current !== roundId) {
+        liveBetsRoundRef.current = roundId;
+        setLiveBets({ dragon: 0, tiger: 0, tie: 0, total: 0, betCount: 0 });
+      }
+      fetch(`/api/bets/round/${roundId}`)
+        .then(r => r.json())
+        .then(data => { if (data && data.totals) setLiveBets({ ...data.totals, betCount: data.betCount || 0 }); })
+        .catch(() => {});
+    };
+    pollBets();
+    const betPollId = setInterval(pollBets, 2000);
+    return () => clearInterval(betPollId);
   }, []);
 
   // ── Continuous game loop for admin (always running) ──
@@ -186,6 +206,18 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
       } else {
         const err = await res.json();
         alert(err.error || "Failed to process transaction");
+      }
+    } catch(e) { console.error(e); }
+  };
+
+  const handleDeleteTransaction = async (txId: string) => {
+    if (!window.confirm('Are you sure you want to delete this transaction record completely?')) return;
+    try {
+      const res = await fetch(`/api/admin/transactions/${txId}`, { method: 'DELETE' });
+      if (res.ok) {
+        setTransactions(prev => prev.filter((t: any) => t.id !== txId));
+      } else {
+        alert("Failed to delete transaction");
       }
     } catch(e) { console.error(e); }
   };
@@ -411,6 +443,59 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   )}
                 </div>
 
+                {/* ── Live Bet Totals ── */}
+                <div style={{ marginBottom: '24px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                    <h3 style={{ margin: 0 }}>📊 Live Bets — Round #{simRoundId}</h3>
+                    <span style={{ fontSize: '12px', color: '#aaa', background: 'rgba(255,255,255,0.07)', padding: '4px 10px', borderRadius: '20px' }}>
+                      {liveBets.betCount} players · ₹{liveBets.total} total
+                    </span>
+                  </div>
+                  {(() => {
+                    const total = liveBets.total || 1;
+                    const dragonPct = Math.round((liveBets.dragon / total) * 100);
+                    const tigerPct  = Math.round((liveBets.tiger  / total) * 100);
+                    const tiePct    = Math.round((liveBets.tie    / total) * 100);
+                    return (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        {/* Dragon */}
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <span style={{ color: '#e74c3c', fontWeight: 'bold' }}>🐉 Dragon</span>
+                            <span style={{ color: '#fff', fontWeight: 'bold' }}>₹{liveBets.dragon} <span style={{ color: '#aaa', fontSize: '12px' }}>({dragonPct}%)</span></span>
+                          </div>
+                          <div style={{ height: '10px', background: 'rgba(255,255,255,0.08)', borderRadius: '5px', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${dragonPct}%`, background: 'linear-gradient(90deg, #c0392b, #e74c3c)', borderRadius: '5px', transition: 'width 0.5s ease' }} />
+                          </div>
+                        </div>
+                        {/* Tiger */}
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <span style={{ color: '#3498db', fontWeight: 'bold' }}>🐯 Tiger</span>
+                            <span style={{ color: '#fff', fontWeight: 'bold' }}>₹{liveBets.tiger} <span style={{ color: '#aaa', fontSize: '12px' }}>({tigerPct}%)</span></span>
+                          </div>
+                          <div style={{ height: '10px', background: 'rgba(255,255,255,0.08)', borderRadius: '5px', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${tigerPct}%`, background: 'linear-gradient(90deg, #2980b9, #3498db)', borderRadius: '5px', transition: 'width 0.5s ease' }} />
+                          </div>
+                        </div>
+                        {/* Tie */}
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <span style={{ color: '#27ae60', fontWeight: 'bold' }}>🤝 Tie</span>
+                            <span style={{ color: '#fff', fontWeight: 'bold' }}>₹{liveBets.tie} <span style={{ color: '#aaa', fontSize: '12px' }}>({tiePct}%)</span></span>
+                          </div>
+                          <div style={{ height: '10px', background: 'rgba(255,255,255,0.08)', borderRadius: '5px', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${tiePct}%`, background: 'linear-gradient(90deg, #219a52, #27ae60)', borderRadius: '5px', transition: 'width 0.5s ease' }} />
+                          </div>
+                        </div>
+                        {liveBets.total === 0 && (
+                          <p style={{ color: '#555', textAlign: 'center', margin: '8px 0', fontSize: '13px' }}>Abhi kisi ne bet nahi lagayi is round mein.</p>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+
                 {/* ── Live Game Preview ── */}
                 <h3 style={{ marginBottom: '8px' }}>🃏 Live Game Preview</h3>
                 <div style={{ transform: 'scale(0.85)', transformOrigin: 'top center', minHeight: '200px' }}>
@@ -468,8 +553,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                             <div className="action-buttons">
                               <button className="action-btn edit" title="Approve" onClick={() => handleTransactionAction(tx.id, 'approve')}>✅</button>
                               <button className="action-btn delete" title="Reject" onClick={() => handleTransactionAction(tx.id, 'reject')}>❌</button>
+                              <button className="action-btn delete" title="Delete" onClick={() => handleDeleteTransaction(tx.id)} style={{ background: '#e74c3c', color: 'white' }}>🗑️</button>
                             </div>
-                          ) : '-'}
+                          ) : (
+                            <div className="action-buttons">
+                              <button className="action-btn delete" title="Delete" onClick={() => handleDeleteTransaction(tx.id)} style={{ background: '#e74c3c', color: 'white' }}>🗑️</button>
+                            </div>
+                          )}
                         </td>
                       </tr>
                     ))}

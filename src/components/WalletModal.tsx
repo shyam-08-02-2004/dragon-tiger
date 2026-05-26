@@ -41,8 +41,10 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
       showMsg('Minimum withdrawal is ₹600.', 'error'); return;
     }
 
-    if (tab === 'deposit' && !utr.trim()) {
-      showMsg('Please enter UTR / Transaction ID.', 'error'); return;
+    if (tab === 'deposit') {
+      if (!utr.trim() || utr.trim().length !== 12) {
+        showMsg('UTR must be exactly 12 digits.', 'error'); return;
+      }
     }
 
     if (tab === 'withdraw' && !upiId.trim()) {
@@ -63,11 +65,16 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
     };
     
     try {
-      await fetch('/api/transactions', {
+      const res = await fetch('/api/transactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(txData)
       });
+      if (!res.ok) {
+        const err = await res.json();
+        showMsg(err.error || 'Transaction failed', 'error');
+        return;
+      }
     } catch(e) {
       console.error(e);
     }
@@ -178,7 +185,7 @@ Status: ⏳ PENDING`,
                       type="text"
                       value={utr}
                       onChange={e => setUtr(e.target.value)}
-                      placeholder="Enter 12-digit UTR"
+                      placeholder="Enter 12-digit UTR" maxLength={12}
                     />
                     <small className="wallet-help">Payment successful hone ke baad UTR yahan dalein.</small>
                   </div>

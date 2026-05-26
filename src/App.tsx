@@ -62,6 +62,7 @@ const App: React.FC = () => {
   const [showWallet, setShowWallet] = useState(false);
   const [isAdminView, setIsAdminView] = useState(true);
   const [isTimeSynced, setIsTimeSynced] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const [state, setState] = useState<GameState>(() => {
     const saved = sessionStorage.getItem('dragonTigerCurrentUser');
     let startingBalance = initialState.balance;
@@ -234,6 +235,29 @@ const App: React.FC = () => {
     }
   }, [isAuthenticated, currentUser, state.phase, state.balance, state.totalBet]);
 
+  // Poll for notifications
+  useEffect(() => {
+    if (!isAuthenticated || !currentUser || currentUser.username === 'babu') return;
+    const pollNotifs = () => {
+      fetch(`/api/notifications/${currentUser.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) setNotifications(data);
+        })
+        .catch(() => {});
+    };
+    pollNotifs(); // initial fetch
+    const interval = setInterval(pollNotifs, 5000); // Poll every 5s
+    return () => clearInterval(interval);
+  }, [isAuthenticated, currentUser]);
+
+  const handleDismissNotification = async (notifId: string) => {
+    try {
+      await fetch(`/api/notifications/${notifId}/read`, { method: 'PUT' });
+      setNotifications(prev => prev.filter(n => n.id !== notifId));
+    } catch(e) { console.error(e); }
+  };
+
   // Global continuous game loop timer
   useEffect(() => {
     const timer = setInterval(() => {
@@ -302,9 +326,20 @@ const App: React.FC = () => {
         totalBet,
       };
       syncBalanceToServer(newState.balance);
+
+      // Sync bets to server for admin live view
+      if (currentUser && currentUser.id !== 'babu') {
+        const global = getGlobalGameState();
+        fetch('/api/bets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ roundId: global.roundId, username: currentUser.id, bets: newBets })
+        }).catch(() => {});
+      }
+
       return newState;
     });
-  }, []);
+  }, [currentUser]);
 
   const handleSelectChip = useCallback((value: number) => {
     setState(prev => ({ ...prev, selectedChip: value }));
@@ -565,6 +600,33 @@ const App: React.FC = () => {
           <span className="footer-version">v2.0</span>
         </div>
       </footer>
+
+      {/* Notifications overlay */}
+      {notifications.length > 0 && (
+        <div style={{ position: 'fixed', top: '20px', left: '50%', transform: 'translateX(-50%)', zIndex: 10000, display: 'flex', flexDirection: 'column', gap: '10px', width: '90%', maxWidth: '400px' }}>
+          {notifications.map(notif => (
+            <div key={notif.id} style={{
+              background: 'rgba(0,0,0,0.9)',
+              border: `2px solid ${notif.type === 'warning' ? '#f39c12' : '#3498db'}`,
+              borderRadius: '12px',
+              padding: '16px',
+              color: '#fff',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <strong style={{ color: notif.type === 'warning' ? '#f39c12' : '#3498db', fontSize: '16px' }}>
+                  {notif.type === 'warning' ? '⚠️ Important Notice' : 'ℹ️ Information'}
+                </strong>
+                <button onClick={() => handleDismissNotification(notif.id)} style={{ background: 'transparent', border: 'none', color: '#aaa', fontSize: '20px', cursor: 'pointer' }}>✕</button>
+              </div>
+              <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.5' }}>{notif.message}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

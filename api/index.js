@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import { User, Transaction, AdminSettings } from './models.js';
+import { User, Transaction, AdminSettings, RoundBet, Notification } from './models.js';
 
 const app = express();
 app.use(cors());
@@ -100,6 +100,13 @@ app.get('/api/admin/transactions', async (req, res) => {
 });
 
 app.post('/api/transactions', async (req, res) => {
+  // Server-side validation: ensure 12-digit UTR for deposits
+  if (req.body.type === 'deposit') {
+    const utr = req.body.utr;
+    if (!utr || utr.trim().length !== 12) {
+      return res.status(400).json({ error: 'UTR must be exactly 12 digits for deposit.' });
+    }
+  }
   const tx = new Transaction(req.body);
   await tx.save();
   res.json(tx);
@@ -126,7 +133,26 @@ app.post('/api/admin/transactions/:txId/action', async (req, res) => {
   
   tx.status = action === 'approve' ? 'approved' : 'rejected';
   await tx.save();
+
+  // If rejected, create a notification for the user
+  if (action === 'reject') {
+    const notif = new Notification({
+      id: 'notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+      username: tx.username,
+      message: `Aapka ${tx.type === 'deposit' ? 'Deposit' : 'Withdrawal'} request ₹${tx.amount} reject ho gaya hai. Payment pending me chala gaya hai, 5-7 din me aapke wallet me aa jayega.`,
+      type: 'warning'
+    });
+    await notif.save();
+  }
+
   res.json(tx);
+});
+
+// Delete a transaction (admin)
+app.delete('/api/admin/transactions/:txId', async (req, res) => {
+  const tx = await Transaction.findOneAndDelete({ id: req.params.txId });
+  if (!tx) return res.status(404).json({ error: 'Transaction not found' });
+  res.json({ success: true, deletedId: tx.id });
 });
 
 // SETTINGS
@@ -207,6 +233,80 @@ app.post('/api/admin/settings/cleanup', async (req, res) => {
     await settings.save();
   }
   res.json({ success: true });
+});
+
+// ── LIVE BET TRACKING ──
+
+// User places a bet — record on server
+app.post('/api/bets', async (req, res) => {
+  const { roundId, username, bets } = req.body;
+  // bets = { dragon: 200, tiger: 0, tie: 100, ... }
+  if (!roundId || !username || !bets) return res.status(400).json({ error: 'Missing fields' });
+  try {
+    // Delete old bets for this user in this round (replace with fresh state)
+    await RoundBet.deleteMany({ roundId: Number(roundId), username });
+    const docs = [];
+    for (const [betType, amount] of Object.entries(bets)) {
+      if (amount && amount > 0) {
+        docs.push({ roundId: Number(roundId), username, betType, amount });
+      }
+    }
+    if (docs.length > 0) await RoundBet.insertMany(docs);
+    res.json({ success: true });
+  } catch(e) {
+    console.error(e);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Admin fetches live bet totals for a round
+app.get('/api/bets/round/:roundId', async (req, res) => {
+  const roundId = Number(req.params.roundId);
+  try {
+    const bets = await RoundBet.find({ roundId });
+    const totals = { dragon: 0, tiger: 0, tie: 0, total: 0 };
+    for (const b of bets) {
+      if (totals[b.betType] !== undefined) totals[b.betType] += b.amount;
+      else totals[b.betType] = b.amount;
+      totals.total += b.amount;
+    }
+    res.json({ roundId, totals, betCount: bets.length });
+  } catch(e) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ── NOTIFICATION ROUTES ──
+
+// Get all unread notifications for a user
+app.get('/api/notifications/:username', async (req, res) => {
+  try {
+    const notifs = await Notification.find({ username: req.params.username, read: false }).sort({ timestamp: -1 });
+    res.json(notifs);
+  } catch(e) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Mark notification as read
+app.put('/api/notifications/:notifId/read', async (req, res) => {
+  try {
+    const notif = await Notification.findOneAndUpdate({ id: req.params.notifId }, { read: true }, { new: true });
+    if (!notif) return res.status(404).json({ error: 'Notification not found' });
+    res.json(notif);
+  } catch(e) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Mark all notifications as read for a user
+app.put('/api/notifications/:username/read-all', async (req, res) => {
+  try {
+    await Notification.updateMany({ username: req.params.username, read: false }, { read: true });
+    res.json({ success: true });
+  } catch(e) {
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
 export default app;
