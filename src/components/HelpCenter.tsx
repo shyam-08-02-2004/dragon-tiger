@@ -100,7 +100,7 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
       <div className="hc-modal" onClick={e => e.stopPropagation()}>
         <div className="hc-header">
           <h2>💬 Help Center</h2>
-          <button className="hc-close-btn" onClick={onClose}>✕</button>
+          <button className="hc-close-btn" onClick={onClose}>← Back</button>
         </div>
         
         <div className="hc-messages-container">
