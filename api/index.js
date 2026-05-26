@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import { User, Transaction, AdminSettings, RoundBet, Notification, RoundHistory } from './models.js';
+import { User, Transaction, AdminSettings, RoundBet, Notification, RoundHistory, ChatMessage } from './models.js';
 
 const app = express();
 app.use(cors());
@@ -414,6 +414,80 @@ app.get('/api/history', async (req, res) => {
     res.json(history);
   } catch (e) {
     console.error(e);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ── CHAT SYSTEM ROUTES ──
+
+// Fetch chat history for a specific user
+app.get('/api/chat/:userId', async (req, res) => {
+  try {
+    const messages = await ChatMessage.find({ userId: req.params.userId }).sort({ timestamp: 1 });
+    res.json(messages);
+  } catch (e) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Send a chat message
+app.post('/api/chat/:userId', async (req, res) => {
+  try {
+    const { sender, message } = req.body;
+    if (!sender || !message) return res.status(400).json({ error: 'Missing fields' });
+    
+    const newMsg = new ChatMessage({
+      id: 'msg_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+      userId: req.params.userId,
+      sender,
+      message,
+      readByAdmin: sender === 'admin', // Admin already read their own message
+      readByUser: sender === 'user' // User already read their own message
+    });
+    await newMsg.save();
+    res.json(newMsg);
+  } catch (e) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Mark all messages as read for a specific role
+app.put('/api/chat/:userId/read', async (req, res) => {
+  try {
+    const { role } = req.body; // 'admin' or 'user'
+    if (role === 'admin') {
+      await ChatMessage.updateMany({ userId: req.params.userId, sender: 'user', readByAdmin: false }, { readByAdmin: true });
+    } else if (role === 'user') {
+      await ChatMessage.updateMany({ userId: req.params.userId, sender: 'admin', readByUser: false }, { readByUser: true });
+    }
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Admin: Get list of active chat sessions and unread count
+app.get('/api/admin/chat/users', async (req, res) => {
+  try {
+    // Get unique users who have sent or received messages
+    const users = await ChatMessage.distinct('userId');
+    const result = [];
+    
+    for (const userId of users) {
+      const lastMessage = await ChatMessage.findOne({ userId }).sort({ timestamp: -1 });
+      const unreadCount = await ChatMessage.countDocuments({ userId, sender: 'user', readByAdmin: false });
+      result.push({ userId, lastMessage, unreadCount });
+    }
+    
+    // Sort by most recent message
+    result.sort((a, b) => {
+      const timeA = a.lastMessage ? new Date(a.lastMessage.timestamp).getTime() : 0;
+      const timeB = b.lastMessage ? new Date(b.lastMessage.timestamp).getTime() : 0;
+      return timeB - timeA;
+    });
+    
+    res.json(result);
+  } catch (e) {
     res.status(500).json({ error: 'Server error' });
   }
 });

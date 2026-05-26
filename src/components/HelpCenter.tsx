@@ -3,88 +3,115 @@ import './HelpCenter.css';
 
 interface Message {
   id: string;
-  from: string; // username or 'admin'
-  to: string;   // opposite party
-  content: string;
+  userId: string;
+  sender: 'user' | 'admin';
+  message: string;
   timestamp: string;
-  read: boolean;
 }
 
 interface HelpCenterProps {
-  username: string; // current user
-  isAdmin?: boolean; // true for admin view
+  userId: string;
+  isOpen: boolean;
   onClose: () => void;
 }
 
-const HelpCenter: React.FC<HelpCenterProps> = ({ username, isAdmin = false, onClose }) => {
+const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMsg, setNewMsg] = useState('');
-  const pollRef = useRef<number | null>(null);
-
-  const fetchMessages = async () => {
-    try {
-      const res = await fetch(`/api/help/${username}`);
-      const data = await res.json();
-      setMessages(data);
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  const [newMessage, setNewMessage] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetchMessages();
-    // poll every 3 seconds
-    pollRef.current = window.setInterval(fetchMessages, 3000);
-    return () => {
-      if (pollRef.current) clearInterval(pollRef.current);
-    };
-  }, []);
+    if (!isOpen) return;
 
-  const sendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMsg.trim()) return;
-    const payload = {
-      from: isAdmin ? 'admin' : username,
-      to: isAdmin ? username : 'admin',
-      content: newMsg.trim()
+    const fetchMessages = async () => {
+      try {
+        const res = await fetch(`/api/chat/${userId}`);
+        const data = await res.json();
+        setMessages(data);
+        
+        // Mark as read
+        await fetch(`/api/chat/${userId}/read`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role: 'user' })
+        });
+      } catch (e) {
+        console.error(e);
+      }
     };
+
+    fetchMessages();
+    const interval = setInterval(fetchMessages, 3000);
+    return () => clearInterval(interval);
+  }, [isOpen, userId]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleSend = async () => {
+    if (!newMessage.trim()) return;
+    
     try {
-      await fetch(`/api/help/${username}`, {
+      const msg = newMessage;
+      setNewMessage('');
+      
+      const res = await fetch(`/api/chat/${userId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ sender: 'user', message: msg })
       });
-      setNewMsg('');
-      fetchMessages();
+      const data = await res.json();
+      setMessages(prev => [...prev, data]);
     } catch (e) {
       console.error(e);
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <div className="help-overlay" onClick={onClose}>
-      <div className="help-modal" onClick={e => e.stopPropagation()}>
-        <button className="help-close" onClick={onClose}>✕</button>
-        <h2>{isAdmin ? `Help - ${username}` : 'Help Center'}</h2>
-        <div className="help-messages">
-          {messages.map(m => (
-            <div key={m.id} className={`help-msg ${m.from === (isAdmin ? 'admin' : username) ? 'own' : ''}`}>
-              <span className="help-sender">{m.from === 'admin' ? 'Admin' : m.from}</span>
-              <p>{m.content}</p>
-              <span className="help-time">{new Date(m.timestamp).toLocaleTimeString()}</span>
-            </div>
-          ))}
+    <div className="hc-overlay" onClick={onClose}>
+      <div className="hc-modal" onClick={e => e.stopPropagation()}>
+        <div className="hc-header">
+          <h2>💬 Help Center</h2>
+          <button className="hc-close-btn" onClick={onClose}>✕</button>
         </div>
-        <form className="help-input" onSubmit={sendMessage}>
-          <input
-            type="text"
-            value={newMsg}
-            onChange={e => setNewMsg(e.target.value)}
-            placeholder="Type your message..."
-            required
+        
+        <div className="hc-messages-container">
+          {messages.length === 0 ? (
+            <div className="hc-empty">
+              <span className="hc-empty-icon">🎧</span>
+              <p>Hi {userId}! How can we help you today?</p>
+              <p className="hc-empty-sub">Send a message and our support team will reply soon.</p>
+            </div>
+          ) : (
+            messages.map((msg, idx) => (
+              <div key={msg.id || idx} className={`hc-message-wrapper ${msg.sender === 'user' ? 'hc-user' : 'hc-admin'}`}>
+                <div className="hc-message">
+                  {msg.message}
+                  <div className="hc-timestamp">
+                    {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        <div className="hc-input-area">
+          <input 
+            type="text" 
+            placeholder="Type your message..." 
+            value={newMessage}
+            onChange={e => setNewMessage(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleSend()}
           />
-          <button type="submit">Send</button>
-        </form>
+          <button className="hc-send-btn" onClick={handleSend} disabled={!newMessage.trim()}>
+            Send
+          </button>
+        </div>
       </div>
     </div>
   );

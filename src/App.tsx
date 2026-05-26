@@ -10,6 +10,7 @@ import GameControls from './components/GameControls';
 import RoadMap from './components/RoadMap';
 import WalletModal from './components/WalletModal';
 import GameHistory from './components/GameHistory';
+import HelpCenter from './components/HelpCenter';
 import type { GameState, BetType, GameResult } from './types/game';
 import { getGlobalGameState, getDeterministicCards, setTimeOffset } from './syncEngine';
 import {
@@ -62,6 +63,7 @@ const App: React.FC = () => {
   });
   const [showWallet, setShowWallet] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showHelpCenter, setShowHelpCenter] = useState(false);
   const [isAdminView, setIsAdminView] = useState(true);
   const [isTimeSynced, setIsTimeSynced] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -103,6 +105,12 @@ const App: React.FC = () => {
 
   useEffect(() => { stateRef.current = state; }, [state]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    const handleOpenHelp = () => setShowHelpCenter(true);
+    document.addEventListener('openHelpCenter', handleOpenHelp);
+    return () => document.removeEventListener('openHelpCenter', handleOpenHelp);
+  }, []);
 
   useEffect(() => {
     fetch('/api/time')
@@ -639,6 +647,14 @@ const App: React.FC = () => {
           rawRoundId={getGlobalGameState().rawRoundId}
           isOpen={showHistory}
           onClose={() => setShowHistory(false)}
+        />
+      )}
+
+      {showHelpCenter && (
+        <HelpCenter 
+          userId={currentUser.id || currentUser.username}
+          isOpen={showHelpCenter}
+          onClose={() => setShowHelpCenter(false)}
         />
       )}
 

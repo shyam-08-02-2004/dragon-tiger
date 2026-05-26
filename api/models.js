@@ -68,3 +68,15 @@ const roundHistorySchema = new mongoose.Schema({
 // Create a TTL index to automatically delete records older than a specific time if needed,
 // but since we only need the latest 2000 per epoch, we can just fetch the epoch's data.
 export const RoundHistory = mongoose.models.RoundHistory || mongoose.model('RoundHistory', roundHistorySchema);
+
+// Help Center Chat Messages
+const chatMessageSchema = new mongoose.Schema({
+  id: { type: String, required: true, unique: true },
+  userId: { type: String, required: true }, // The user's mobile/id
+  sender: { type: String, enum: ['user', 'admin'], required: true },
+  message: { type: String, required: true },
+  readByAdmin: { type: Boolean, default: false },
+  readByUser: { type: Boolean, default: false },
+  timestamp: { type: Date, default: Date.now }
+});
+export const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage', chatMessageSchema);

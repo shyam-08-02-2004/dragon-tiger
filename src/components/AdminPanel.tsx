@@ -13,7 +13,7 @@ interface AdminPanelProps {
 const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [users, setUsers] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'users' | 'game' | 'transactions'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'game' | 'transactions' | 'support'>('users');
   const [simPhase, setSimPhase] = useState<'betting' | 'dealing' | 'result'>('betting');
   const [simTimer, setSimTimer] = useState<number>(15);
   const [simRoundId, setSimRoundId] = useState<number>(0);
@@ -33,6 +33,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [saveMsg, setSaveMsg] = useState<string>('');
   const liveBetsRoundRef = useRef<number>(0);
 
+  const [supportUsers, setSupportUsers] = useState<any[]>([]);
+  const [selectedSupportUser, setSelectedSupportUser] = useState<string | null>(null);
+  const [supportMessages, setSupportMessages] = useState<any[]>([]);
+  const [newSupportMsg, setNewSupportMsg] = useState('');
+  const supportEndRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const fetchData = () => {
       fetch('/api/admin/users')
@@ -48,6 +54,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
       fetch('/api/admin/round-outcomes')
         .then(res => res.json())
         .then(data => { if (Array.isArray(data)) setRoundOutcomes(data); })
+        .catch(console.error);
+
+      fetch('/api/admin/chat/users')
+        .then(res => res.json())
+        .then(data => { if (Array.isArray(data)) setSupportUsers(data); })
         .catch(console.error);
     };
 
@@ -74,6 +85,48 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     const betPollId = setInterval(pollBets, 2000);
     return () => clearInterval(betPollId);
   }, []);
+
+  // ── Support Chat Polling ──
+  useEffect(() => {
+    if (activeTab !== 'support' || !selectedSupportUser) return;
+    
+    const fetchChat = async () => {
+      try {
+        const res = await fetch(`/api/chat/${selectedSupportUser}`);
+        const data = await res.json();
+        setSupportMessages(data);
+        
+        await fetch(`/api/chat/${selectedSupportUser}/read`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role: 'admin' })
+        });
+      } catch (e) {}
+    };
+    
+    fetchChat();
+    const intv = setInterval(fetchChat, 3000);
+    return () => clearInterval(intv);
+  }, [activeTab, selectedSupportUser]);
+
+  useEffect(() => {
+    supportEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [supportMessages]);
+
+  const handleSendSupportMsg = async () => {
+    if (!newSupportMsg.trim() || !selectedSupportUser) return;
+    try {
+      const msg = newSupportMsg;
+      setNewSupportMsg('');
+      const res = await fetch(`/api/chat/${selectedSupportUser}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sender: 'admin', message: msg })
+      });
+      const data = await res.json();
+      setSupportMessages(prev => [...prev, data]);
+    } catch(e) {}
+  };
 
   // ── Continuous game loop for admin (always running) ──
   useEffect(() => {
@@ -265,6 +318,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
           <button className={`nav-btn ${activeTab === 'transactions' ? 'active' : ''}`} onClick={() => setActiveTab('transactions')}>
             💸 Transactions
           </button>
+          <button className={`nav-btn ${activeTab === 'support' ? 'active' : ''}`} onClick={() => setActiveTab('support')}>
+            💬 Support
+          </button>
         </nav>
 
         <button className="admin-logout-btn" onClick={onLogout}>🚪 Logout</button>
@@ -272,7 +328,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
       <main className="admin-main">
         <header className="admin-header">
-          <h1>{activeTab === 'users' ? 'User Management' : activeTab === 'game' ? 'Game Control Room' : 'Transactions'}</h1>
+          <h1>{activeTab === 'users' ? 'User Management' : activeTab === 'game' ? 'Game Control Room' : activeTab === 'transactions' ? 'Transactions' : 'Support Center'}</h1>
           <div className="admin-badge">Admin Privileges Active</div>
         </header>
 
@@ -582,6 +638,85 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                     )}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          )}
+
+          {/* ── SUPPORT TAB ── */}
+          {activeTab === 'support' && (
+            <div className="admin-card" style={{ display: 'flex', height: '600px', padding: 0, overflow: 'hidden' }}>
+              <div style={{ width: '300px', borderRight: '1px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column' }}>
+                <h3 style={{ padding: '20px', margin: 0, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Chats</h3>
+                <div style={{ flex: 1, overflowY: 'auto' }}>
+                  {supportUsers.map(u => (
+                    <div 
+                      key={u.userId}
+                      onClick={() => setSelectedSupportUser(u.userId)}
+                      style={{ 
+                        padding: '15px 20px', 
+                        cursor: 'pointer', 
+                        borderBottom: '1px solid rgba(255,255,255,0.05)',
+                        background: selectedSupportUser === u.userId ? 'rgba(52, 152, 219, 0.2)' : 'transparent',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <span style={{ fontWeight: 'bold' }}>👤 {u.userId}</span>
+                      {u.unreadCount > 0 && (
+                        <span style={{ background: '#e74c3c', color: 'white', borderRadius: '12px', padding: '2px 8px', fontSize: '12px', fontWeight: 'bold' }}>
+                          {u.unreadCount}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                  {supportUsers.length === 0 && <div style={{ padding: '20px', color: '#888', textAlign: 'center' }}>No active chats</div>}
+                </div>
+              </div>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'rgba(0,0,0,0.2)' }}>
+                {selectedSupportUser ? (
+                  <>
+                    <div style={{ padding: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)', fontWeight: 'bold', fontSize: '18px' }}>
+                      Chatting with {selectedSupportUser}
+                    </div>
+                    <div style={{ flex: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      {supportMessages.map((msg, i) => (
+                        <div key={msg.id || i} style={{ display: 'flex', justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start' }}>
+                          <div style={{ 
+                            maxWidth: '70%', padding: '10px 15px', borderRadius: '15px',
+                            background: msg.sender === 'admin' ? '#3498db' : 'rgba(255,255,255,0.1)',
+                            borderBottomRightRadius: msg.sender === 'admin' ? '4px' : '15px',
+                            borderBottomLeftRadius: msg.sender === 'user' ? '4px' : '15px',
+                            color: 'white'
+                          }}>
+                            {msg.message}
+                            <div style={{ fontSize: '10px', opacity: 0.7, marginTop: '5px', textAlign: 'right' }}>
+                              {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      <div ref={supportEndRef} />
+                    </div>
+                    <div style={{ padding: '20px', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', gap: '10px' }}>
+                      <input 
+                        type="text" 
+                        value={newSupportMsg}
+                        onChange={e => setNewSupportMsg(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && handleSendSupportMsg()}
+                        placeholder="Type reply..."
+                        style={{ flex: 1, padding: '12px 15px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.05)', color: 'white', outline: 'none' }}
+                      />
+                      <button onClick={handleSendSupportMsg} style={{ background: '#2ecc71', color: 'white', border: 'none', borderRadius: '20px', padding: '0 20px', fontWeight: 'bold', cursor: 'pointer' }}>
+                        Send
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>
+                    Select a user from the left to start chatting
+                  </div>
+                )}
               </div>
             </div>
           )}

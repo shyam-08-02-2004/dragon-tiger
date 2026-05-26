@@ -43,6 +43,14 @@ const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username
             📋 History
           </button>
         )}
+        <button 
+          className="history-btn" 
+          onClick={() => document.dispatchEvent(new CustomEvent('openHelpCenter'))} 
+          title="Help Center" 
+          style={{ background: 'rgba(52, 152, 219, 0.2)', borderColor: '#3498db' }}
+        >
+          💬 Support
+        </button>
       </div>
 
       <div className="header-right">
