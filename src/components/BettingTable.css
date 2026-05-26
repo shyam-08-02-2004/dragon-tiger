@@ -342,11 +342,13 @@
     height: 100%;
     flex-direction: column;
     justify-content: center;
+    gap: 8px;
   }
   .tie-zone .bet-label {
     writing-mode: vertical-rl;
     text-orientation: upright;
     letter-spacing: -2px;
+    margin-bottom: 4px;
   }
   .bet-label {
     font-size: 13px;
@@ -379,11 +381,13 @@
     height: 100%;
     flex-direction: column;
     justify-content: center;
+    gap: 4px;
   }
   .tie-zone .bet-label {
     writing-mode: vertical-rl;
     text-orientation: upright;
     letter-spacing: -2px;
+    margin-bottom: 2px;
   }
   .side-bets-row {
     flex-direction: column;
