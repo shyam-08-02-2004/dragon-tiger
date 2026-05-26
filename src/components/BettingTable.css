@@ -38,6 +38,9 @@
   align-items: stretch;
   gap: 12px;
   margin-bottom: 12px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .center-bets {
@@ -185,11 +188,13 @@
   animation: pulse-gold 2s ease-in-out infinite;
 }
 
-/* Side Zones */
 .side-bets-row {
   display: flex;
   align-items: stretch;
   gap: 12px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .side-bets-group {
@@ -199,7 +204,7 @@
 }
 
 .side-bets-spacer {
-  flex: 0 0 160px;
+  flex: 1;
 }
 
 .dragon-side-zone {
