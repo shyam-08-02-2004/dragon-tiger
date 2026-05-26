@@ -25,9 +25,9 @@ const BettingTable: React.FC<BettingTableProps> = ({ bets, onBet, phase, selecte
         onClick={() => canBet && onBet(type)}
         disabled={!canBet}
       >
+        <span className="bet-payout">{payoutStr}</span>
         <span className="bet-label">{label}</span>
         {sublabel && <span className="bet-sublabel">{sublabel}</span>}
-        <span className="bet-payout">{payoutStr}</span>
         {amount > 0 && (
           <div className="bet-chip-stack">
             <div className="bet-amount-badge">₹{amount}</div>
@@ -42,12 +42,12 @@ const BettingTable: React.FC<BettingTableProps> = ({ bets, onBet, phase, selecte
       <div className="table-felt">
         {/* Main bets row */}
         <div className="main-bets-row">
-          {renderBetZone('dragon', '🐉 DRAGON', undefined, 'dragon-zone')}
+          {renderBetZone('dragon', 'DRAGON', undefined, 'dragon-zone')}
           <div className="center-bets">
             {renderBetZone('tie', 'TIE', undefined, 'tie-zone')}
 
           </div>
-          {renderBetZone('tiger', '🐯 TIGER', undefined, 'tiger-zone')}
+          {renderBetZone('tiger', 'TIGER', undefined, 'tiger-zone')}
         </div>
 
 
