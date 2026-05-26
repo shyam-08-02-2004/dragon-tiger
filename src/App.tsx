@@ -348,7 +348,7 @@ const App: React.FC = () => {
   const handleDeal = async (roundId?: number, seed?: number) => {
     if (!roundId) return;
     
-    // Attempt to consume forced outcome from server
+    // Fetch forced outcome from server (READ only - not deleted, so all users get same)
     let forcedOutcome = 'none';
     try {
       const res = await fetch('/api/admin/settings/consume', {
@@ -371,18 +371,21 @@ const App: React.FC = () => {
       let { dragonCard, tigerCard } = getDeterministicCards(roundId, seed);
       let result = determineResult(dragonCard, tigerCard);
       
-      // Override if forced
-      if (forcedOutcome !== 'none') {
-        if (forcedOutcome === 'dragon' && result !== 'dragon') {
-          dragonCard = { suit: '♠', rank: 'K', value: 13 };
-          tigerCard = { suit: '♥', rank: '2', value: 2 };
-        } else if (forcedOutcome === 'tiger' && result !== 'tiger') {
-          tigerCard = { suit: '♠', rank: 'K', value: 13 };
-          dragonCard = { suit: '♥', rank: '2', value: 2 };
-        } else if (forcedOutcome === 'tie' && result !== 'tie' && result !== 'suited-tie') {
-          dragonCard = { suit: '♠', rank: '8', value: 8 };
-          tigerCard = { suit: '♥', rank: '8', value: 8 };
-        }
+      // Override cards to match forced outcome
+      if (forcedOutcome === 'dragon') {
+        // Dragon MUST win — give Dragon K♠ and Tiger 2♥
+        dragonCard = { suit: '♠', rank: 'K', value: 13 };
+        tigerCard  = { suit: '♥', rank: '2', value: 2  };
+        result = determineResult(dragonCard, tigerCard);
+      } else if (forcedOutcome === 'tiger') {
+        // Tiger MUST win — give Tiger K♠ and Dragon 2♥
+        dragonCard = { suit: '♥', rank: '2', value: 2  };
+        tigerCard  = { suit: '♠', rank: 'K', value: 13 };
+        result = determineResult(dragonCard, tigerCard);
+      } else if (forcedOutcome === 'tie') {
+        // Tie — both get 8
+        dragonCard = { suit: '♠', rank: '8', value: 8 };
+        tigerCard  = { suit: '♥', rank: '8', value: 8 };
         result = determineResult(dragonCard, tigerCard);
       }
 
@@ -399,7 +402,6 @@ const App: React.FC = () => {
         if (newHistory.length > 50) newHistory.shift();
         
         const newBalance = prev.balance + winnings;
-        // Update balance on server if won
         if (currentUser && currentUser.id !== 'babu') {
            fetch(`/api/users/${currentUser.id}/balance`, {
              method: 'PUT',
@@ -407,6 +409,13 @@ const App: React.FC = () => {
              body: JSON.stringify({ balance: newBalance })
            });
         }
+
+        // Cleanup old forced outcomes after result
+        fetch('/api/admin/settings/cleanup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ roundId })
+        }).catch(() => {});
 
         return {
           ...prev,
@@ -424,6 +433,7 @@ const App: React.FC = () => {
       });
     }, 1000);
   };
+
 
 
   

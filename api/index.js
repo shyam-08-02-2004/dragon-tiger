@@ -181,24 +181,32 @@ app.delete('/api/admin/round-outcomes/:roundId', async (req, res) => {
   res.json({ success: true, roundOutcomes: settings ? settings.roundOutcomes : [] });
 });
 
-// Consume outcome for a round (called by frontend when dealing)
+// READ outcome for a round - does NOT delete, so ALL users get the same forced cards
 app.post('/api/admin/settings/consume', async (req, res) => {
   const roundId = Number(req.body.roundId);
   let settings = await AdminSettings.findOne({ id: 'global' });
   
-  // Check roundOutcomes array for this specific roundId
   if (settings && settings.roundOutcomes && settings.roundOutcomes.length > 0) {
-    const idx = settings.roundOutcomes.findIndex(r => Number(r.roundId) === roundId);
-    if (idx !== -1) {
-      const outcome = settings.roundOutcomes[idx].outcome;
-      settings.roundOutcomes.splice(idx, 1);
-      settings.markModified('roundOutcomes');
-      await settings.save();
-      return res.json({ outcome });
+    const entry = settings.roundOutcomes.find(r => Number(r.roundId) === roundId);
+    if (entry) {
+      return res.json({ outcome: entry.outcome });
     }
   }
   
   res.json({ outcome: 'none' });
+});
+
+// Clean up old round outcomes (called after result is shown)
+app.post('/api/admin/settings/cleanup', async (req, res) => {
+  const roundId = Number(req.body.roundId);
+  let settings = await AdminSettings.findOne({ id: 'global' });
+  if (settings && settings.roundOutcomes) {
+    // Remove outcomes for rounds <= current round (already passed)
+    settings.roundOutcomes = settings.roundOutcomes.filter(r => Number(r.roundId) > roundId);
+    settings.markModified('roundOutcomes');
+    await settings.save();
+  }
+  res.json({ success: true });
 });
 
 export default app;

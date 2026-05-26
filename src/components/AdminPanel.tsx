@@ -66,16 +66,50 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
           return 'betting';
         }
         if (global.phase === 'dealing' && prevPhase === 'betting') {
-          setTimeout(() => {
-            const { dragonCard, tigerCard } = getDeterministicCards(global.roundId, global.rawRoundId);
-            setSimDragonCard(dragonCard);
-            setSimTigerCard(tigerCard);
-            setTimeout(() => {
-              setSimResult(determineResult(dragonCard, tigerCard));
-              setSimPhase('result');
-            }, 1000);
-          }, 500);
           setSimTimer(0);
+          
+          // Fetch forced outcome and apply same card override as users
+          fetch('/api/admin/settings/consume', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ roundId: global.roundId })
+          })
+            .then(r => r.json())
+            .then(data => {
+              const forcedOutcome = data.outcome || 'none';
+              let { dragonCard, tigerCard } = getDeterministicCards(global.roundId, global.rawRoundId);
+
+              // Apply same override logic as App.tsx
+              if (forcedOutcome === 'dragon') {
+                dragonCard = { suit: '♠', rank: 'K', value: 13 };
+                tigerCard  = { suit: '♥', rank: '2', value: 2  };
+              } else if (forcedOutcome === 'tiger') {
+                dragonCard = { suit: '♥', rank: '2', value: 2  };
+                tigerCard  = { suit: '♠', rank: 'K', value: 13 };
+              } else if (forcedOutcome === 'tie') {
+                dragonCard = { suit: '♠', rank: '8', value: 8 };
+                tigerCard  = { suit: '♥', rank: '8', value: 8 };
+              }
+
+              setSimDragonCard(dragonCard);
+              setSimTigerCard(tigerCard);
+
+              setTimeout(() => {
+                setSimResult(determineResult(dragonCard, tigerCard));
+                setSimPhase('result');
+              }, 1000);
+            })
+            .catch(() => {
+              // Fallback: use deterministic cards
+              const { dragonCard, tigerCard } = getDeterministicCards(global.roundId, global.rawRoundId);
+              setSimDragonCard(dragonCard);
+              setSimTigerCard(tigerCard);
+              setTimeout(() => {
+                setSimResult(determineResult(dragonCard, tigerCard));
+                setSimPhase('result');
+              }, 1000);
+            });
+
           return 'dealing';
         }
         return prevPhase;
