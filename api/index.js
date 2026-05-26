@@ -99,6 +99,11 @@ app.get('/api/admin/transactions', async (req, res) => {
   res.json(transactions);
 });
 
+app.get('/api/transactions/:username', async (req, res) => {
+  const transactions = await Transaction.find({ username: req.params.username }).sort({ timestamp: -1 });
+  res.json(transactions);
+});
+
 app.post('/api/transactions', async (req, res) => {
   // Server-side validation: ensure 12-digit UTR for deposits
   if (req.body.type === 'deposit') {
@@ -106,6 +111,13 @@ app.post('/api/transactions', async (req, res) => {
     if (!utr || utr.trim().length !== 12) {
       return res.status(400).json({ error: 'UTR must be exactly 12 digits for deposit.' });
     }
+  } else if (req.body.type === 'withdraw') {
+    const user = await User.findOne({ id: req.body.username });
+    if (!user || user.balance < req.body.amount) {
+      return res.status(400).json({ error: 'Insufficient balance' });
+    }
+    user.balance -= req.body.amount;
+    await user.save();
   }
   const tx = new Transaction(req.body);
   await tx.save();
@@ -135,10 +147,8 @@ app.post('/api/admin/transactions/:txId/action', async (req, res) => {
       if (tx.type === 'deposit') {
         user.balance += tx.amount;
         user.hasDeposited = true;
-      } else if (tx.type === 'withdraw') {
-        if (user.balance < tx.amount) return res.status(400).json({ error: 'Insufficient balance' });
-        user.balance -= tx.amount;
       }
+      // Note: Withdrawal balance is already deducted upon request creation.
       await user.save();
     }
   }

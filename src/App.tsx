@@ -588,7 +588,16 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      {showWallet && <WalletModal username={currentUser.id || currentUser.username} hasDeposited={currentUser.hasDeposited || false} balance={balance} onClose={() => setShowWallet(false)} />}
+      {showWallet && <WalletModal 
+        username={currentUser.id || currentUser.username} 
+        hasDeposited={currentUser.hasDeposited || false} 
+        balance={balance} 
+        onClose={() => setShowWallet(false)} 
+        onWithdrawSuccess={(amount) => {
+          setState(prev => ({ ...prev, balance: prev.balance - amount }));
+          setCurrentUser(prev => prev ? { ...prev, balance: prev.balance - amount } : null);
+        }}
+      />}
 
       {/* Footer */}
       <footer className="game-footer" id="game-footer">

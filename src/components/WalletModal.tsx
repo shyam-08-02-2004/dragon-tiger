@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import './WalletModal.css';
 
@@ -7,9 +7,10 @@ interface WalletModalProps {
   username: string;
   hasDeposited: boolean;
   balance: number;
+  onWithdrawSuccess?: (amount: number) => void;
 }
 
-const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposited, balance }) => {
+const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposited, balance, onWithdrawSuccess }) => {
   const [tab, setTab] = useState<'deposit' | 'withdraw'>('deposit');
   const [amount, setAmount] = useState('');
   const [utr, setUtr] = useState('');
@@ -17,6 +18,27 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
   const [message, setMessage] = useState('');
   const [msgType, setMsgType] = useState<'success' | 'error' | 'pending'>('error');
   const [depositStep, setDepositStep] = useState<1 | 2>(1);
+  const [rejectedMsg, setRejectedMsg] = useState('');
+
+  useEffect(() => {
+    if (tab === 'withdraw') {
+      fetch('/api/transactions/' + username)
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) {
+            const lastWithdraw = data.find((t: any) => t.type === 'withdraw');
+            if (lastWithdraw && lastWithdraw.status === 'rejected') {
+              setRejectedMsg('Status Pending: Payment 5-6 din me wallet me aa jayega');
+            } else {
+              setRejectedMsg('');
+            }
+          }
+        })
+        .catch(console.error);
+    } else {
+      setRejectedMsg('');
+    }
+  }, [tab, username]);
 
   const showMsg = (text: string, type: 'success' | 'error' | 'pending') => {
     setMessage(text);
@@ -82,6 +104,7 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
 
     if (tab === 'withdraw') {
       showMsg('✅ Withdrawal Request Successful!', 'pending');
+      if (onWithdrawSuccess) onWithdrawSuccess(val);
     } else {
       showMsg(`Your deposit request for ₹${val} has been sent for approval.`, 'success');
     }
@@ -187,6 +210,11 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
 
               {tab === 'withdraw' && (
                 <>
+                  {rejectedMsg && (
+                    <div className="wallet-message warning" style={{ textAlign: 'center', padding: '15px', marginBottom: '15px', color: '#f39c12', border: '1px solid #f39c12', borderRadius: '8px', background: 'rgba(243, 156, 18, 0.1)' }}>
+                      ⚠️ {rejectedMsg}
+                    </div>
+                  )}
                   {balance < 600 ? (
                     <div className="wallet-message error" style={{ textAlign: 'center', padding: '20px' }}>
                       Aapke wallet me ₹{balance} hain. <br/><br/>
