@@ -109,6 +109,18 @@ app.post('/api/transactions', async (req, res) => {
   }
   const tx = new Transaction(req.body);
   await tx.save();
+
+  // If this is a withdrawal request, send a notification to the user
+  if (req.body.type === 'withdraw') {
+    const notif = new Notification({
+      id: 'notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+      username: req.body.username,
+      message: `Aapka withdrawal request ₹${req.body.amount} pending me chala gaya hai, 5-6 din me aapke wallet me aa jayega.`,
+      type: 'info'
+    });
+    await notif.save();
+  }
+
   res.json(tx);
 });
 
