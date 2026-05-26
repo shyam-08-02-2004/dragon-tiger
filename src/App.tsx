@@ -94,7 +94,7 @@ const App: React.FC = () => {
       result: initialResult
     };
   });
-  const msgIdx = useRef(0);
+  // duplicate msgIdx removed
   const stateRef = useRef<GameState>(state);
   const lastLocalBalanceUpdate = useRef<number>(0);
 
@@ -136,7 +136,7 @@ const App: React.FC = () => {
         setIsTimeSynced(true);
       });
   }, []);
-  const msgIdx = useRef(0);
+
 
   const handleLogin = (user: UserAccount) => {
     sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify(user));
@@ -456,7 +456,7 @@ const App: React.FC = () => {
           { id: roundId, dragonCard, tigerCard, result, win: winnings },
         ];
         
-        if (newHistory.length > 50) newHistory.shift();
+        if (newHistory.length > 100) newHistory.shift();
         
         const newBalance = prev.balance + winnings;
         lastLocalBalanceUpdate.current = Date.now();

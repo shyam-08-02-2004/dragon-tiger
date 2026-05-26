@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import type { RoundResult } from '../types/game';
 import './HistoryPopup.css';
 
@@ -6,37 +6,27 @@ interface HistoryPopupProps {
   history: RoundResult[];
 }
 
+const getLabel = (result: string | null) => {
+  if (result === 'dragon') return { icon: '🐉', label: 'Dragon', cls: 'hp-dragon' };
+  if (result === 'tiger') return { icon: '🐯', label: 'Tiger', cls: 'hp-tiger' };
+  if (result === 'tie') return { icon: '🤝', label: 'Tie', cls: 'hp-tie' };
+  return { icon: '🤝', label: 'Tie', cls: 'hp-tie' };
+};
+
 const HistoryPopup: React.FC<HistoryPopupProps> = ({ history }) => {
-  const [visible, setVisible] = useState(true);
-
-  useEffect(() => {
-    setVisible(true);
-    const t = setTimeout(() => setVisible(false), 5000);
-    return () => clearTimeout(t);
-  }, [history.length]);
-
-  if (!visible || history.length === 0) return null;
-
-  const last5 = history.slice().reverse();
-
-  const getLabel = (result: string | null) => {
-    if (result === 'dragon') return { icon: '🐉', label: 'Dragon', cls: 'hp-dragon' };
-    if (result === 'tiger') return { icon: '🐯', label: 'Tiger', cls: 'hp-tiger' };
-    if (result === 'tie') return { icon: '🤝', label: 'Tie', cls: 'hp-tie' };
-    return { icon: '🤝', label: 'Tie', cls: 'hp-tie' };
-  };
+  if (!history || history.length === 0) return null;
 
   return (
     <div className="history-popup" id="history-popup">
       <div className="hp-header">
-        <span className="hp-title">📋 Last {last5.length} Rounds</span>
-        <button className="hp-close" onClick={() => setVisible(false)}>✕</button>
+        <span className="hp-title">📋 All {history.length} Rounds</span>
       </div>
       <div className="hp-list">
-        {last5.map((r, i) => {
+        {history.map((r, i) => {
           const { icon, label, cls } = getLabel(r.result);
+          const isLatest = i === history.length - 1;
           return (
-            <div key={r.id} className={`hp-row ${cls} ${i === 0 ? 'hp-latest' : ''}`}>
+            <div key={r.id} className={`hp-row ${cls} ${isLatest ? 'hp-latest' : ''}`}> 
               <span className="hp-round">Round #{r.id}</span>
               <span className="hp-result">{icon} {label}</span>
               <span className="hp-cards">
@@ -46,7 +36,6 @@ const HistoryPopup: React.FC<HistoryPopupProps> = ({ history }) => {
           );
         })}
       </div>
-      <div className="hp-footer">Auto-closes in 5s</div>
     </div>
   );
 };
