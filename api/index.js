@@ -115,8 +115,8 @@ app.post('/api/transactions', async (req, res) => {
     const notif = new Notification({
       id: 'notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
       username: req.body.username,
-      message: `Aapka withdrawal request ₹${req.body.amount} pending me chala gaya hai, 5-6 din me aapke wallet me aa jayega.`,
-      type: 'info'
+      message: `Aapka withdrawal request ₹${req.body.amount} successfully submit ho gaya hai. Admin approval ka wait karein.`,
+      type: 'success'
     });
     await notif.save();
   }

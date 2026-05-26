@@ -607,7 +607,7 @@ const App: React.FC = () => {
           {notifications.map(notif => (
             <div key={notif.id} style={{
               background: 'rgba(0,0,0,0.9)',
-              border: `2px solid ${notif.type === 'warning' ? '#f39c12' : '#3498db'}`,
+              border: `2px solid ${notif.type === 'warning' ? '#f39c12' : notif.type === 'success' ? '#2ecc71' : '#3498db'}`,
               borderRadius: '12px',
               padding: '16px',
               color: '#fff',
@@ -617,8 +617,8 @@ const App: React.FC = () => {
               gap: '8px'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <strong style={{ color: notif.type === 'warning' ? '#f39c12' : '#3498db', fontSize: '16px' }}>
-                  {notif.type === 'warning' ? '⚠️ Important Notice' : 'ℹ️ Information'}
+                <strong style={{ color: notif.type === 'warning' ? '#f39c12' : notif.type === 'success' ? '#2ecc71' : '#3498db', fontSize: '16px' }}>
+                  {notif.type === 'warning' ? '⚠️ Important Notice' : notif.type === 'success' ? '✅ Success' : 'ℹ️ Information'}
                 </strong>
                 <button onClick={() => handleDismissNotification(notif.id)} style={{ background: 'transparent', border: 'none', color: '#aaa', fontSize: '20px', cursor: 'pointer' }}>✕</button>
               </div>
