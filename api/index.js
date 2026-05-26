@@ -451,6 +451,29 @@ app.post('/api/chat/:userId', async (req, res) => {
   }
 });
 
+// Edit a chat message
+app.put('/api/chat/message/:id', async (req, res) => {
+  try {
+    const { message } = req.body;
+    const msg = await ChatMessage.findOneAndUpdate({ id: req.params.id }, { message }, { new: true });
+    if (!msg) return res.status(404).json({ error: 'Message not found' });
+    res.json(msg);
+  } catch (e) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Delete a chat message
+app.delete('/api/chat/message/:id', async (req, res) => {
+  try {
+    const msg = await ChatMessage.findOneAndDelete({ id: req.params.id });
+    if (!msg) return res.status(404).json({ error: 'Message not found' });
+    res.json({ success: true, deletedId: req.params.id });
+  } catch (e) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Mark all messages as read for a specific role
 app.put('/api/chat/:userId/read', async (req, res) => {
   try {

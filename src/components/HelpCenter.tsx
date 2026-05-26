@@ -20,6 +20,8 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const [holdTimeout, setHoldTimeout] = useState<any>(null);
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -48,6 +50,27 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  const handleDeleteMessage = async (msgId: string) => {
+    try {
+      await fetch(`/api/chat/message/${msgId}`, { method: 'DELETE' });
+      setMessages(prev => prev.filter(m => m.id !== msgId));
+    } catch(e) { console.error(e); }
+  };
+
+  const startHold = (msg: Message) => {
+    if (msg.sender !== 'user') return;
+    const timer = setTimeout(() => {
+      if (window.confirm('Do you want to delete this message?')) {
+        handleDeleteMessage(msg.id);
+      }
+    }, 600);
+    setHoldTimeout(timer);
+  };
+
+  const endHold = () => {
+    if (holdTimeout) clearTimeout(holdTimeout);
+  };
 
   const handleSend = async () => {
     if (!newMessage.trim()) return;
@@ -88,7 +111,16 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
           ) : (
             messages.map((msg, idx) => (
               <div key={msg.id || idx} className={`hc-message-wrapper ${msg.sender === 'user' ? 'hc-user' : 'hc-admin'}`}>
-                <div className="hc-message">
+                <div 
+                  className="hc-message"
+                  onTouchStart={() => startHold(msg)}
+                  onTouchEnd={endHold}
+                  onMouseDown={() => startHold(msg)}
+                  onMouseUp={endHold}
+                  onMouseLeave={endHold}
+                  style={{ cursor: msg.sender === 'user' ? 'pointer' : 'default' }}
+                  title={msg.sender === 'user' ? 'Hold to delete' : ''}
+                >
                   {msg.message}
                   <div className="hc-timestamp">
                     {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

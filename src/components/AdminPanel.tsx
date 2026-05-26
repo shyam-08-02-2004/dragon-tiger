@@ -145,6 +145,48 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
       console.error(e);
     }
   };
+  const [holdTimeout, setHoldTimeout] = useState<any>(null);
+
+  const handleAdminDeleteMessage = async (msgId: string) => {
+    try {
+      await fetch(`/api/chat/message/${msgId}`, { method: 'DELETE' });
+      setSupportMessages(prev => prev.filter(m => m.id !== msgId));
+    } catch(e) { console.error(e); }
+  };
+
+  const handleAdminEditMessage = async (msgId: string, oldMsg: string) => {
+    const newMsg = window.prompt("Edit message:", oldMsg);
+    if (newMsg && newMsg.trim() !== oldMsg) {
+      try {
+        const res = await fetch(`/api/chat/message/${msgId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: newMsg })
+        });
+        if (res.ok) {
+          setSupportMessages(prev => prev.map(m => m.id === msgId ? { ...m, message: newMsg } : m));
+        }
+      } catch(e) { console.error(e); }
+    }
+  };
+
+  const startAdminHold = (msg: any) => {
+    const timer = setTimeout(() => {
+      const action = window.prompt("Type 'edit' to edit or 'delete' to delete this message:");
+      if (action === 'delete') {
+        if (window.confirm("Are you sure you want to delete this message?")) {
+          handleAdminDeleteMessage(msg.id);
+        }
+      } else if (action === 'edit') {
+        handleAdminEditMessage(msg.id, msg.message);
+      }
+    }, 600);
+    setHoldTimeout(timer);
+  };
+
+  const endAdminHold = () => {
+    if (holdTimeout) clearTimeout(holdTimeout);
+  };
 
   // ── Continuous game loop for admin (always running) ──
   useEffect(() => {
@@ -709,14 +751,23 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                     <div className="admin-chat-messages">
                       {supportMessages.map((msg, i) => (
                         <div key={msg.id || i} style={{ display: 'flex', justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start' }}>
-                          <div style={{ 
-                            maxWidth: '75%', padding: '10px 15px', borderRadius: '15px',
-                            background: msg.sender === 'admin' ? '#3498db' : 'rgba(255,255,255,0.1)',
-                            borderBottomRightRadius: msg.sender === 'admin' ? '4px' : '15px',
-                            borderBottomLeftRadius: msg.sender === 'user' ? '4px' : '15px',
-                            color: 'white',
-                            wordBreak: 'break-word'
-                          }}>
+                          <div 
+                            style={{ 
+                              maxWidth: '75%', padding: '10px 15px', borderRadius: '15px',
+                              background: msg.sender === 'admin' ? '#3498db' : 'rgba(255,255,255,0.1)',
+                              borderBottomRightRadius: msg.sender === 'admin' ? '4px' : '15px',
+                              borderBottomLeftRadius: msg.sender === 'user' ? '4px' : '15px',
+                              color: 'white',
+                              wordBreak: 'break-word',
+                              cursor: 'pointer'
+                            }}
+                            onTouchStart={() => startAdminHold(msg)}
+                            onTouchEnd={endAdminHold}
+                            onMouseDown={() => startAdminHold(msg)}
+                            onMouseUp={endAdminHold}
+                            onMouseLeave={endAdminHold}
+                            title="Hold to edit/delete"
+                          >
                             {msg.message}
                             <div style={{ fontSize: '10px', opacity: 0.7, marginTop: '5px', textAlign: 'right' }}>
                               {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
