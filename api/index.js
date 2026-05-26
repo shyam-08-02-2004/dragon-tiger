@@ -118,10 +118,13 @@ app.post('/api/transactions', async (req, res) => {
     }
     let user = await User.findOne({ id: req.body.username });
     if (!user) {
+      user = await User.findOne({ username: req.body.username });
+    }
+    if (!user) {
       if (req.body.username === 'babu') {
         user = { balance: 999999, save: async () => {} };
       } else {
-        return res.status(404).json({ error: 'User not found.' });
+        return res.status(404).json({ error: 'User not found. Please log out and log back in.' });
       }
     }
     if (user.balance < req.body.amount) {
