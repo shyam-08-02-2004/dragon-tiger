@@ -134,10 +134,19 @@ app.post('/api/transactions', async (req, res) => {
     const notif = new Notification({
       id: 'notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
       username: req.body.username,
-      message: `Payment pending me chala gaya 5-6 din me wallet me aa jayega`,
+      message: 'Payment pending me chala gaya 5-6 din me wallet me aa jayega',
       type: 'info'
     });
     await notif.save();
+
+    // Notify admin of withdrawal request
+    const adminNotif = new Notification({
+      id: 'admin_notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+      username: 'admin',
+      message: `Withdrawal request from ${req.body.username} for ₹${req.body.amount}`,
+      type: 'admin'
+    });
+    await adminNotif.save();
   }
 
   res.json(tx);
@@ -156,6 +165,12 @@ app.post('/api/admin/transactions/:txId/action', async (req, res) => {
         user.hasDeposited = true;
       }
       // Note: Withdrawal balance is already deducted upon request creation.
+      await user.save();
+    }
+  } else if (action === 'reject') {
+    const user = await User.findOne({ id: tx.username });
+    if (user && tx.type === 'withdraw') {
+      user.balance += tx.amount;
       await user.save();
     }
   }
@@ -334,6 +349,24 @@ app.put('/api/notifications/:username/read-all', async (req, res) => {
     await Notification.updateMany({ username: req.params.username, read: false }, { read: true });
     res.json({ success: true });
   } catch(e) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Mark all notifications as read for a user
+app.post('/api/notifications/:username', async (req, res) => {
+  try {
+    const { message, type } = req.body;
+    const notif = new Notification({
+      id: 'notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+      username: req.params.username,
+      message: message || 'New notification',
+      type: type || 'info'
+    });
+    await notif.save();
+    res.json(notif);
+  } catch (e) {
+    console.error(e);
     res.status(500).json({ error: 'Server error' });
   }
 });

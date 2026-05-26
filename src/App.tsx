@@ -635,18 +635,18 @@ const App: React.FC = () => {
         <div style={{ position: 'fixed', top: '20px', left: '50%', transform: 'translateX(-50%)', zIndex: 10000, display: 'flex', flexDirection: 'column', gap: '10px', width: '90%', maxWidth: '400px' }}>
           {notifications.map(notif => (
             <div key={notif.id} style={{
-              background: 'rgba(0,0,0,0.9)',
-              border: `2px solid ${notif.type === 'warning' ? '#f39c12' : notif.type === 'success' ? '#2ecc71' : '#3498db'}`,
-              borderRadius: '12px',
-              padding: '16px',
-              color: '#fff',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '8px'
+                background: 'rgba(20,20,20,0.95)',
+                border: `2px solid ${notif.type === 'warning' ? '#f39c12' : notif.type === 'success' ? '#2ecc71' : notif.type === 'info' ? '#f1c40f' : '#3498db'}`,
+                borderRadius: '12px',
+                padding: '16px',
+                color: '#fff',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <strong style={{ color: notif.type === 'warning' ? '#f39c12' : notif.type === 'success' ? '#2ecc71' : '#3498db', fontSize: '16px' }}>
+                <strong style={{ color: notif.type === 'warning' ? '#f39c12' : notif.type === 'success' ? '#2ecc71' : notif.type === 'info' ? '#f1c40f' : '#3498db', fontSize: '16px' }}>
                   {notif.type === 'warning' ? '⚠️ Important Notice' : notif.type === 'success' ? '✅ Success' : 'ℹ️ Information'}
                 </strong>
                 <button onClick={() => handleDismissNotification(notif.id)} style={{ background: 'transparent', border: 'none', color: '#aaa', fontSize: '20px', cursor: 'pointer' }}>✕</button>

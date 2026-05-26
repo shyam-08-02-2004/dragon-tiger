@@ -98,20 +98,21 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
       }
     } catch(e) {
       console.error(e);
+      showMsg('Network error. Please try again.', 'error');
       setIsSubmitting(false);
+      return;
     }
 
-
     if (tab === 'withdraw') {
-      showMsg('✅ Payment pending me chala gaya 5-6 din me wallet me aa jayega', 'pending');
       if (onWithdrawSuccess) onWithdrawSuccess(val);
+      onClose();
+      return;
     } else {
       showMsg(`Your deposit request for ₹${val} has been sent for approval.`, 'success');
     }
 
     setAmount(''); setUtr(''); setUpiId('');
     setIsSubmitting(false);
-    setTimeout(() => onClose(), 2500);
   };
 
   return (
