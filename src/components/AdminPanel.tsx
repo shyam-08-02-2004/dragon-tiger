@@ -147,11 +147,27 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   };
   const [editingChatId, setEditingChatId] = useState<string | null>(null);
   const [editingChatText, setEditingChatText] = useState('');
+  
+  const [activeAdminMenuMsgId, setActiveAdminMenuMsgId] = useState<string | null>(null);
+  const adminHoldTimeoutRef = useRef<any>(null);
+
+  const startAdminHold = (msgId: string) => {
+    adminHoldTimeoutRef.current = setTimeout(() => {
+      setActiveAdminMenuMsgId(msgId);
+    }, 600);
+  };
+
+  const endAdminHold = () => {
+    if (adminHoldTimeoutRef.current) {
+      clearTimeout(adminHoldTimeoutRef.current);
+    }
+  };
 
   const handleAdminDeleteMessage = async (msgId: string) => {
     try {
       await fetch(`/api/chat/message/${msgId}`, { method: 'DELETE' });
       setSupportMessages(prev => prev.filter(m => m.id !== msgId));
+      setActiveAdminMenuMsgId(null);
     } catch(e) { console.error(e); }
   };
 
@@ -761,26 +777,34 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                                 </div>
                               </div>
                             ) : (
-                              <>
+                              <div
+                                onTouchStart={() => startAdminHold(msg.id)}
+                                onTouchEnd={endAdminHold}
+                                onMouseDown={() => startAdminHold(msg.id)}
+                                onMouseUp={endAdminHold}
+                                onMouseLeave={endAdminHold}
+                              >
                                 {msg.message}
                                 <div style={{ fontSize: '10px', opacity: 0.7, marginTop: '5px', textAlign: 'right' }}>
                                   {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </div>
-                                <div style={{ display: 'flex', gap: '8px', marginTop: '6px', justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start' }}>
-                                  <button 
-                                    onClick={() => { setEditingChatId(msg.id); setEditingChatText(msg.message); }}
-                                    style={{ background: 'none', border: 'none', color: '#f1c40f', fontSize: '12px', cursor: 'pointer', padding: 0 }}
-                                  >
-                                    ✏️ Edit
-                                  </button>
-                                  <button 
-                                    onClick={() => handleAdminDeleteMessage(msg.id)}
-                                    style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: '12px', cursor: 'pointer', padding: 0 }}
-                                  >
-                                    🗑️ Delete
-                                  </button>
-                                </div>
-                              </>
+                                {activeAdminMenuMsgId === msg.id && (
+                                  <div style={{ display: 'flex', gap: '8px', marginTop: '6px', justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start' }}>
+                                    <button 
+                                      onClick={() => { setEditingChatId(msg.id); setEditingChatText(msg.message); setActiveAdminMenuMsgId(null); }}
+                                      style={{ background: 'none', border: 'none', color: '#f1c40f', fontSize: '12px', cursor: 'pointer', padding: 0 }}
+                                    >
+                                      ✏️ Edit
+                                    </button>
+                                    <button 
+                                      onClick={() => handleAdminDeleteMessage(msg.id)}
+                                      style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: '12px', cursor: 'pointer', padding: 0 }}
+                                    >
+                                      🗑️ Delete
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
                             )}
                           </div>
                         </div>

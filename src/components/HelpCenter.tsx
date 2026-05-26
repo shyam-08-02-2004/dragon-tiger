@@ -19,7 +19,20 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [activeMenuMsgId, setActiveMenuMsgId] = useState<string | null>(null);
+  const holdTimeoutRef = useRef<any>(null);
 
+  const startHold = (msgId: string) => {
+    holdTimeoutRef.current = setTimeout(() => {
+      setActiveMenuMsgId(msgId);
+    }, 600);
+  };
+
+  const endHold = () => {
+    if (holdTimeoutRef.current) {
+      clearTimeout(holdTimeoutRef.current);
+    }
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -54,6 +67,7 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
     try {
       await fetch(`/api/chat/message/${msgId}`, { method: 'DELETE' });
       setMessages(prev => prev.filter(m => m.id !== msgId));
+      setActiveMenuMsgId(null);
     } catch(e) { console.error(e); }
   };
 
@@ -99,11 +113,18 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
           ) : (
             messages.map((msg, idx) => (
               <div key={msg.id} className={`hc-message-wrapper ${msg.sender === 'user' ? 'hc-user' : 'hc-admin'}`}>
-                <div className="hc-message">
+                <div 
+                  className="hc-message"
+                  onTouchStart={() => msg.sender === 'user' && startHold(msg.id)}
+                  onTouchEnd={endHold}
+                  onMouseDown={() => msg.sender === 'user' && startHold(msg.id)}
+                  onMouseUp={endHold}
+                  onMouseLeave={endHold}
+                >
                   {msg.message}
                   <div className="hc-timestamp" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
                     <span>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                    {msg.sender === 'user' && (
+                    {msg.sender === 'user' && activeMenuMsgId === msg.id && (
                       <button 
                         onClick={() => handleDeleteMessage(msg.id)}
                         style={{
@@ -113,7 +134,7 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
                         }}
                         title="Delete message"
                       >
-                        🗑️
+                        🗑️ Delete
                       </button>
                     )}
                   </div>
