@@ -94,7 +94,10 @@ const App: React.FC = () => {
       result: initialResult
     };
   });
+  const msgIdx = useRef(0);
   const stateRef = useRef<GameState>(state);
+  const lastLocalBalanceUpdate = useRef<number>(0);
+
   useEffect(() => { stateRef.current = state; }, [state]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -156,6 +159,9 @@ const App: React.FC = () => {
           .then(res => res.json())
           .then(user => {
             if (user.balance !== undefined) {
+              // Skip updating from poll if we just updated locally within the last 4 seconds
+              if (Date.now() - lastLocalBalanceUpdate.current < 4000) return;
+
               setCurrentUser(prev => prev ? { ...prev, balance: user.balance, hasDeposited: user.hasDeposited } : null);
               setState(prev => prev.balance !== user.balance ? { ...prev, balance: user.balance } : prev);
               
@@ -338,6 +344,7 @@ const App: React.FC = () => {
         balance: prev.balance - cost,
         totalBet,
       };
+      lastLocalBalanceUpdate.current = Date.now();
       syncBalanceToServer(newState.balance);
 
       // Sync bets to server for admin live view
@@ -367,6 +374,7 @@ const App: React.FC = () => {
         bets: {},
         totalBet: 0,
       };
+      lastLocalBalanceUpdate.current = Date.now();
       syncBalanceToServer(newState.balance);
       return newState;
     });
@@ -387,6 +395,7 @@ const App: React.FC = () => {
         balance: prev.balance - cost,
         totalBet: cost * 2,
       };
+      lastLocalBalanceUpdate.current = Date.now();
       syncBalanceToServer(newState.balance);
       return newState;
     });
@@ -450,6 +459,7 @@ const App: React.FC = () => {
         if (newHistory.length > 50) newHistory.shift();
         
         const newBalance = prev.balance + winnings;
+        lastLocalBalanceUpdate.current = Date.now();
         if (currentUser && currentUser.id !== 'babu') {
            fetch(`/api/users/${currentUser.id}/balance`, {
              method: 'PUT',
