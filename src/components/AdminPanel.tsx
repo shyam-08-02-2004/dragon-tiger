@@ -789,7 +789,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                               >
                                 {msg.message}
                                 <div style={{ fontSize: '10px', opacity: 0.7, marginTop: '5px', textAlign: 'right' }}>
-                                  {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                  {new Date(msg.timestamp).toLocaleString('en-US', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true })}
                                 </div>
                                 {activeAdminMenuMsgId === msg.id && (
                                   <div style={{ display: 'flex', gap: '8px', marginTop: '6px', justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start', animation: 'hcFadeIn 0.3s ease' }}>

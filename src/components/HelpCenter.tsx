@@ -161,7 +161,7 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
                     <>
                       {msg.message}
                       <div className="hc-timestamp" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
-                        <span>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span>{new Date(msg.timestamp).toLocaleString('en-US', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true })}</span>
                         {msg.sender === 'user' && activeMenuMsgId === msg.id && (
                           <div style={{ display: 'flex', gap: '8px', animation: 'hcFadeIn 0.3s ease' }}>
                             <button 
