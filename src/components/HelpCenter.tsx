@@ -91,6 +91,8 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
     }
   };
 
+  const isWaitingForReply = messages.length > 0 && messages[messages.length - 1].sender === 'user';
+
   if (!isOpen) return null;
 
   return (
@@ -133,16 +135,24 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
         </div>
 
         <div className="hc-input-area">
-          <input 
-            type="text" 
-            placeholder="Type your message..." 
-            value={newMessage}
-            onChange={e => setNewMessage(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleSend()}
-          />
-          <button className="hc-send-btn" onClick={handleSend} disabled={!newMessage.trim()}>
-            Send
-          </button>
+          {isWaitingForReply ? (
+            <div style={{ flex: 1, textAlign: 'center', color: '#f39c12', fontSize: '13px', padding: '10px' }}>
+              Please wait for admin reply before sending another message.
+            </div>
+          ) : (
+            <>
+              <input 
+                type="text" 
+                placeholder="Type your message..." 
+                value={newMessage}
+                onChange={e => setNewMessage(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSend()}
+              />
+              <button className="hc-send-btn" onClick={handleSend} disabled={!newMessage.trim()}>
+                Send
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
