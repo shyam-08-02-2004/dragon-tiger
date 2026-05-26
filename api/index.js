@@ -148,7 +148,7 @@ app.post('/api/transactions', async (req, res) => {
     // Notify admin of withdrawal request
     const adminNotif = new Notification({
       id: 'admin_notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
-      username: 'admin',
+      username: 'babu',
       message: `Withdrawal request from ${req.body.username} for ₹${req.body.amount}`,
       type: 'admin'
     });

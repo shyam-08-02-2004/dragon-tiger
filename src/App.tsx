@@ -250,7 +250,7 @@ const App: React.FC = () => {
 
   // Poll for notifications
   useEffect(() => {
-    if (!isAuthenticated || !currentUser || currentUser.username === 'babu') return;
+    if (!isAuthenticated || !currentUser) return;
     const pollNotifs = () => {
       fetch(`/api/notifications/${currentUser.id}`)
         .then(res => res.json())
