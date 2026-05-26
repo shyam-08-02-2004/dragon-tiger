@@ -115,8 +115,8 @@ app.post('/api/transactions', async (req, res) => {
     const notif = new Notification({
       id: 'notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
       username: req.body.username,
-      message: `Aapka withdrawal request ₹${req.body.amount} successfully submit ho gaya hai. Admin approval ka wait karein.`,
-      type: 'success'
+      message: `₹${req.body.amount} ki withdrawal request bhej di gayi hai. Status: PENDING`,
+      type: 'info'
     });
     await notif.save();
   }
@@ -151,7 +151,7 @@ app.post('/api/admin/transactions/:txId/action', async (req, res) => {
     const notif = new Notification({
       id: 'notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
       username: tx.username,
-      message: `Aapka ${tx.type === 'deposit' ? 'Deposit' : 'Withdrawal'} request ₹${tx.amount} reject ho gaya hai. Payment pending me chala gaya hai, 5-7 din me aapke wallet me aa jayega.`,
+      message: `Aapka withdrawal reject ho gaya hai, 5-6 din me wallet me payment aa jayega.`,
       type: 'warning'
     });
     await notif.save();

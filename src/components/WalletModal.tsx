@@ -81,23 +81,13 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
 
 
     if (tab === 'withdraw') {
-      showMsg(
-        `✅ Withdrawal Request Submitted!
-
-₹${val} ke withdrawal ki request bhej di gayi hai.
-
-Admin approval ke baad aapke UPI (${upiId}) par payment aa jayega.
-
-Estimated Time: 5-6 Working Days
-Status: ⏳ PENDING`,
-        'pending'
-      );
+      showMsg('✅ Withdrawal Request Successful!', 'pending');
     } else {
       showMsg(`Your deposit request for ₹${val} has been sent for approval.`, 'success');
     }
 
     setAmount(''); setUtr(''); setUpiId('');
-    if (tab === 'deposit') setTimeout(() => onClose(), 2500);
+    setTimeout(() => onClose(), 2500);
   };
 
   return (
