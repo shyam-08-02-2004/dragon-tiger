@@ -371,7 +371,7 @@
     gap: 8px;
   }
   .center-bets {
-    flex: 0 0 45px;
+    flex: 0 0 35px;
     flex-direction: row;
     justify-content: center;
     align-items: stretch;
@@ -381,22 +381,25 @@
     padding: 8px 4px;
   }
   .tie-zone {
-    width: 100%;
-    min-height: 45px;
-    height: 45px;
+    width: 60%;
+    min-height: 35px;
+    height: 35px;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 2px;
-    padding: 4px;
+    padding: 2px;
   }
   .tie-zone .bet-label {
     writing-mode: horizontal-tb;
     text-orientation: mixed;
     letter-spacing: 1px;
     margin-bottom: 0;
-    font-size: 12px;
+    font-size: 11px;
     line-height: normal;
+  }
+  .tie-zone .bet-payout {
+    font-size: 10px;
   }
   .side-bets-row {
     flex-direction: column;
