@@ -170,23 +170,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     }
   };
 
-  const startAdminHold = (msg: any) => {
-    const timer = setTimeout(() => {
-      const action = window.prompt("Type 'edit' to edit or 'delete' to delete this message:");
-      if (action === 'delete') {
-        if (window.confirm("Are you sure you want to delete this message?")) {
-          handleAdminDeleteMessage(msg.id);
-        }
-      } else if (action === 'edit') {
-        handleAdminEditMessage(msg.id, msg.message);
-      }
-    }, 600);
-    setHoldTimeout(timer);
-  };
 
-  const endAdminHold = () => {
-    if (holdTimeout) clearTimeout(holdTimeout);
-  };
 
   // ── Continuous game loop for admin (always running) ──
   useEffect(() => {
@@ -761,16 +745,28 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                               wordBreak: 'break-word',
                               cursor: 'pointer'
                             }}
-                            onTouchStart={() => startAdminHold(msg)}
-                            onTouchEnd={endAdminHold}
-                            onMouseDown={() => startAdminHold(msg)}
-                            onMouseUp={endAdminHold}
-                            onMouseLeave={endAdminHold}
-                            title="Hold to edit/delete"
                           >
                             {msg.message}
                             <div style={{ fontSize: '10px', opacity: 0.7, marginTop: '5px', textAlign: 'right' }}>
                               {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                            <div style={{ display: 'flex', gap: '8px', marginTop: '6px', justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start' }}>
+                              <button 
+                                onClick={() => handleAdminEditMessage(msg.id, msg.message)}
+                                style={{ background: 'none', border: 'none', color: '#f1c40f', fontSize: '12px', cursor: 'pointer', padding: 0 }}
+                              >
+                                ✏️ Edit
+                              </button>
+                              <button 
+                                onClick={() => {
+                                  if (window.confirm("Are you sure you want to delete this message?")) {
+                                    handleAdminDeleteMessage(msg.id);
+                                  }
+                                }}
+                                style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: '12px', cursor: 'pointer', padding: 0 }}
+                              >
+                                🗑️ Delete
+                              </button>
                             </div>
                           </div>
                         </div>

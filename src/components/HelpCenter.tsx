@@ -20,7 +20,6 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const [holdTimeout, setHoldTimeout] = useState<any>(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -58,19 +57,6 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
     } catch(e) { console.error(e); }
   };
 
-  const startHold = (msg: Message) => {
-    if (msg.sender !== 'user') return;
-    const timer = setTimeout(() => {
-      if (window.confirm('Do you want to delete this message?')) {
-        handleDeleteMessage(msg.id);
-      }
-    }, 600);
-    setHoldTimeout(timer);
-  };
-
-  const endHold = () => {
-    if (holdTimeout) clearTimeout(holdTimeout);
-  };
 
   const handleSend = async () => {
     if (!newMessage.trim()) return;
@@ -112,20 +98,28 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
             </div>
           ) : (
             messages.map((msg, idx) => (
-              <div key={msg.id || idx} className={`hc-message-wrapper ${msg.sender === 'user' ? 'hc-user' : 'hc-admin'}`}>
-                <div 
-                  className="hc-message"
-                  onTouchStart={() => startHold(msg)}
-                  onTouchEnd={endHold}
-                  onMouseDown={() => startHold(msg)}
-                  onMouseUp={endHold}
-                  onMouseLeave={endHold}
-                  style={{ cursor: msg.sender === 'user' ? 'pointer' : 'default' }}
-                  title={msg.sender === 'user' ? 'Hold to delete' : ''}
-                >
+              <div key={msg.id} className={`hc-message-wrapper ${msg.sender === 'user' ? 'hc-user' : 'hc-admin'}`}>
+                <div className="hc-message">
                   {msg.message}
-                  <div className="hc-timestamp">
-                    {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  <div className="hc-timestamp" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
+                    <span>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    {msg.sender === 'user' && (
+                      <button 
+                        onClick={() => {
+                          if (window.confirm('Do you want to delete this message?')) {
+                            handleDeleteMessage(msg.id);
+                          }
+                        }}
+                        style={{
+                          background: 'none', border: 'none', color: '#e74c3c', 
+                          fontSize: '12px', cursor: 'pointer', padding: '0 4px',
+                          marginLeft: '8px'
+                        }}
+                        title="Delete message"
+                      >
+                        🗑️
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
