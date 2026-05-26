@@ -9,6 +9,7 @@ import ChipSelector from './components/ChipSelector';
 import GameControls from './components/GameControls';
 import RoadMap from './components/RoadMap';
 import WalletModal from './components/WalletModal';
+import GameHistory from './components/GameHistory';
 import type { GameState, BetType, GameResult } from './types/game';
 import { getGlobalGameState, getDeterministicCards, setTimeOffset } from './syncEngine';
 import {
@@ -60,6 +61,7 @@ const App: React.FC = () => {
     return saved ? JSON.parse(saved) : null;
   });
   const [showWallet, setShowWallet] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const [isAdminView, setIsAdminView] = useState(true);
   const [isTimeSynced, setIsTimeSynced] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -547,7 +549,8 @@ const App: React.FC = () => {
         roundNumber={roundNumber} 
         username={currentUser?.username || ''} 
         hasDeposited={currentUser?.hasDeposited || false}
-        onLogout={handleLogout} 
+        onLogout={handleLogout}
+        onShowHistory={() => setShowHistory(true)}
       />
 
       <main className="game-main" id="game-main">
@@ -629,6 +632,15 @@ const App: React.FC = () => {
           });
         }}
       />}
+
+      {showHistory && (
+        <GameHistory
+          currentRound={roundNumber}
+          rawRoundId={getGlobalGameState().rawRoundId}
+          isOpen={showHistory}
+          onClose={() => setShowHistory(false)}
+        />
+      )}
 
       {/* Footer */}
       <footer className="game-footer" id="game-footer">

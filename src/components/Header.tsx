@@ -9,9 +9,10 @@ interface HeaderProps {
   username: string;
   hasDeposited: boolean;
   onLogout: () => void;
+  onShowHistory?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username, hasDeposited, onLogout }) => {
+const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username, hasDeposited, onLogout, onShowHistory }) => {
   const [showWallet, setShowWallet] = useState(false);
 
   return (
@@ -37,6 +38,11 @@ const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username
           <span className="round-label">ROUND</span>
           <span className="round-number">#{roundNumber}</span>
         </div>
+        {onShowHistory && (
+          <button className="history-btn" onClick={onShowHistory} title="Game History">
+            📋 History
+          </button>
+        )}
       </div>
 
       <div className="header-right">
