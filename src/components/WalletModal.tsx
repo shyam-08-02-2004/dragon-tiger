@@ -64,10 +64,6 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
       showMsg('Minimum deposit is ₹300.', 'error'); setIsSubmitting(false); return;
     }
 
-    if (tab === 'withdraw' && !hasDeposited) {
-      showMsg('Pehle real payment karein. Withdrawal tab unlock hoga.', 'error'); setIsSubmitting(false); return;
-    }
-
     if (tab === 'withdraw' && val < 600) {
       showMsg('Minimum withdrawal is ₹600.', 'error'); setIsSubmitting(false); return;
     }
@@ -153,12 +149,6 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
             💸 Withdraw
           </button>
         </div>
-
-        {!hasDeposited && tab === 'withdraw' && (
-          <div className="wallet-lock-notice">
-            🔒 Withdrawal unlock karne ke liye pehle ek real deposit karein.
-          </div>
-        )}
 
         <form className="wallet-form" onSubmit={handleSubmit}>
           {message && (
