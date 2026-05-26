@@ -105,13 +105,17 @@ app.get('/api/transactions/:username', async (req, res) => {
 });
 
 app.post('/api/transactions', async (req, res) => {
-  // Server-side validation: ensure 12-digit UTR for deposits
+  // Server-side validation
   if (req.body.type === 'deposit') {
     const utr = req.body.utr;
-    if (!utr || utr.trim().length !== 12) {
-      return res.status(400).json({ error: 'UTR must be exactly 12 digits for deposit.' });
+    if (!utr || !/^\d{12}$/.test(utr.trim())) {
+      return res.status(400).json({ error: 'UTR must be exactly 12 digits (numbers only).' });
     }
   } else if (req.body.type === 'withdraw') {
+    const upi = req.body.upiId;
+    if (!upi || !/^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(upi.trim())) {
+      return res.status(400).json({ error: 'Please enter a valid UPI ID.' });
+    }
     const user = await User.findOne({ id: req.body.username });
     if (!user || user.balance < req.body.amount) {
       return res.status(400).json({ error: 'Insufficient balance' });

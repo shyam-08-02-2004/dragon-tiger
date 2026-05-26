@@ -64,13 +64,17 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
     }
 
     if (tab === 'deposit') {
-      if (!utr.trim() || utr.trim().length !== 12) {
-        showMsg('UTR must be exactly 12 digits.', 'error'); return;
+      const utrStr = utr.trim();
+      if (!/^\d{12}$/.test(utrStr)) {
+        showMsg('UTR must be exactly 12 digits (numbers only).', 'error'); return;
       }
     }
 
-    if (tab === 'withdraw' && !upiId.trim()) {
-      showMsg('Please enter your UPI ID.', 'error'); return;
+    if (tab === 'withdraw') {
+      const upiStr = upiId.trim();
+      if (!/^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(upiStr)) {
+        showMsg('Please enter a valid UPI ID (e.g., name@ybl).', 'error'); return;
+      }
     }
 
     // Save transaction (balance cut happens on admin approval)
