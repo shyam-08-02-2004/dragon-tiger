@@ -383,9 +383,10 @@
   .tie-zone {
     width: 100%;
     height: auto;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
-    gap: 8px;
+    align-items: center;
+    gap: 4px;
     padding: 8px;
   }
   .tie-zone .bet-label {
