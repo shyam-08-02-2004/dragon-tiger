@@ -96,6 +96,7 @@ const App: React.FC = () => {
   });
   // duplicate msgIdx removed
   const stateRef = useRef<GameState>(state);
+  const msgIdx = useRef<number>(0);
   const lastLocalBalanceUpdate = useRef<number>(0);
 
   useEffect(() => { stateRef.current = state; }, [state]);
