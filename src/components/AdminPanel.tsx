@@ -145,7 +145,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
       console.error(e);
     }
   };
-  const [holdTimeout, setHoldTimeout] = useState<any>(null);
+  const [editingChatId, setEditingChatId] = useState<string | null>(null);
+  const [editingChatText, setEditingChatText] = useState('');
 
   const handleAdminDeleteMessage = async (msgId: string) => {
     try {
@@ -154,9 +155,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     } catch(e) { console.error(e); }
   };
 
-  const handleAdminEditMessage = async (msgId: string, oldMsg: string) => {
-    const newMsg = window.prompt("Edit message:", oldMsg);
-    if (newMsg && newMsg.trim() !== oldMsg) {
+  const handleAdminEditMessage = async (msgId: string, newMsg: string) => {
+    if (newMsg && newMsg.trim() !== '') {
       try {
         const res = await fetch(`/api/chat/message/${msgId}`, {
           method: 'PUT',
@@ -168,9 +168,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
         }
       } catch(e) { console.error(e); }
     }
+    setEditingChatId(null);
+    setEditingChatText('');
   };
-
-
 
   // ── Continuous game loop for admin (always running) ──
   useEffect(() => {
@@ -746,28 +746,42 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                               cursor: 'pointer'
                             }}
                           >
-                            {msg.message}
-                            <div style={{ fontSize: '10px', opacity: 0.7, marginTop: '5px', textAlign: 'right' }}>
-                              {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </div>
-                            <div style={{ display: 'flex', gap: '8px', marginTop: '6px', justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start' }}>
-                              <button 
-                                onClick={() => handleAdminEditMessage(msg.id, msg.message)}
-                                style={{ background: 'none', border: 'none', color: '#f1c40f', fontSize: '12px', cursor: 'pointer', padding: 0 }}
-                              >
-                                ✏️ Edit
-                              </button>
-                              <button 
-                                onClick={() => {
-                                  if (window.confirm("Are you sure you want to delete this message?")) {
-                                    handleAdminDeleteMessage(msg.id);
-                                  }
-                                }}
-                                style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: '12px', cursor: 'pointer', padding: 0 }}
-                              >
-                                🗑️ Delete
-                              </button>
-                            </div>
+                            {editingChatId === msg.id ? (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <input 
+                                  type="text" 
+                                  value={editingChatText} 
+                                  onChange={e => setEditingChatText(e.target.value)} 
+                                  style={{ width: '100%', padding: '6px', borderRadius: '4px', border: 'none', color: '#000' }}
+                                  autoFocus
+                                />
+                                <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                                  <button onClick={() => setEditingChatId(null)} style={{ background: '#ccc', color: '#000', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', fontSize: '12px' }}>Cancel</button>
+                                  <button onClick={() => handleAdminEditMessage(msg.id, editingChatText)} style={{ background: '#2ecc71', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', fontSize: '12px' }}>Save</button>
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                {msg.message}
+                                <div style={{ fontSize: '10px', opacity: 0.7, marginTop: '5px', textAlign: 'right' }}>
+                                  {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </div>
+                                <div style={{ display: 'flex', gap: '8px', marginTop: '6px', justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start' }}>
+                                  <button 
+                                    onClick={() => { setEditingChatId(msg.id); setEditingChatText(msg.message); }}
+                                    style={{ background: 'none', border: 'none', color: '#f1c40f', fontSize: '12px', cursor: 'pointer', padding: 0 }}
+                                  >
+                                    ✏️ Edit
+                                  </button>
+                                  <button 
+                                    onClick={() => handleAdminDeleteMessage(msg.id)}
+                                    style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: '12px', cursor: 'pointer', padding: 0 }}
+                                  >
+                                    🗑️ Delete
+                                  </button>
+                                </div>
+                              </>
+                            )}
                           </div>
                         </div>
                       ))}

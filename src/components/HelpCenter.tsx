@@ -105,11 +105,7 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
                     <span>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     {msg.sender === 'user' && (
                       <button 
-                        onClick={() => {
-                          if (window.confirm('Do you want to delete this message?')) {
-                            handleDeleteMessage(msg.id);
-                          }
-                        }}
+                        onClick={() => handleDeleteMessage(msg.id)}
                         style={{
                           background: 'none', border: 'none', color: '#e74c3c', 
                           fontSize: '12px', cursor: 'pointer', padding: '0 4px',
