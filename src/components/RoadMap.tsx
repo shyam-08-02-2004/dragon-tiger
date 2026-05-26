@@ -6,10 +6,9 @@ interface RoadMapProps {
   history: RoundResult[];
 }
 
-const MAX_VISIBLE = 15;
-
+// Display full history without limit
 const RoadMap: React.FC<RoadMapProps> = ({ history }) => {
-  const visible = history.slice(-MAX_VISIBLE);
+  const visible = history;
 
   return (
     <div className="roadmap" id="roadmap">

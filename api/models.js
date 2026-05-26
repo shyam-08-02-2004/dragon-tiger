@@ -57,3 +57,14 @@ const notificationSchema = new mongoose.Schema({
   timestamp: { type: Date, default: Date.now }
 });
 export const Notification = mongoose.models.Notification || mongoose.model('Notification', notificationSchema);
+
+// Tracks global history up to 2000 rounds
+const roundHistorySchema = new mongoose.Schema({
+  roundId: { type: Number, required: true, unique: true },
+  roundNumber: { type: Number, required: true },
+  result: { type: String, enum: ['dragon', 'tiger', 'tie'], required: true },
+  timestamp: { type: Date, default: Date.now }
+});
+// Create a TTL index to automatically delete records older than a specific time if needed,
+// but since we only need the latest 2000 per epoch, we can just fetch the epoch's data.
+export const RoundHistory = mongoose.models.RoundHistory || mongoose.model('RoundHistory', roundHistorySchema);

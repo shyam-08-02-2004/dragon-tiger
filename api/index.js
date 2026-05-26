@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import { User, Transaction, AdminSettings, RoundBet, Notification } from './models.js';
+import { User, Transaction, AdminSettings, RoundBet, Notification, RoundHistory } from './models.js';
 
 const app = express();
 app.use(cors());
@@ -378,6 +378,40 @@ app.post('/api/notifications/:username', async (req, res) => {
     });
     await notif.save();
     res.json(notif);
+  } catch (e) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// GLOBAL ROUND HISTORY ROUTES
+app.post('/api/history/record', async (req, res) => {
+  try {
+    const { roundId, result } = req.body;
+    const roundNumber = (roundId % 2000) + 1;
+    
+    // Upsert to prevent duplicate entries if multiple clients call it
+    await RoundHistory.findOneAndUpdate(
+      { roundId },
+      { roundId, roundNumber, result },
+      { upsert: true, new: true }
+    );
+    res.json({ success: true });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.get('/api/history', async (req, res) => {
+  try {
+    const currentRoundId = Math.floor(Date.now() / 25000);
+    const epochStart = currentRoundId - (currentRoundId % 2000);
+    
+    const history = await RoundHistory.find({ roundId: { $gte: epochStart } })
+      .sort({ roundId: 1 })
+      .limit(2000);
+      
+    res.json(history);
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: 'Server error' });

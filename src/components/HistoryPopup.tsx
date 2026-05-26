@@ -17,7 +17,7 @@ const HistoryPopup: React.FC<HistoryPopupProps> = ({ history }) => {
 
   if (!visible || history.length === 0) return null;
 
-  const last5 = history.slice(-5).reverse();
+  const last5 = history.slice().reverse();
 
   const getLabel = (result: string | null) => {
     if (result === 'dragon') return { icon: '🐉', label: 'Dragon', cls: 'hp-dragon' };
