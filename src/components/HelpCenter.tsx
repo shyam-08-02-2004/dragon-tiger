@@ -164,13 +164,15 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
                         <span>{new Date(msg.timestamp).toLocaleString('en-US', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true })}</span>
                         {msg.sender === 'user' && activeMenuMsgId === msg.id && (
                           <div style={{ display: 'flex', gap: '8px', animation: 'hcFadeIn 0.3s ease' }}>
-                            <button 
-                              onClick={() => { setEditingChatId(msg.id); setEditingChatText(msg.message); setActiveMenuMsgId(null); }}
-                              style={{ background: 'none', border: 'none', color: '#f1c40f', fontSize: '12px', cursor: 'pointer', padding: 0 }}
-                              title="Edit message"
-                            >
-                              ✏️ Edit
-                            </button>
+                            {Date.now() - new Date(msg.timestamp).getTime() <= 10 * 60 * 1000 && (
+                              <button 
+                                onClick={() => { setEditingChatId(msg.id); setEditingChatText(msg.message); setActiveMenuMsgId(null); }}
+                                style={{ background: 'none', border: 'none', color: '#f1c40f', fontSize: '12px', cursor: 'pointer', padding: 0 }}
+                                title="Edit message"
+                              >
+                                ✏️ Edit
+                              </button>
+                            )}
                             <button 
                               onClick={() => handleDeleteMessage(msg.id)}
                               style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: '12px', cursor: 'pointer', padding: 0 }}

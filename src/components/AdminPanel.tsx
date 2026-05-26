@@ -793,12 +793,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                                 </div>
                                 {activeAdminMenuMsgId === msg.id && (
                                   <div style={{ display: 'flex', gap: '8px', marginTop: '6px', justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start', animation: 'hcFadeIn 0.3s ease' }}>
-                                    <button 
-                                      onClick={() => { setEditingChatId(msg.id); setEditingChatText(msg.message); setActiveAdminMenuMsgId(null); }}
-                                      style={{ background: 'none', border: 'none', color: '#f1c40f', fontSize: '12px', cursor: 'pointer', padding: 0 }}
-                                    >
-                                      ✏️ Edit
-                                    </button>
+                                    {Date.now() - new Date(msg.timestamp).getTime() <= 10 * 60 * 1000 && (
+                                      <button 
+                                        onClick={() => { setEditingChatId(msg.id); setEditingChatText(msg.message); setActiveAdminMenuMsgId(null); }}
+                                        style={{ background: 'none', border: 'none', color: '#f1c40f', fontSize: '12px', cursor: 'pointer', padding: 0 }}
+                                      >
+                                        ✏️ Edit
+                                      </button>
+                                    )}
                                     <button 
                                       onClick={() => handleAdminDeleteMessage(msg.id)}
                                       style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: '12px', cursor: 'pointer', padding: 0 }}
