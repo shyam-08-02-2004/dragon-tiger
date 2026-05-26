@@ -6,12 +6,13 @@ interface BottomNavProps {
   onOpenWallet: () => void;
   onOpenHistory: () => void;
   onOpenSupport: () => void;
+  onGoHome: () => void;
 }
 
-const BottomNav: React.FC<BottomNavProps> = ({ username, onOpenWallet, onOpenHistory, onOpenSupport }) => {
+const BottomNav: React.FC<BottomNavProps> = ({ username, onOpenWallet, onOpenHistory, onOpenSupport, onGoHome }) => {
   return (
     <div className="bottom-nav">
-      <div className="nav-item profile-item">
+      <div className="nav-item" onClick={onGoHome}>
         <span className="nav-icon">👤</span>
         <span className="nav-label">{username}</span>
       </div>

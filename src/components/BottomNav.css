@@ -43,13 +43,4 @@
   letter-spacing: 0.5px;
 }
 
-.profile-item {
-  cursor: default;
-}
-
-.profile-item:hover, .profile-item:active {
-  color: rgba(255, 255, 255, 0.6);
-  transform: none;
-}
-
 

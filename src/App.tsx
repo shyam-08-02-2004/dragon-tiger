@@ -695,6 +695,12 @@ const App: React.FC = () => {
         onOpenWallet={() => setShowWallet(true)}
         onOpenHistory={() => setShowHistory(true)}
         onOpenSupport={() => setShowHelpCenter(true)}
+        onGoHome={() => {
+          setShowWallet(false);
+          setShowHistory(false);
+          setShowHelpCenter(false);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
       />
     </div>
   );
