@@ -3,6 +3,7 @@ import Header from './components/Header';
 import Auth from './components/Auth';
 import type { UserAccount } from './components/Auth';
 import AdminPanel from './components/AdminPanel';
+import BottomNav from './components/BottomNav';
 import CardDisplay from './components/CardDisplay';
 import BettingTable from './components/BettingTable';
 import ChipSelector from './components/ChipSelector';
@@ -645,7 +646,7 @@ const App: React.FC = () => {
       )}
 
       {/* Footer */}
-      <footer className="game-footer" id="game-footer">
+      <footer className="game-footer" id="game-footer" style={{ paddingBottom: '70px' }}>
         <div className="footer-content">
           <span className="footer-logo">🐉 Dragon Tiger 🐯</span>
           <span className="footer-sep">|</span>
@@ -688,6 +689,13 @@ const App: React.FC = () => {
           ))}
         </div>
       )}
+
+      <BottomNav 
+        username={currentUser?.username || ''}
+        onOpenWallet={() => setShowWallet(true)}
+        onOpenHistory={() => setShowHistory(true)}
+        onOpenSupport={() => setShowHelpCenter(true)}
+      />
     </div>
   );
 };
