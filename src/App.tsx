@@ -55,10 +55,10 @@ const initialState: GameState = {
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return !!localStorage.getItem('dragonTigerCurrentUser');
+    return !!sessionStorage.getItem('dragonTigerCurrentUser');
   });
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
-    const saved = localStorage.getItem('dragonTigerCurrentUser');
+    const saved = sessionStorage.getItem('dragonTigerCurrentUser');
     return saved ? JSON.parse(saved) : null;
   });
   const [showWallet, setShowWallet] = useState(false);
@@ -67,7 +67,7 @@ const App: React.FC = () => {
   const [isTimeSynced, setIsTimeSynced] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [state, setState] = useState<GameState>(() => {
-    const saved = localStorage.getItem('dragonTigerCurrentUser');
+    const saved = sessionStorage.getItem('dragonTigerCurrentUser');
     let startingBalance = initialState.balance;
     if (saved) {
       try { startingBalance = JSON.parse(saved).balance; } catch(e){}
@@ -149,14 +149,14 @@ const App: React.FC = () => {
 
 
   const handleLogin = (user: UserAccount) => {
-    localStorage.setItem('dragonTigerCurrentUser', JSON.stringify(user));
+    sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify(user));
     setCurrentUser(user);
     setState(prev => ({ ...prev, balance: user.balance, history: [], roundNumber: getGlobalGameState().roundId, bets: {}, totalBet: 0 }));
     setIsAuthenticated(true);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('dragonTigerCurrentUser');
+    sessionStorage.removeItem('dragonTigerCurrentUser');
     setIsAuthenticated(false);
     setCurrentUser(null);
   };
@@ -175,11 +175,11 @@ const App: React.FC = () => {
               setCurrentUser(prev => prev ? { ...prev, balance: user.balance, hasDeposited: user.hasDeposited } : null);
               setState(prev => prev.balance !== user.balance ? { ...prev, balance: user.balance } : prev);
               
-              const savedStr = localStorage.getItem('dragonTigerCurrentUser');
+              const savedStr = sessionStorage.getItem('dragonTigerCurrentUser');
               if (savedStr) {
                  const saved = JSON.parse(savedStr);
                  if (saved.balance !== user.balance || saved.hasDeposited !== user.hasDeposited) {
-                    localStorage.setItem('dragonTigerCurrentUser', JSON.stringify({ ...saved, balance: user.balance, hasDeposited: user.hasDeposited }));
+                    sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify({ ...saved, balance: user.balance, hasDeposited: user.hasDeposited }));
                  }
               }
             }
@@ -619,7 +619,7 @@ const App: React.FC = () => {
           setCurrentUser(prev => {
             if (prev) {
               const updated = { ...prev, balance: prev.balance - amount };
-              localStorage.setItem('dragonTigerCurrentUser', JSON.stringify(updated));
+              sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify(updated));
               return updated;
             }
             return null;
