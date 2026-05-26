@@ -337,6 +337,15 @@ const App: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ balance: newBal })
       }).catch(e => console.error(e));
+
+      // Update sessionStorage immediately so refresh doesn't show stale balance
+      const savedStr = sessionStorage.getItem('dragonTigerCurrentUser');
+      if (savedStr) {
+        try {
+          const saved = JSON.parse(savedStr);
+          sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify({ ...saved, balance: newBal }));
+        } catch(e) {}
+      }
     }
   };
 
@@ -471,11 +480,7 @@ const App: React.FC = () => {
         const newBalance = prev.balance + winnings;
         lastLocalBalanceUpdate.current = Date.now();
         if (currentUser && currentUser.id !== 'babu') {
-           fetch(`/api/users/${currentUser.id}/balance`, {
-             method: 'PUT',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify({ balance: newBalance })
-           });
+           syncBalanceToServer(newBalance);
         }
 
         // Cleanup old forced outcomes after result
