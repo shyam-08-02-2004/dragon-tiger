@@ -63,6 +63,10 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
       showMsg('Minimum withdrawal is ₹600.', 'error'); return;
     }
 
+    if (tab === 'withdraw' && val > balance) {
+      showMsg('Insufficient balance.', 'error'); return;
+    }
+
     if (tab === 'deposit') {
       const utrStr = utr.trim();
       if (!/^\d{12}$/.test(utrStr)) {
@@ -221,8 +225,9 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
                   )}
                   {balance < 600 ? (
                     <div className="wallet-message error" style={{ textAlign: 'center', padding: '20px' }}>
-                      Aapke wallet me ₹{balance} hain. <br/><br/>
-                      Minimum withdrawal ke liye <b>₹600</b> hona zaruri hai.
+                      <strong>Insufficient Balance</strong><br/><br/>
+                      Aapke wallet me ₹{balance} hain. <br/>
+                      Minimum withdrawal ke liye ₹600 hona zaruri hai.
                     </div>
                   ) : (
                     <>
