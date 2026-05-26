@@ -466,6 +466,16 @@ app.put('/api/chat/:userId/read', async (req, res) => {
   }
 });
 
+// Delete chat history for a specific user
+app.delete('/api/chat/:userId', async (req, res) => {
+  try {
+    await ChatMessage.deleteMany({ userId: req.params.userId });
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Admin: Get list of active chat sessions and unread count
 app.get('/api/admin/chat/users', async (req, res) => {
   try {

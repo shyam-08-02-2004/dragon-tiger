@@ -64,7 +64,6 @@ const App: React.FC = () => {
   const [showWallet, setShowWallet] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showHelpCenter, setShowHelpCenter] = useState(false);
-  const [isAdminView, setIsAdminView] = useState(true);
   const [isTimeSynced, setIsTimeSynced] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [state, setState] = useState<GameState>(() => {
@@ -520,30 +519,17 @@ const App: React.FC = () => {
     return <Auth onLogin={handleLogin} />;
   }
 
-  if (currentUser.username === 'babu' && isAdminView) {
+  if (currentUser.username === 'babu') {
     return (
       <div style={{ position: 'relative', width: '100%', minHeight: '100vh', overflowX: 'hidden' }}>
         <AdminPanel onLogout={handleLogout} />
-        <button 
-          onClick={() => setIsAdminView(false)}
-          style={{ position: 'fixed', bottom: '20px', right: '20px', background: 'var(--gold)', color: '#000', border: 'none', padding: '12px 24px', borderRadius: '24px', fontWeight: 'bold', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', cursor: 'pointer', zIndex: 9999 }}
-        >
-          🎮 Play Game
-        </button>
       </div>
     );
   }
 
   return (
     <div className="app" id="app-root">
-      {currentUser.username === 'babu' && !isAdminView && (
-        <button 
-          onClick={() => setIsAdminView(true)}
-          style={{ position: 'fixed', top: '80px', right: '20px', background: 'rgba(0,0,0,0.8)', color: 'var(--gold)', border: '1px solid var(--gold)', padding: '10px 20px', borderRadius: '20px', fontWeight: 'bold', zIndex: 9999, cursor: 'pointer' }}
-        >
-          🛡️ Admin Panel
-        </button>
-      )}
+
       {/* Background ambiance */}
       <div className="bg-decoration">
         <div className="bg-dragon">🐉</div>

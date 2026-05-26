@@ -128,6 +128,24 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     } catch(e) {}
   };
 
+  const handleDeleteChat = async () => {
+    if (!selectedSupportUser) return;
+    if (!window.confirm(`Are you sure you want to delete the chat history for ${selectedSupportUser}?`)) return;
+    
+    try {
+      await fetch(`/api/chat/${selectedSupportUser}`, { method: 'DELETE' });
+      setSupportMessages([]);
+      setSelectedSupportUser(null);
+      // Refresh user list
+      fetch('/api/admin/chat/users')
+        .then(res => res.json())
+        .then(data => { if (Array.isArray(data)) setSupportUsers(data); })
+        .catch(console.error);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   // ── Continuous game loop for admin (always running) ──
   useEffect(() => {
     simTimerRef.current = setInterval(() => {
@@ -323,7 +341,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
           </button>
         </nav>
 
-        <button className="admin-logout-btn" onClick={onLogout}>🚪 Logout</button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: 'auto' }}>
+          <button className="admin-logout-btn" onClick={onLogout} style={{ marginTop: 0 }}>🚪 Logout</button>
+        </div>
       </aside>
 
       <main className="admin-main">
@@ -644,8 +664,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
           {/* ── SUPPORT TAB ── */}
           {activeTab === 'support' && (
-            <div className="admin-card" style={{ display: 'flex', height: '600px', padding: 0, overflow: 'hidden' }}>
-              <div style={{ width: '300px', borderRight: '1px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column' }}>
+            <div className={`admin-card admin-chat-layout ${selectedSupportUser ? 'chat-active' : ''}`}>
+              <div className="admin-chat-sidebar">
                 <h3 style={{ padding: '20px', margin: 0, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Chats</h3>
                 <div style={{ flex: 1, overflowY: 'auto' }}>
                   {supportUsers.map(u => (
@@ -673,21 +693,29 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   {supportUsers.length === 0 && <div style={{ padding: '20px', color: '#888', textAlign: 'center' }}>No active chats</div>}
                 </div>
               </div>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'rgba(0,0,0,0.2)' }}>
+              
+              <div className="admin-chat-main">
                 {selectedSupportUser ? (
                   <>
-                    <div style={{ padding: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)', fontWeight: 'bold', fontSize: '18px' }}>
-                      Chatting with {selectedSupportUser}
+                    <div className="admin-chat-header">
+                      <button className="admin-chat-back" onClick={() => setSelectedSupportUser(null)}>
+                        ← Back
+                      </button>
+                      <span style={{ fontWeight: 'bold', fontSize: '16px' }}>{selectedSupportUser}</span>
+                      <button className="admin-chat-delete" onClick={handleDeleteChat} title="Delete Chat">
+                        🗑️
+                      </button>
                     </div>
-                    <div style={{ flex: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div className="admin-chat-messages">
                       {supportMessages.map((msg, i) => (
                         <div key={msg.id || i} style={{ display: 'flex', justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start' }}>
                           <div style={{ 
-                            maxWidth: '70%', padding: '10px 15px', borderRadius: '15px',
+                            maxWidth: '75%', padding: '10px 15px', borderRadius: '15px',
                             background: msg.sender === 'admin' ? '#3498db' : 'rgba(255,255,255,0.1)',
                             borderBottomRightRadius: msg.sender === 'admin' ? '4px' : '15px',
                             borderBottomLeftRadius: msg.sender === 'user' ? '4px' : '15px',
-                            color: 'white'
+                            color: 'white',
+                            wordBreak: 'break-word'
                           }}>
                             {msg.message}
                             <div style={{ fontSize: '10px', opacity: 0.7, marginTop: '5px', textAlign: 'right' }}>
@@ -698,23 +726,22 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                       ))}
                       <div ref={supportEndRef} />
                     </div>
-                    <div style={{ padding: '20px', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', gap: '10px' }}>
+                    <div className="admin-chat-input">
                       <input 
                         type="text" 
                         value={newSupportMsg}
                         onChange={e => setNewSupportMsg(e.target.value)}
                         onKeyDown={e => e.key === 'Enter' && handleSendSupportMsg()}
                         placeholder="Type reply..."
-                        style={{ flex: 1, padding: '12px 15px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.05)', color: 'white', outline: 'none' }}
                       />
-                      <button onClick={handleSendSupportMsg} style={{ background: '#2ecc71', color: 'white', border: 'none', borderRadius: '20px', padding: '0 20px', fontWeight: 'bold', cursor: 'pointer' }}>
+                      <button onClick={handleSendSupportMsg}>
                         Send
                       </button>
                     </div>
                   </>
                 ) : (
-                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>
-                    Select a user from the left to start chatting
+                  <div className="admin-chat-empty">
+                    Select a user to start chatting
                   </div>
                 )}
               </div>
