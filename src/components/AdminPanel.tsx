@@ -4,6 +4,7 @@ import CardDisplay from './CardDisplay';
 import { determineResult } from '../types/game';
 import { getGlobalGameState, getDeterministicCards } from '../syncEngine';
 import type { Card, GameResult } from '../types/game';
+import GameHistory from './GameHistory';
 
 interface AdminPanelProps {
   onLogout: () => void;
@@ -24,6 +25,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [editBalanceUser, setEditBalanceUser] = useState<string | null>(null);
   const [newBalance, setNewBalance] = useState<string>('');
   const [liveBets, setLiveBets] = useState<{ dragon: number; tiger: number; tie: number; total: number; betCount: number }>({ dragon: 0, tiger: 0, tie: 0, total: 0, betCount: 0 });
+  const [showGameHistory, setShowGameHistory] = useState(false);
 
   // Round outcome control
   const [roundOutcomes, setRoundOutcomes] = useState<{ roundId: number; outcome: string }[]>([]);
@@ -344,8 +346,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: '20px', padding: '20px',
                   background: 'linear-gradient(135deg, rgba(241,196,15,0.15), rgba(0,0,0,0))',
-                  border: '2px solid rgba(241,196,15,0.5)', borderRadius: '14px', marginBottom: '24px'
+                  border: '2px solid rgba(241,196,15,0.5)', borderRadius: '14px', marginBottom: '24px', position: 'relative'
                 }}>
+                  <button 
+                    onClick={() => setShowGameHistory(true)}
+                    style={{ position: 'absolute', top: '20px', right: '20px', background: '#3498db', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
+                  >
+                    📜 Game History
+                  </button>
                   <div style={{ textAlign: 'center', minWidth: '100px' }}>
                     <div style={{ fontSize: '11px', color: '#aaa', textTransform: 'uppercase', letterSpacing: '1px' }}>Live Round</div>
                     <div style={{ fontSize: '54px', fontWeight: '900', color: '#f1c40f', lineHeight: 1 }}>#{simRoundId}</div>
@@ -608,6 +616,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Game History Modal */}
+      {showGameHistory && (
+        <GameHistory
+          currentRound={simRoundId}
+          rawRoundId={getGlobalGameState().rawRoundId}
+          isOpen={showGameHistory}
+          onClose={() => setShowGameHistory(false)}
+        />
       )}
     </div>
   );

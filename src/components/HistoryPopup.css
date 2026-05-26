@@ -62,11 +62,17 @@
   justify-content: space-between;
   gap: 8px;
   padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid transparent;
-  transition: all 0.2s;
+  border-radius: 12px;
+  font-size: 13px;
+  background: linear-gradient(135deg, rgba(212,160,23,0.12), rgba(255,255,255,0.05));
+  border: 1px solid rgba(212,160,23,0.2);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.hp-row:hover {
+  transform: translateY(-2px) scale(1.02);
+  background: linear-gradient(135deg, rgba(212,160,23,0.2), rgba(255,255,255,0.1));
 }
 
 .hp-latest {
@@ -117,4 +123,22 @@
   font-family: var(--font-tech);
   background: rgba(0, 0, 0, 0.3);
   letter-spacing: 1px;
+}
+@media (max-width: 600px) {
+  .history-popup {
+    width: 96%;
+    max-width: none;
+    border-radius: 12px;
+    padding: 8px;
+  }
+  .hp-header, .hp-title {
+    font-size: 12px;
+  }
+  .hp-row {
+    font-size: 11px;
+    padding: 6px 8px;
+  }
+  .hp-round, .hp-result, .hp-cards {
+    font-size: 10px;
+  }
 }
