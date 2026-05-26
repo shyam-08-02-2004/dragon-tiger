@@ -595,7 +595,14 @@ const App: React.FC = () => {
         onClose={() => setShowWallet(false)} 
         onWithdrawSuccess={(amount) => {
           setState(prev => ({ ...prev, balance: prev.balance - amount }));
-          setCurrentUser(prev => prev ? { ...prev, balance: prev.balance - amount } : null);
+          setCurrentUser(prev => {
+            if (prev) {
+              const updated = { ...prev, balance: prev.balance - amount };
+              sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify(updated));
+              return updated;
+            }
+            return null;
+          });
         }}
       />}
 
