@@ -421,7 +421,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                         <div className="vs-line" />
                         <div className="vs-badge">VS</div>
                         <div className="vs-line" />
-                        {(simResult === 'tie' || simResult === 'suited-tie') && simPhase === 'result' && (
+                        {simResult === 'tie' && simPhase === 'result' && (
                           <div className="tie-indicator">TIE</div>
                         )}
                       </div>

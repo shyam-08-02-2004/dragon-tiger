@@ -45,7 +45,7 @@ const BettingTable: React.FC<BettingTableProps> = ({ bets, onBet, phase, selecte
           {renderBetZone('dragon', '🐉 DRAGON', undefined, 'dragon-zone')}
           <div className="center-bets">
             {renderBetZone('tie', 'TIE', undefined, 'tie-zone')}
-            {renderBetZone('suited-tie', 'SUITED TIE', undefined, 'suited-tie-zone')}
+
           </div>
           {renderBetZone('tiger', '🐯 TIGER', undefined, 'tiger-zone')}
         </div>

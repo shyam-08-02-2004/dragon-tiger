@@ -1,8 +1,8 @@
 export type Suit = '♠' | '♥' | '♦' | '♣';
 export type Rank = 'A' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | 'J' | 'Q' | 'K';
-export type BetType = 'dragon' | 'tiger' | 'tie' | 'suited-tie' | 'dragon-odd' | 'dragon-even' | 'tiger-odd' | 'tiger-even' | 'dragon-red' | 'dragon-black' | 'tiger-red' | 'tiger-black';
+export type BetType = 'dragon' | 'tiger' | 'tie' | 'dragon-odd' | 'dragon-even' | 'tiger-odd' | 'tiger-even' | 'dragon-red' | 'dragon-black' | 'tiger-red' | 'tiger-black';
 export type GamePhase = 'betting' | 'dealing' | 'result' | 'idle';
-export type GameResult = 'dragon' | 'tiger' | 'tie' | 'suited-tie' | null;
+export type GameResult = 'dragon' | 'tiger' | 'tie' | null;
 
 export interface Card {
   suit: Suit;
@@ -49,27 +49,27 @@ export interface ChipValue {
 }
 
 export const CHIP_VALUES: ChipValue[] = [
-  { value: 10, label: '10', color: '#1a4a8e', borderColor: '#3498db', textColor: '#ffffff' },
-  { value: 25, label: '25', color: '#1a6b2e', borderColor: '#27ae60', textColor: '#ffffff' },
-  { value: 50, label: '50', color: '#7a3b8e', borderColor: '#9b59b6', textColor: '#ffffff' },
-  { value: 100, label: '100', color: '#8e6b1a', borderColor: '#f39c12', textColor: '#ffffff' },
-  { value: 500, label: '500', color: '#1a7a7a', borderColor: '#1abc9c', textColor: '#ffffff' },
-  { value: 1000, label: '1K', color: '#1a1a1a', borderColor: '#d4a017', textColor: '#d4a017' },
+  { value: 10,   label: '10',  color: '#1a4a8e', borderColor: '#3498db', textColor: '#ffffff' },
+  { value: 25,   label: '25',  color: '#1a6b2e', borderColor: '#27ae60', textColor: '#ffffff' },
+  { value: 50,   label: '50',  color: '#7a3b8e', borderColor: '#9b59b6', textColor: '#ffffff' },
+  { value: 100,  label: '100', color: '#8e6b1a', borderColor: '#f39c12', textColor: '#ffffff' },
+  { value: 500,  label: '500', color: '#1a7a7a', borderColor: '#1abc9c', textColor: '#ffffff' },
+  { value: 1000, label: '1K',  color: '#1a1a1a', borderColor: '#d4a017', textColor: '#d4a017' },
 ];
 
+// Tie pe 8 guna milta hai: 10 lagao → 80 milenge
 export const BET_PAYOUTS: Record<BetType, number> = {
-  'dragon': 1,
-  'tiger': 1,
-  'tie': 8,
-  'suited-tie': 50,
-  'dragon-odd': 0.75,
-  'dragon-even': 0.75,
-  'tiger-odd': 0.75,
-  'tiger-even': 0.75,
-  'dragon-red': 0.9,
+  'dragon':       1,
+  'tiger':        1,
+  'tie':          8,
+  'dragon-odd':   0.75,
+  'dragon-even':  0.75,
+  'tiger-odd':    0.75,
+  'tiger-even':   0.75,
+  'dragon-red':   0.9,
   'dragon-black': 0.9,
-  'tiger-red': 0.9,
-  'tiger-black': 0.9,
+  'tiger-red':    0.9,
+  'tiger-black':  0.9,
 };
 
 export const SUITS: Suit[] = ['♠', '♥', '♦', '♣'];
@@ -111,11 +111,9 @@ export function drawCard(): Card {
   return deck[0];
 }
 
+// Suited-tie removed — ab sirf tie hai
 export function determineResult(dragon: Card, tiger: Card): GameResult {
-  if (dragon.value === tiger.value) {
-    if (dragon.suit === tiger.suit) return 'suited-tie';
-    return 'tie';
-  }
+  if (dragon.value === tiger.value) return 'tie';
   return dragon.value > tiger.value ? 'dragon' : 'tiger';
 }
 
@@ -131,24 +129,24 @@ export function calculateWinnings(
     const payout = BET_PAYOUTS[betType];
     let won = false;
 
-    if (betType === 'dragon') won = result === 'dragon';
-    else if (betType === 'tiger') won = result === 'tiger';
-    else if (betType === 'tie') won = result === 'tie' || result === 'suited-tie';
-    else if (betType === 'suited-tie') won = result === 'suited-tie';
-    else if (betType === 'dragon-odd') won = result === 'dragon' && dragonCard.value % 2 !== 0;
-    else if (betType === 'dragon-even') won = result === 'dragon' && dragonCard.value % 2 === 0;
-    else if (betType === 'tiger-odd') won = result === 'tiger' && tigerCard.value % 2 !== 0;
-    else if (betType === 'tiger-even') won = result === 'tiger' && tigerCard.value % 2 === 0;
-    else if (betType === 'dragon-red') won = result === 'dragon' && isRed(dragonCard.suit);
+    if      (betType === 'dragon')       won = result === 'dragon';
+    else if (betType === 'tiger')        won = result === 'tiger';
+    else if (betType === 'tie')          won = result === 'tie';
+    else if (betType === 'dragon-odd')   won = result === 'dragon' && dragonCard.value % 2 !== 0;
+    else if (betType === 'dragon-even')  won = result === 'dragon' && dragonCard.value % 2 === 0;
+    else if (betType === 'tiger-odd')    won = result === 'tiger'  && tigerCard.value  % 2 !== 0;
+    else if (betType === 'tiger-even')   won = result === 'tiger'  && tigerCard.value  % 2 === 0;
+    else if (betType === 'dragon-red')   won = result === 'dragon' && isRed(dragonCard.suit);
     else if (betType === 'dragon-black') won = result === 'dragon' && !isRed(dragonCard.suit);
-    else if (betType === 'tiger-red') won = result === 'tiger' && isRed(tigerCard.suit);
-    else if (betType === 'tiger-black') won = result === 'tiger' && !isRed(tigerCard.suit);
+    else if (betType === 'tiger-red')    won = result === 'tiger'  && isRed(tigerCard.suit);
+    else if (betType === 'tiger-black')  won = result === 'tiger'  && !isRed(tigerCard.suit);
 
     if (won) {
-      total += amount + amount * payout;
+      total += amount + amount * payout; // apni bet wapas + profit
     }
-    // Dragon/Tiger bets return half on tie
-    if ((betType === 'dragon' || betType === 'tiger') && (result === 'tie' || result === 'suited-tie')) {
+
+    // Dragon/Tiger bet par tie aane par aadha (50%) wapas milta hai
+    if ((betType === 'dragon' || betType === 'tiger') && result === 'tie') {
       total += amount * 0.5;
     }
   }

@@ -22,7 +22,7 @@ const HistoryPopup: React.FC<HistoryPopupProps> = ({ history }) => {
   const getLabel = (result: string | null) => {
     if (result === 'dragon') return { icon: '🐉', label: 'Dragon', cls: 'hp-dragon' };
     if (result === 'tiger') return { icon: '🐯', label: 'Tiger', cls: 'hp-tiger' };
-    if (result === 'suited-tie') return { icon: '✨', label: 'Suited Tie', cls: 'hp-stie' };
+    if (result === 'tie') return { icon: '🤝', label: 'Tie', cls: 'hp-tie' };
     return { icon: '🤝', label: 'Tie', cls: 'hp-tie' };
   };
 

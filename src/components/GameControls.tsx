@@ -30,7 +30,6 @@ const GameControls: React.FC<GameControlsProps> = ({
     if (phase !== 'result') return null;
     if (result === 'dragon') return { text: '🐉 DRAGON WINS!', cls: 'banner-dragon' };
     if (result === 'tiger') return { text: '🐯 TIGER WINS!', cls: 'banner-tiger' };
-    if (result === 'suited-tie') return { text: '✨ SUITED TIE!', cls: 'banner-suited-tie' };
     if (result === 'tie') return { text: '🤝 TIE!', cls: 'banner-tie' };
     return null;
   };

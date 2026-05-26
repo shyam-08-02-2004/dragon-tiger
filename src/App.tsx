@@ -31,7 +31,7 @@ const DEALER_MESSAGES = {
   dragon: "The Dragon roars! Dragon wins this round!",
   tiger: "The Tiger pounces! Tiger takes the win!",
   tie: "It's a Tie! Incredible!",
-  'suited-tie': "🌟 Magnificent! A Suited Tie — the rarest outcome!",
+
   nextRound: "New round starting. Place your bets!",
 };
 
@@ -426,8 +426,8 @@ const App: React.FC = () => {
           balance: newBalance,
           lastWin,
           history: newHistory,
-          dealerMessage: result === 'tie' || result === 'suited-tie' 
-            ? 'It\'s a Tie!' 
+          dealerMessage: result === 'tie'
+            ? 'It\'s a Tie!'
             : `${result ? result.toUpperCase() : ''} WINS!`
         };
       });
@@ -506,7 +506,7 @@ const App: React.FC = () => {
               <div className="vs-line" />
               <div className="vs-badge">VS</div>
               <div className="vs-line" />
-              {(result === 'tie' || result === 'suited-tie') && phase === 'result' && (
+              {result === 'tie' && phase === 'result' && (
                 <div className="tie-indicator">TIE</div>
               )}
             </div>
