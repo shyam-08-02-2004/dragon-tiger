@@ -19,11 +19,27 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
   const [msgType, setMsgType] = useState<'success' | 'error' | 'pending'>('error');
   const [depositStep, setDepositStep] = useState<1 | 2>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (tab === 'withdraw') {
       fetch('/api/transactions/' + username)
         .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) {
+            const now = new Date().getTime();
+            const recentApproved = data.find(tx => 
+              tx.type === 'withdraw' && 
+              tx.status === 'approved' && 
+              (now - new Date(tx.timestamp).getTime() < 24 * 60 * 60 * 1000)
+            );
+            if (recentApproved) {
+              setPendingMessage('Payment pending me chala gaya 5-6 din me wallet me aa jayega');
+            } else {
+              setPendingMessage(null);
+            }
+          }
+        })
         .catch(console.error);
     }
   }, [tab, username]);
@@ -211,6 +227,11 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
 
               {tab === 'withdraw' && (
                 <>
+                  {pendingMessage && (
+                    <div className="wallet-message pending" style={{ textAlign: 'center', padding: '15px', marginBottom: '15px' }}>
+                      {pendingMessage}
+                    </div>
+                  )}
                   {balance < 600 ? (
                     <div className="wallet-message error" style={{ textAlign: 'center', padding: '20px' }}>
                       <strong>Insufficient Balance</strong><br/><br/>
