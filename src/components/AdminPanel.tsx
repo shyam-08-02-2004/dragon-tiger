@@ -788,8 +788,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                                 onMouseLeave={() => endAdminHold(msg.id)}
                               >
                                 {msg.message}
-                                <div style={{ fontSize: '10px', opacity: 0.7, marginTop: '5px', textAlign: 'right' }}>
-                                  {new Date(msg.timestamp).toLocaleString('en-US', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true })}
+                                <div style={{ fontSize: '10px', opacity: 0.7, marginTop: '5px', display: 'flex', alignItems: 'center', justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start', gap: '4px' }}>
+                                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                  {new Date(msg.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })} • {new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
                                 </div>
                                 {activeAdminMenuMsgId === msg.id && (
                                   <div style={{ display: 'flex', gap: '8px', marginTop: '6px', justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start', animation: 'hcFadeIn 0.3s ease' }}>

@@ -161,7 +161,10 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
                     <>
                       {msg.message}
                       <div className="hc-timestamp" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
-                        <span>{new Date(msg.timestamp).toLocaleString('en-US', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true })}</span>
+                        <span style={{ fontSize: '10px', opacity: 0.8, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                          {new Date(msg.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })} • {new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                        </span>
                         {msg.sender === 'user' && activeMenuMsgId === msg.id && (
                           <div style={{ display: 'flex', gap: '8px', animation: 'hcFadeIn 0.3s ease' }}>
                             {Date.now() - new Date(msg.timestamp).getTime() <= 10 * 60 * 1000 && (
