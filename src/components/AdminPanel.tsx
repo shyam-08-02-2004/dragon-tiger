@@ -150,17 +150,20 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   
   const [activeAdminMenuMsgId, setActiveAdminMenuMsgId] = useState<string | null>(null);
   const adminHoldTimeoutRef = useRef<any>(null);
+  const adminHideTimeoutRef = useRef<any>(null);
 
   const startAdminHold = (msgId: string) => {
+    if (adminHideTimeoutRef.current) clearTimeout(adminHideTimeoutRef.current);
     adminHoldTimeoutRef.current = setTimeout(() => {
       setActiveAdminMenuMsgId(msgId);
     }, 600);
   };
 
-  const endAdminHold = () => {
-    if (adminHoldTimeoutRef.current) {
-      clearTimeout(adminHoldTimeoutRef.current);
-    }
+  const endAdminHold = (msgId: string) => {
+    if (adminHoldTimeoutRef.current) clearTimeout(adminHoldTimeoutRef.current);
+    adminHideTimeoutRef.current = setTimeout(() => {
+      setActiveAdminMenuMsgId(curr => curr === msgId ? null : curr);
+    }, 2000);
   };
 
   const handleAdminDeleteMessage = async (msgId: string) => {
@@ -779,17 +782,17 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                             ) : (
                               <div
                                 onTouchStart={() => startAdminHold(msg.id)}
-                                onTouchEnd={endAdminHold}
+                                onTouchEnd={() => endAdminHold(msg.id)}
                                 onMouseDown={() => startAdminHold(msg.id)}
-                                onMouseUp={endAdminHold}
-                                onMouseLeave={endAdminHold}
+                                onMouseUp={() => endAdminHold(msg.id)}
+                                onMouseLeave={() => endAdminHold(msg.id)}
                               >
                                 {msg.message}
                                 <div style={{ fontSize: '10px', opacity: 0.7, marginTop: '5px', textAlign: 'right' }}>
                                   {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </div>
                                 {activeAdminMenuMsgId === msg.id && (
-                                  <div style={{ display: 'flex', gap: '8px', marginTop: '6px', justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start' }}>
+                                  <div style={{ display: 'flex', gap: '8px', marginTop: '6px', justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start', animation: 'hcFadeIn 0.3s ease' }}>
                                     <button 
                                       onClick={() => { setEditingChatId(msg.id); setEditingChatText(msg.message); setActiveAdminMenuMsgId(null); }}
                                       style={{ background: 'none', border: 'none', color: '#f1c40f', fontSize: '12px', cursor: 'pointer', padding: 0 }}

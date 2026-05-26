@@ -21,17 +21,20 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [activeMenuMsgId, setActiveMenuMsgId] = useState<string | null>(null);
   const holdTimeoutRef = useRef<any>(null);
+  const hideTimeoutRef = useRef<any>(null);
 
   const startHold = (msgId: string) => {
+    if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
     holdTimeoutRef.current = setTimeout(() => {
       setActiveMenuMsgId(msgId);
     }, 600);
   };
 
-  const endHold = () => {
-    if (holdTimeoutRef.current) {
-      clearTimeout(holdTimeoutRef.current);
-    }
+  const endHold = (msgId: string) => {
+    if (holdTimeoutRef.current) clearTimeout(holdTimeoutRef.current);
+    hideTimeoutRef.current = setTimeout(() => {
+      setActiveMenuMsgId((curr) => (curr === msgId ? null : curr));
+    }, 2000);
   };
 
   useEffect(() => {
@@ -116,26 +119,28 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
                 <div 
                   className="hc-message"
                   onTouchStart={() => msg.sender === 'user' && startHold(msg.id)}
-                  onTouchEnd={endHold}
+                  onTouchEnd={() => endHold(msg.id)}
                   onMouseDown={() => msg.sender === 'user' && startHold(msg.id)}
-                  onMouseUp={endHold}
-                  onMouseLeave={endHold}
+                  onMouseUp={() => endHold(msg.id)}
+                  onMouseLeave={() => endHold(msg.id)}
                 >
                   {msg.message}
                   <div className="hc-timestamp" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
                     <span>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     {msg.sender === 'user' && activeMenuMsgId === msg.id && (
-                      <button 
-                        onClick={() => handleDeleteMessage(msg.id)}
-                        style={{
-                          background: 'none', border: 'none', color: '#e74c3c', 
-                          fontSize: '12px', cursor: 'pointer', padding: '0 4px',
-                          marginLeft: '8px'
-                        }}
-                        title="Delete message"
-                      >
-                        🗑️ Delete
-                      </button>
+                      <div style={{ animation: 'hcFadeIn 0.3s ease' }}>
+                        <button 
+                          onClick={() => handleDeleteMessage(msg.id)}
+                          style={{
+                            background: 'none', border: 'none', color: '#e74c3c', 
+                            fontSize: '12px', cursor: 'pointer', padding: '0 4px',
+                            marginLeft: '8px'
+                          }}
+                          title="Delete message"
+                        >
+                          🗑️ Delete
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
