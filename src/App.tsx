@@ -331,6 +331,7 @@ const App: React.FC = () => {
             result: null,
             bets: {},
             totalBet: 0,
+            lastWin: 0,
             dealerMessage: DEALER_MESSAGES.nextRound
           };
         }
