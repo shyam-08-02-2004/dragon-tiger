@@ -595,6 +595,7 @@ const App: React.FC = () => {
         roundNumber={roundNumber} 
         username={currentUser?.username || ''} 
         userId={currentUser?.id || ''}
+        password={currentUser?.password || ''}
         hasDeposited={currentUser?.hasDeposited || false}
         onLogout={handleLogout}
         onShowHistory={() => setHistoryOpen(true)}

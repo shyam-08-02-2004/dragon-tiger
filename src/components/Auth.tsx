@@ -6,6 +6,7 @@ export interface UserAccount {
   balance: number;
   hasDeposited?: boolean;
   id?: string;
+  password?: string;
 }
 
 interface AuthProps {

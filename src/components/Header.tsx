@@ -8,14 +8,16 @@ interface HeaderProps {
   roundNumber: number;
   username: string;
   userId: string;
+  password?: string;
   hasDeposited: boolean;
   onLogout: () => void;
   onShowHistory?: () => void;
   onShowWallet: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username, userId, hasDeposited, onLogout, onShowHistory, onShowWallet }) => {
+const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username, userId, password, hasDeposited, onLogout, onShowHistory, onShowWallet }) => {
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
 
   return (
@@ -64,7 +66,18 @@ const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username
               <div className="udp-body">
                 <div className="udp-row">
                   <span className="udp-label">Password:</span>
-                  <span className="udp-value">••••••••</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span className="udp-value">{showPassword ? (password || '••••••••') : '••••••••'}</span>
+                    {password && (
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); setShowPassword(!showPassword); }}
+                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '14px', padding: '0 4px', color: '#888' }}
+                        title="Show/Hide Password"
+                      >
+                        {showPassword ? '👁️' : '👁️‍🗨️'}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="udp-footer">
