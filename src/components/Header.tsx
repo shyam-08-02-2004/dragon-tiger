@@ -13,9 +13,10 @@ interface HeaderProps {
   onLogout: () => void;
   onShowHistory?: () => void;
   onShowWallet: () => void;
+  onShowSupport?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username, userId, password, hasDeposited, onLogout, onShowHistory, onShowWallet }) => {
+const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username, userId, password, hasDeposited, onLogout, onShowHistory, onShowWallet, onShowSupport }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -110,6 +111,13 @@ const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username
           </span>
           <div className="wallet-add-btn">+</div>
         </div>
+        
+        {onShowSupport && (
+          <button className="header-support-btn" onClick={onShowSupport} title="Help Center">
+            <span className="support-icon">💬</span>
+            <span className="support-text">Support</span>
+          </button>
+        )}
       </div>
     </header>
   );

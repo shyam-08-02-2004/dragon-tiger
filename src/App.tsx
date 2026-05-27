@@ -610,6 +610,7 @@ const App: React.FC = () => {
         onLogout={handleLogout}
         onShowHistory={() => setHistoryOpen(true)}
         onShowWallet={() => setWalletOpen(true)}
+        onShowSupport={() => setHelpOpen(true)}
       />
 
       <main className="game-main" id="game-main">
@@ -718,13 +719,6 @@ const App: React.FC = () => {
           <span className="footer-info">18+ | Play Responsibly | For Entertainment Only</span>
           <span className="footer-sep">|</span>
           <span className="footer-version">v2.0</span>
-          <span className="footer-sep">|</span>
-          <button 
-            onClick={() => setHelpOpen(true)}
-            style={{ background: 'transparent', border: 'none', color: '#3498db', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}
-          >
-            💬 Support
-          </button>
         </div>
       </footer>
 
