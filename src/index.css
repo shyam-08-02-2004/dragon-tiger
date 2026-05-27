@@ -371,4 +371,10 @@ body {
   .auth-box {
     padding: 20px;
   }
+
+  html, body {
+    height: auto;
+    min-height: 100%;
+    overflow-y: auto;
+  }
 }
