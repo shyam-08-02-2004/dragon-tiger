@@ -222,3 +222,48 @@
 }
 
 /* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .app {
+    height: 100dvh;
+    overflow: hidden;
+  }
+  
+  .game-main {
+    flex: 1;
+    overflow: hidden;
+    justify-content: space-between;
+  }
+  
+  .table-area {
+    padding: 0 4px;
+    flex-shrink: 1;
+  }
+  
+  .cards-arena {
+    min-height: auto;
+    height: auto;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 0;
+  }
+  
+  .vs-line {
+    height: 30px;
+  }
+  
+  .betting-panel {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 2px;
+    flex-shrink: 0;
+  }
+
+  .game-footer {
+    display: none;
+  }
+
+  .bg-dragon, .bg-tiger {
+    display: none;
+  }
+}

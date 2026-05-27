@@ -223,30 +223,54 @@
     font-size: 11px;
   }
   .chip-row {
-    gap: 6px;
+    gap: 4px;
   }
 }
 
 @media (max-width: 480px) {
+  .chip-selector {
+    padding: 2px 4px;
+    gap: 4px;
+  }
   .bet-actions {
-    flex-direction: column;
-    gap: 6px;
+    flex-direction: row;
+    gap: 4px;
+    justify-content: space-between;
+  }
+  .total-bet-display {
+    min-width: 80px;
+    padding: 2px 4px;
+  }
+  .total-bet-label {
+    font-size: 9px;
+  }
+  .total-bet-amount {
+    font-size: 14px;
   }
   .action-buttons {
-    width: 100%;
-    justify-content: center;
+    width: auto;
+    flex: 1;
+    justify-content: flex-end;
+    gap: 4px;
   }
   .action-btn {
     flex: 1;
-    padding: 4px 8px;
-    font-size: 12px;
-    min-width: auto;
+    padding: 4px 6px;
+    font-size: 11px;
+    min-width: 80px;
+    flex-direction: row;
+    justify-content: center;
   }
   .btn-icon {
-    font-size: 20px;
+    font-size: 14px;
   }
   .btn-text {
-    font-size: 12px;
-    letter-spacing: 1.2px;
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+  .chip {
+    width: 38px;
+    height: 38px;
+    border-width: 3px;
   }
 }
