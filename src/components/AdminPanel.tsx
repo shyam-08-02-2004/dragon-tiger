@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import './AdminPanel.css';
 import './WalletModal.css';
 import CardDisplay from './CardDisplay';
@@ -100,7 +100,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     }
   }, [selectedUserHistory, userHistoryTab]);
 
-  // ── Live bet polling every 2 seconds ──
+  // â”€â”€ Live bet polling every 2 seconds â”€â”€
   useEffect(() => {
     const pollBets = () => {
       const global = getGlobalGameState();
@@ -119,7 +119,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     return () => clearInterval(betPollId);
   }, []);
 
-  // ── Support Chat Polling ──
+  // â”€â”€ Support Chat Polling â”€â”€
   useEffect(() => {
     if (activeTab !== 'support' || !selectedSupportUser) return;
     
@@ -224,7 +224,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     setEditingChatText('');
   };
 
-  // ── Continuous game loop for admin (always running) ──
+  // â”€â”€ Continuous game loop for admin (always running) â”€â”€
   useEffect(() => {
     simTimerRef.current = setInterval(() => {
       const global = getGlobalGameState();
@@ -258,14 +258,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
               // Apply same override logic as App.tsx
               if (forcedOutcome === 'dragon') {
-                dragonCard = { suit: '♠', rank: 'K', value: 13 };
-                tigerCard  = { suit: '♥', rank: '2', value: 2  };
+                dragonCard = { suit: 'â™ ', rank: 'K', value: 13 };
+                tigerCard  = { suit: 'â™¥', rank: '2', value: 2  };
               } else if (forcedOutcome === 'tiger') {
-                dragonCard = { suit: '♥', rank: '2', value: 2  };
-                tigerCard  = { suit: '♠', rank: 'K', value: 13 };
+                dragonCard = { suit: 'â™¥', rank: '2', value: 2  };
+                tigerCard  = { suit: 'â™ ', rank: 'K', value: 13 };
               } else if (forcedOutcome === 'tie') {
-                dragonCard = { suit: '♠', rank: '8', value: 8 };
-                tigerCard  = { suit: '♥', rank: '8', value: 8 };
+                dragonCard = { suit: 'â™ ', rank: '8', value: 8 };
+                tigerCard  = { suit: 'â™¥', rank: '8', value: 8 };
               }
 
               setSimDragonCard(dragonCard);
@@ -296,7 +296,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     return () => { if (simTimerRef.current) clearInterval(simTimerRef.current); };
   }, []);
 
-  // ── Set outcome for ANY round ──
+  // â”€â”€ Set outcome for ANY round â”€â”€
   const setRoundOutcome = async (roundId: number, outcome: string) => {
     try {
       const res = await fetch('/api/admin/round-outcomes', {
@@ -307,14 +307,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
       if (res.ok) {
         const data = await res.json();
         setRoundOutcomes(data.roundOutcomes || []);
-        setSaveMsg(`✅ Round #${roundId} → ${outcome.toUpperCase()} set ho gaya!`);
+        setSaveMsg(`âœ… Round #${roundId} â†’ ${outcome.toUpperCase()} set ho gaya!`);
         setTargetRoundId('');
         setTimeout(() => setSaveMsg(''), 4000);
       }
     } catch(e) { console.error(e); }
   };
 
-  // ── Remove outcome for a round ──
+  // â”€â”€ Remove outcome for a round â”€â”€
   const removeRoundOutcome = async (roundId: number) => {
     try {
       const res = await fetch(`/api/admin/round-outcomes/${roundId}`, { method: 'DELETE' });
@@ -380,17 +380,17 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   };
 
   const phaseColor = simPhase === 'betting' ? '#f39c12' : simPhase === 'dealing' ? '#3498db' : '#2ecc71';
-  const phaseLabel = simPhase === 'betting' ? `🎯 Betting Open (${simTimer}s)` : simPhase === 'dealing' ? '🃏 Dealing Cards...' : '🏆 Round Over';
+  const phaseLabel = simPhase === 'betting' ? `ðŸŽ¯ Betting Open (${simTimer}s)` : simPhase === 'dealing' ? 'ðŸƒ Dealing Cards...' : 'ðŸ† Round Over';
 
   return (
     <div className="admin-layout">
       <aside className="admin-sidebar">
         <div className="admin-brand">
-          <span className="admin-logo">🛡️</span>
+          <span className="admin-logo">ðŸ›¡ï¸</span>
           <h2>CASINO ADMIN</h2>
         </div>
 
-        {/* ── Live Round Badge in sidebar ── */}
+        {/* â”€â”€ Live Round Badge in sidebar â”€â”€ */}
         <div style={{
           margin: '10px 16px',
           padding: '12px',
@@ -405,14 +405,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
         </div>
         
         <nav className="admin-nav">
-          <button className={`admin-nav-btn ${activeTab === 'users' ? 'active' : ''}`} onClick={() => handleTabChange('users')}>👥 Users</button>
-          <button className={`admin-nav-btn ${activeTab === 'game' ? 'active' : ''}`} onClick={() => handleTabChange('game')}>🎲 Game Control</button>
-          <button className={`admin-nav-btn ${activeTab === 'transactions' ? 'active' : ''}`} onClick={() => handleTabChange('transactions')}>💳 Transactions</button>
-          <button className={`admin-nav-btn ${activeTab === 'support' ? 'active' : ''}`} onClick={() => handleTabChange('support')}>💬 Support</button>
+          <button className={`admin-nav-btn ${activeTab === 'users' ? 'active' : ''}`} onClick={() => handleTabChange('users')}>ðŸ‘¥ Users</button>
+          <button className={`admin-nav-btn ${activeTab === 'game' ? 'active' : ''}`} onClick={() => handleTabChange('game')}>ðŸŽ² Game Control</button>
+          <button className={`admin-nav-btn ${activeTab === 'transactions' ? 'active' : ''}`} onClick={() => handleTabChange('transactions')}>ðŸ’³ Transactions</button>
+          <button className={`admin-nav-btn ${activeTab === 'support' ? 'active' : ''}`} onClick={() => handleTabChange('support')}>ðŸ’¬ Support</button>
         </nav>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: 'auto' }}>
-          <button className="admin-logout-btn" onClick={onLogout} style={{ marginTop: 0 }}>🚪 Logout</button>
+          <button className="admin-logout-btn" onClick={onLogout} style={{ marginTop: 0 }}>ðŸšª Logout</button>
         </div>
       </aside>
 
@@ -423,12 +423,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
         </header>
 
         <div className="admin-content">
-          {/* ── USERS TAB ── */}
+          {/* â”€â”€ USERS TAB â”€â”€ */}
           {activeTab === 'users' && (
             <div className="admin-card">
               <h3>Registered Players</h3>
               <div className="table-responsive">
-                <table className="admin-table">
+                <table className="admin-table-v2">
                   <thead>
                     <tr>
                       <th>Mobile Number</th>
@@ -450,13 +450,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                           <td data-label="Balance">
                             {editBalanceUser === user.id ? (
                               <div className="edit-balance-group">
-                                <span className="currency-symbol">₹</span>
+                                <span className="currency-symbol">â‚¹</span>
                                 <input type="number" value={newBalance} onChange={(e) => setNewBalance(e.target.value)} className="balance-input" autoFocus />
-                                <button className="save-btn" onClick={() => handleUpdateBalance(user.id)}>✓</button>
-                                <button className="cancel-btn" onClick={() => setEditBalanceUser(null)}>✕</button>
+                                <button className="save-btn" onClick={() => handleUpdateBalance(user.id)}>âœ“</button>
+                                <button className="cancel-btn" onClick={() => setEditBalanceUser(null)}>âœ•</button>
                               </div>
                             ) : (
-                              <span className="balance-display gold">₹{user.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                              <span className="balance-display gold">â‚¹{user.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                             )}
                           </td>
                           <td data-label="Deposited">
@@ -466,9 +466,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                           </td>
                           <td data-label="Actions">
                             <div className="action-buttons">
-                              <button className="action-btn edit" onClick={() => { setEditBalanceUser(user.id); setNewBalance(user.balance.toString()); }} title="Edit Balance">💰</button>
+                              <button className="action-btn edit" onClick={() => { setEditBalanceUser(user.id); setNewBalance(user.balance.toString()); }} title="Edit Balance">ðŸ’°</button>
                               <button className="btn-secondary" onClick={() => handleUserHistory(user.id)}>View History</button>
-                              <button className="action-btn delete" onClick={() => handleDeleteUser(user.id)} title="Delete User">🗑️</button>
+                              <button className="action-btn delete" onClick={() => handleDeleteUser(user.id)} title="Delete User">ðŸ—‘ï¸</button>
                             </div>
                           </td>
                         </tr>
@@ -483,22 +483,22 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
             </div>
           )}
 
-          {/* ── GAME TAB ── */}
+          {/* â”€â”€ GAME TAB â”€â”€ */}
           {activeTab === 'game' && (
             <div className="admin-grid">
               <div className="admin-card">
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                  <h2 style={{ margin: 0 }}>🎮 Game Control</h2>
+                  <h2 style={{ margin: 0 }}>ðŸŽ® Game Control</h2>
                   <button 
                     onClick={() => handleShowGameHist(true)}
                     style={{ background: '#3498db', color: '#fff', border: 'none', padding: '10px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}
                   >
-                    📜 <span className="hide-mobile">Game History</span>
+                    ðŸ“œ <span className="hide-mobile">Game History</span>
                   </button>
                 </div>
 
-                {/* ── Current Round Info ── */}
+                {/* â”€â”€ Current Round Info â”€â”€ */}
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: '20px', padding: '20px',
                   background: 'linear-gradient(135deg, rgba(241,196,15,0.15), rgba(0,0,0,0))',
@@ -529,14 +529,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   </div>
                 </div>
 
-                {/* ── ANY ROUND WIN CONTROL ── */}
+                {/* â”€â”€ ANY ROUND WIN CONTROL â”€â”€ */}
                 <div style={{
                   padding: '20px', background: 'rgba(155,89,182,0.08)', border: '2px solid rgba(155,89,182,0.5)',
                   borderRadius: '14px', marginBottom: '24px'
                 }}>
-                  <h3 style={{ color: '#9b59b6', margin: '0 0 6px 0' }}>🎯 Kisi Bhi Round Ka Result Set Karein</h3>
+                  <h3 style={{ color: '#9b59b6', margin: '0 0 6px 0' }}>ðŸŽ¯ Kisi Bhi Round Ka Result Set Karein</h3>
                   <p className="text-muted" style={{ margin: '0 0 16px 0', fontSize: '13px' }}>
-                    Round number daalo (1–2000) aur choose karo Dragon / Tiger / Tie — agle us round mein wahi result aayega.
+                    Round number daalo (1â€“2000) aur choose karo Dragon / Tiger / Tie â€” agle us round mein wahi result aayega.
                   </p>
 
                   {saveMsg && (
@@ -563,22 +563,22 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                     </div>
                     <button onClick={() => { const r = parseInt(targetRoundId) || simRoundId; setRoundOutcome(r, 'dragon'); }}
                       style={{ flex: 1, minWidth: '90px', padding: '12px 16px', border: '2px solid #e74c3c', background: 'rgba(231,76,60,0.2)', color: '#e74c3c', borderRadius: '10px', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer' }}>
-                      🐉 Dragon
+                      ðŸ‰ Dragon
                     </button>
                     <button onClick={() => { const r = parseInt(targetRoundId) || simRoundId; setRoundOutcome(r, 'tiger'); }}
                       style={{ flex: 1, minWidth: '90px', padding: '12px 16px', border: '2px solid #3498db', background: 'rgba(52,152,219,0.2)', color: '#3498db', borderRadius: '10px', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer' }}>
-                      🐯 Tiger
+                      ðŸ¯ Tiger
                     </button>
                     <button onClick={() => { const r = parseInt(targetRoundId) || simRoundId; setRoundOutcome(r, 'tie'); }}
                       style={{ flex: 1, minWidth: '90px', padding: '12px 16px', border: '2px solid #27ae60', background: 'rgba(39,174,96,0.2)', color: '#27ae60', borderRadius: '10px', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer' }}>
-                      🤝 Tie
+                      ðŸ¤ Tie
                     </button>
                   </div>
 
                   {/* Set Rounds Table */}
                   {roundOutcomes.length > 0 && (
                     <div>
-                      <div style={{ fontSize: '13px', color: '#aaa', marginBottom: '8px' }}>📋 Set kiye gaye rounds:</div>
+                      <div style={{ fontSize: '13px', color: '#aaa', marginBottom: '8px' }}>ðŸ“‹ Set kiye gaye rounds:</div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                         {roundOutcomes.sort((a,b) => a.roundId - b.roundId).map(ro => (
                           <div key={ro.roundId} style={{
@@ -589,11 +589,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                           }}>
                             <span style={{ color: '#f1c40f', fontWeight: 'bold' }}>#{ro.roundId}</span>
                             <span style={{ textTransform: 'capitalize', fontWeight: 'bold', color: '#fff' }}>
-                              {ro.outcome === 'dragon' ? '🐉' : ro.outcome === 'tiger' ? '🐯' : '🤝'} {ro.outcome}
+                              {ro.outcome === 'dragon' ? 'ðŸ‰' : ro.outcome === 'tiger' ? 'ðŸ¯' : 'ðŸ¤'} {ro.outcome}
                             </span>
                             <button onClick={() => removeRoundOutcome(ro.roundId)}
                               style={{ background: 'rgba(255,0,0,0.3)', color: 'white', border: '1px solid #e74c3c', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '10px', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                              ✕
+                              âœ•
                             </button>
                           </div>
                         ))}
@@ -607,12 +607,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   )}
                 </div>
 
-                {/* ── Live Bet Totals ── */}
+                {/* â”€â”€ Live Bet Totals â”€â”€ */}
                 <div style={{ marginBottom: '24px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                    <h3 style={{ margin: 0 }}>📊 Live Bets — Round #{simRoundId}</h3>
+                    <h3 style={{ margin: 0 }}>ðŸ“Š Live Bets â€” Round #{simRoundId}</h3>
                     <span style={{ fontSize: '12px', color: '#aaa', background: 'rgba(255,255,255,0.07)', padding: '4px 10px', borderRadius: '20px' }}>
-                      {liveBets.betCount} players · ₹{liveBets.total} total
+                      {liveBets.betCount} players Â· â‚¹{liveBets.total} total
                     </span>
                   </div>
                   {(() => {
@@ -625,8 +625,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                         {/* Dragon */}
                         <div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                            <span style={{ color: '#e74c3c', fontWeight: 'bold' }}>🐉 Dragon</span>
-                            <span style={{ color: '#fff', fontWeight: 'bold' }}>₹{liveBets.dragon} <span style={{ color: '#aaa', fontSize: '12px' }}>({dragonPct}%)</span></span>
+                            <span style={{ color: '#e74c3c', fontWeight: 'bold' }}>ðŸ‰ Dragon</span>
+                            <span style={{ color: '#fff', fontWeight: 'bold' }}>â‚¹{liveBets.dragon} <span style={{ color: '#aaa', fontSize: '12px' }}>({dragonPct}%)</span></span>
                           </div>
                           <div style={{ height: '10px', background: 'rgba(255,255,255,0.08)', borderRadius: '5px', overflow: 'hidden' }}>
                             <div style={{ height: '100%', width: `${dragonPct}%`, background: 'linear-gradient(90deg, #c0392b, #e74c3c)', borderRadius: '5px', transition: 'width 0.5s ease' }} />
@@ -635,8 +635,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                         {/* Tiger */}
                         <div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                            <span style={{ color: '#3498db', fontWeight: 'bold' }}>🐯 Tiger</span>
-                            <span style={{ color: '#fff', fontWeight: 'bold' }}>₹{liveBets.tiger} <span style={{ color: '#aaa', fontSize: '12px' }}>({tigerPct}%)</span></span>
+                            <span style={{ color: '#3498db', fontWeight: 'bold' }}>ðŸ¯ Tiger</span>
+                            <span style={{ color: '#fff', fontWeight: 'bold' }}>â‚¹{liveBets.tiger} <span style={{ color: '#aaa', fontSize: '12px' }}>({tigerPct}%)</span></span>
                           </div>
                           <div style={{ height: '10px', background: 'rgba(255,255,255,0.08)', borderRadius: '5px', overflow: 'hidden' }}>
                             <div style={{ height: '100%', width: `${tigerPct}%`, background: 'linear-gradient(90deg, #2980b9, #3498db)', borderRadius: '5px', transition: 'width 0.5s ease' }} />
@@ -645,8 +645,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                         {/* Tie */}
                         <div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                            <span style={{ color: '#27ae60', fontWeight: 'bold' }}>🤝 Tie</span>
-                            <span style={{ color: '#fff', fontWeight: 'bold' }}>₹{liveBets.tie} <span style={{ color: '#aaa', fontSize: '12px' }}>({tiePct}%)</span></span>
+                            <span style={{ color: '#27ae60', fontWeight: 'bold' }}>ðŸ¤ Tie</span>
+                            <span style={{ color: '#fff', fontWeight: 'bold' }}>â‚¹{liveBets.tie} <span style={{ color: '#aaa', fontSize: '12px' }}>({tiePct}%)</span></span>
                           </div>
                           <div style={{ height: '10px', background: 'rgba(255,255,255,0.08)', borderRadius: '5px', overflow: 'hidden' }}>
                             <div style={{ height: '100%', width: `${tiePct}%`, background: 'linear-gradient(90deg, #219a52, #27ae60)', borderRadius: '5px', transition: 'width 0.5s ease' }} />
@@ -660,8 +660,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   })()}
                 </div>
 
-                {/* ── Live Game Preview ── */}
-                <h3 style={{ marginBottom: '8px' }}>🃏 Live Game Preview</h3>
+                {/* â”€â”€ Live Game Preview â”€â”€ */}
+                <h3 style={{ marginBottom: '8px' }}>ðŸƒ Live Game Preview</h3>
                 <div style={{ transform: 'scale(0.85)', transformOrigin: 'top center', minHeight: '200px' }}>
                   <div className="table-area" style={{ pointerEvents: 'none' }}>
                     <div className="cards-arena" id="cards-arena">
@@ -678,7 +678,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                     </div>
                     {simResult && simPhase === 'result' && (
                       <div style={{ textAlign: 'center', marginTop: '12px', fontSize: '22px', fontWeight: 'bold', color: '#f1c40f' }}>
-                        🏆 {simResult === 'dragon' ? '🐉 Dragon Wins!' : simResult === 'tiger' ? '🐯 Tiger Wins!' : '🤝 Tie!'}
+                        ðŸ† {simResult === 'dragon' ? 'ðŸ‰ Dragon Wins!' : simResult === 'tiger' ? 'ðŸ¯ Tiger Wins!' : 'ðŸ¤ Tie!'}
                       </div>
                     )}
                   </div>
@@ -688,12 +688,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
             </div>
           )}
 
-          {/* ── TRANSACTIONS TAB ── */}
+          {/* â”€â”€ TRANSACTIONS TAB â”€â”€ */}
           {activeTab === 'transactions' && (
             <div className="admin-card">
               <h3>Pending Transactions</h3>
               <div className="table-responsive">
-                <table className="admin-table">
+                <table className="admin-table-v2">
                   <thead>
                     <tr>
                       <th>Time</th><th>User</th><th>Type</th><th>Amount</th><th>UTR / UPI</th><th>Status</th><th>Actions</th>
@@ -705,7 +705,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                         <td data-label="Time">{new Date(tx.timestamp).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}</td>
                         <td data-label="User" className="fw-bold">{tx.username}</td>
                         <td data-label="Type" className={tx.type === 'deposit' ? 'green' : 'gold'}>{tx.type.toUpperCase()}</td>
-                        <td data-label="Amount" className="gold">₹{tx.amount}</td>
+                        <td data-label="Amount" className="gold">â‚¹{tx.amount}</td>
                         <td data-label="UTR/UPI" style={{ fontSize: '12px', maxWidth: '120px', wordBreak: 'break-all' }}>
                           {tx.utr && <span style={{ color: '#aaa' }}>UTR: {tx.utr}</span>}
                           {tx.upiId && <span style={{ color: '#7ec8e3' }}>UPI: {tx.upiId}</span>}
@@ -715,13 +715,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                         <td data-label="Actions">
                           {tx.status === 'pending' ? (
                             <div className="action-buttons">
-                              <button className="action-btn edit" title="Approve" onClick={() => handleTransactionAction(tx.id, 'approve')}>✅</button>
-                              <button className="action-btn delete" title="Reject" onClick={() => handleTransactionAction(tx.id, 'reject')}>❌</button>
-                              <button className="action-btn delete" title="Delete" onClick={() => handleDeleteTransaction(tx.id)} style={{ background: '#e74c3c', color: 'white' }}>🗑️</button>
+                              <button className="action-btn edit" title="Approve" onClick={() => handleTransactionAction(tx.id, 'approve')}>âœ…</button>
+                              <button className="action-btn delete" title="Reject" onClick={() => handleTransactionAction(tx.id, 'reject')}>âŒ</button>
+                              <button className="action-btn delete" title="Delete" onClick={() => handleDeleteTransaction(tx.id)} style={{ background: '#e74c3c', color: 'white' }}>ðŸ—‘ï¸</button>
                             </div>
                           ) : (
                             <div className="action-buttons">
-                              <button className="action-btn delete" title="Delete" onClick={() => handleDeleteTransaction(tx.id)} style={{ background: '#e74c3c', color: 'white' }}>🗑️</button>
+                              <button className="action-btn delete" title="Delete" onClick={() => handleDeleteTransaction(tx.id)} style={{ background: '#e74c3c', color: 'white' }}>ðŸ—‘ï¸</button>
                             </div>
                           )}
                         </td>
@@ -736,7 +736,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
             </div>
           )}
 
-          {/* ── SUPPORT TAB ── */}
+          {/* â”€â”€ SUPPORT TAB â”€â”€ */}
           {activeTab === 'support' && (
             <div className={`admin-card admin-chat-layout ${selectedSupportUser ? 'chat-active' : ''}`}>
               <div className="admin-chat-sidebar">
@@ -756,7 +756,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                         alignItems: 'center'
                       }}
                     >
-                      <span style={{ fontWeight: 'bold' }}>👤 {u.userId}</span>
+                      <span style={{ fontWeight: 'bold' }}>ðŸ‘¤ {u.userId}</span>
                       {u.unreadCount > 0 && (
                         <span style={{ background: '#e74c3c', color: 'white', borderRadius: '12px', padding: '2px 8px', fontSize: '12px', fontWeight: 'bold' }}>
                           {u.unreadCount}
@@ -773,11 +773,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   <>
                     <div className="admin-chat-header">
                       <button className="admin-chat-back" onClick={() => handleSupportUser(null)}>
-                        ← Back
+                        â† Back
                       </button>
                       <span style={{ fontWeight: 'bold', fontSize: '16px' }}>{selectedSupportUser}</span>
                       <button className="admin-chat-delete" onClick={handleDeleteChat} title="Delete Chat">
-                        🗑️
+                        ðŸ—‘ï¸
                       </button>
                     </div>
                     <div className="admin-chat-messages">
@@ -819,7 +819,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                                 {msg.message}
                                 <div style={{ fontSize: '10px', opacity: 0.7, marginTop: '5px', display: 'flex', alignItems: 'center', justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start', gap: '4px' }}>
                                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                                  {new Date(msg.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })} • {new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                                  {new Date(msg.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })} â€¢ {new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
                                 </div>
                                 {activeAdminMenuMsgId === msg.id && (
                                   <div style={{ display: 'flex', gap: '8px', marginTop: '6px', justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start', animation: 'hcFadeIn 0.3s ease' }}>
@@ -828,14 +828,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                                         onClick={() => { setEditingChatId(msg.id); setEditingChatText(msg.message); setActiveAdminMenuMsgId(null); }}
                                         style={{ background: 'none', border: 'none', color: '#f1c40f', fontSize: '12px', cursor: 'pointer', padding: 0 }}
                                       >
-                                        ✏️ Edit
+                                        âœï¸ Edit
                                       </button>
                                     )}
                                     <button 
                                       onClick={() => handleAdminDeleteMessage(msg.id)}
                                       style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: '12px', cursor: 'pointer', padding: 0 }}
                                     >
-                                      🗑️ Delete
+                                      ðŸ—‘ï¸ Delete
                                     </button>
                                   </div>
                                 )}
@@ -876,7 +876,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
           <div className="wallet-modal">
             <div className="wallet-header">
               <h2>History: {selectedUserHistory}</h2>
-              <button className="close-btn" onClick={() => handleUserHistory(null)}>✕</button>
+              <button className="close-btn" onClick={() => handleUserHistory(null)}>âœ•</button>
             </div>
             
             <div className="wallet-tabs" style={{ marginBottom: '15px' }}>
@@ -896,14 +896,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
             <div className="wallet-content" style={{ maxHeight: '400px', overflowY: 'auto' }}>
               {userHistoryTab === 'transactions' ? (
-                <table className="admin-table">
+                <table className="admin-table-v2">
                   <thead><tr><th>Time</th><th>Type</th><th>Amount</th><th>Status</th></tr></thead>
                   <tbody>
                     {transactions.filter(t => t.username === selectedUserHistory).slice().reverse().map(tx => (
                       <tr key={tx.id}>
                         <td data-label="Time">{new Date(tx.timestamp).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}</td>
                         <td data-label="Type" className={tx.type === 'deposit' ? 'green' : 'gold'}>{tx.type.toUpperCase()}</td>
-                        <td data-label="Amount">₹{tx.amount}</td>
+                        <td data-label="Amount">â‚¹{tx.amount}</td>
                         <td data-label="Status"><span className={`status-badge ${tx.status}`}>{tx.status}</span></td>
                       </tr>
                     ))}
@@ -913,7 +913,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   </tbody>
                 </table>
               ) : (
-                <table className="admin-table">
+                <table className="admin-table-v2">
                   <thead><tr><th>Time</th><th>Round</th><th>Bet On</th><th>Bet</th><th>Win</th><th>Result</th></tr></thead>
                   <tbody>
                     {adminBetHistory.map((b, i) => (
@@ -921,8 +921,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                         <td data-label="Time">{new Date(b.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</td>
                         <td data-label="Round">#{b.roundNumber}</td>
                         <td data-label="Bet On" style={{ color: '#7ec8e3' }}>{b.betSide || '-'}</td>
-                        <td data-label="Bet">₹{b.betAmount}</td>
-                        <td data-label="Win">₹{b.winAmount}</td>
+                        <td data-label="Bet">â‚¹{b.betAmount}</td>
+                        <td data-label="Win">â‚¹{b.winAmount}</td>
                         <td data-label="Result" style={{ color: b.winAmount > 0 ? '#2ecc71' : '#e74c3c', fontWeight: 'bold' }}>
                           {b.winAmount > 0 ? 'WIN' : 'LOST'}
                         </td>
@@ -953,3 +953,4 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 };
 
 export default AdminPanel;
+

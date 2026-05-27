@@ -1,4 +1,4 @@
-.admin-layout {
+﻿.admin-layout {
   display: flex;
   height: 100vh;
   background-color: var(--dark-bg);
@@ -219,12 +219,12 @@ html, body {
   background: rgba(0, 0, 0, 0.2);
 }
 
-.admin-table {
+.admin-table-v2 {
   width: 100%;
   border-collapse: collapse;
 }
 
-.admin-table th {
+.admin-table-v2 th {
   text-align: left;
   padding: 20px;
   font-size: 13px;
@@ -236,7 +236,7 @@ html, body {
   border-bottom: 2px solid rgba(255, 196, 0, 0.2);
 }
 
-.admin-table td {
+.admin-table-v2 td {
   padding: 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   vertical-align: middle;
@@ -244,7 +244,7 @@ html, body {
   transition: background 0.2s ease;
 }
 
-.admin-table tbody tr:hover td {
+.admin-table-v2 tbody tr:hover td {
   background: rgba(255, 196, 0, 0.05);
 }
 
@@ -435,7 +435,7 @@ html, body {
   color: var(--text-muted);
 }
 
-/* ── SUPPORT CHAT LAYOUT ── */
+/* â”€â”€ SUPPORT CHAT LAYOUT â”€â”€ */
 .admin-chat-layout {
   display: flex;
   height: 100%;
@@ -674,9 +674,34 @@ html, body {
     -webkit-overflow-scrolling: touch;
   }
   
-  .admin-table {
-    min-width: 800px; /* Force horizontal scroll on mobile */
+    /* Mobile Card View for All Tables */
+  .admin-table-v2 thead { display: none; }
+  .table-responsive { background: transparent; border: none; overflow-x: hidden; }
+  .admin-table-v2, .admin-table-v2 tbody, .admin-table-v2 tr, .admin-table-v2 td { display: block; width: 100%; }
+  .admin-table-v2 tr {
+    background: linear-gradient(145deg, rgba(30, 35, 40, 0.9), rgba(15, 20, 25, 0.9));
+    border: 1px solid rgba(255, 196, 0, 0.15); border-radius: 16px; margin-bottom: 20px; padding: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4); position: relative; overflow: hidden;
+    display: flex; flex-direction: column;
   }
+  .admin-table-v2 tr::before {
+    content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+    background: var(--gold); border-radius: 4px 0 0 4px;
+  }
+  .admin-table-v2 td {
+    text-align: right; padding: 6px 5px !important; margin-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.05); position: relative; font-size: 14px !important;
+    display: flex; justify-content: space-between; alignItems: center;
+  }
+  .admin-table-v2 td:last-child {
+    border-bottom: none; justify-content: center; margin-top: 5px; margin-bottom: 0;
+  }
+  .admin-table-v2 td::before {
+    content: attr(data-label); font-family: var(--font-tech); color: #888;
+    text-transform: uppercase; font-size: 11px; letter-spacing: 1px; font-weight: bold; margin-right: 15px;
+  }
+  .action-buttons { width: 100%; justify-content: center; }
+  .action-btn { margin: 0 7px; }
 
   .outcome-selector { 
     grid-template-columns: 1fr; 
@@ -784,13 +809,13 @@ html, body {
     font-size: 18px;
   }
 
-  .admin-table {
+  .admin-table-v2 {
     min-width: 600px;
     font-size: 13px;
   }
 
-  .admin-table th,
-  .admin-table td {
+  .admin-table-v2 th,
+  .admin-table-v2 td {
     padding: 12px 8px;
   }
 
@@ -816,4 +841,14 @@ html, body {
     width: 100px;
     padding: 6px 12px;
   }
+}
+
+/* ----- DESKTOP ANIMATIONS FOR ADMIN TABLES ----- */
+.admin-table-v2 tr {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.admin-table-v2 tbody tr:hover {
+  background: rgba(255, 196, 0, 0.08) !important;
+  transform: scale(1.01);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
