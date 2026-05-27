@@ -594,9 +594,11 @@ const App: React.FC = () => {
         lastWin={lastWin} 
         roundNumber={roundNumber} 
         username={currentUser?.username || ''} 
+        userId={currentUser?.id || ''}
         hasDeposited={currentUser?.hasDeposited || false}
         onLogout={handleLogout}
         onShowHistory={() => setHistoryOpen(true)}
+        onShowWallet={() => setWalletOpen(true)}
       />
 
       <main className="game-main" id="game-main">

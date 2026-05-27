@@ -7,13 +7,14 @@ interface HeaderProps {
   lastWin: number;
   roundNumber: number;
   username: string;
+  userId: string;
   hasDeposited: boolean;
   onLogout: () => void;
   onShowHistory?: () => void;
+  onShowWallet: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username, hasDeposited, onLogout, onShowHistory }) => {
-  const [showWallet, setShowWallet] = useState(false);
+const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username, userId, hasDeposited, onLogout, onShowHistory, onShowWallet }) => {
   const [showDropdown, setShowDropdown] = useState(false);
 
 
@@ -52,19 +53,36 @@ const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username
         <div className="user-info dropdown-container" onClick={() => setShowDropdown(!showDropdown)}>
           <span className="username-badge">👤 {username} ▾</span>
           {showDropdown && (
-            <div className="user-dropdown">
-              <button onClick={(e) => { e.stopPropagation(); onLogout(); }} className="logout-action-btn">
-                🚪 Logout
-              </button>
+            <div className="user-dropdown-profile">
+              <div className="udp-header">
+                <div className="udp-avatar">👤</div>
+                <div className="udp-details">
+                  <div className="udp-username">{username}</div>
+                  <div className="udp-reg">Reg. No: #{userId || 'N/A'}</div>
+                </div>
+              </div>
+              <div className="udp-body">
+                <div className="udp-row">
+                  <span className="udp-label">Password:</span>
+                  <span className="udp-value">••••••••</span>
+                </div>
+              </div>
+              <div className="udp-footer">
+                <button className="udp-btn udp-wallet" onClick={(e) => { e.stopPropagation(); setShowDropdown(false); onShowWallet(); }}>
+                  💰 Wallet
+                </button>
+                <button className="udp-btn udp-logout" onClick={(e) => { e.stopPropagation(); onLogout(); }}>
+                  🚪 Logout
+                </button>
+              </div>
             </div>
           )}
         </div>
-        <div className="stat-block premium-wallet" id="balance-display" onClick={() => setShowWallet(true)} title="Add/Withdraw Funds">
+        <div className="stat-block premium-wallet" id="balance-display" onClick={onShowWallet} title="Add/Withdraw Funds">
           <span className="stat-label">WALLET ➕</span>
           <span className="stat-value gold">₹{balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
         </div>
       </div>
-      {showWallet && <WalletModal username={username} hasDeposited={hasDeposited} balance={balance} onClose={() => setShowWallet(false)} />}
     </header>
   );
 };
