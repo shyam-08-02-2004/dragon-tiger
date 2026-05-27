@@ -136,7 +136,7 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
             {/* Table Header */}
             <div className="gh-table-header">
               <span className="gh-col-round">Round</span>
-              <span className="gh-col-game">Game</span>
+              <span className="gh-col-game" style={{ textAlign: 'center' }}>Time</span>
               <span className="gh-col-winner">Winner</span>
             </div>
 
@@ -147,10 +147,11 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
               ) : (
                 pastRounds.map((r, i) => {
                   const { label, cls, bar } = winnerInfo(r.winner);
+                  const roundTime = new Date(r.rawRoundId * 20000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
                   return (
                     <div key={`${r.round}-${r.rawRoundId}`} className={`gh-row ${bar} ${i === 0 ? 'gh-latest' : ''}`}>
                       <span className="gh-col-round">#{r.round}</span>
-                      <span className="gh-col-game">Dragon Tiger</span>
+                      <span className="gh-col-game" style={{ textAlign: 'center', fontSize: '11px', color: '#999' }}>{roundTime}</span>
                       <span className={`gh-col-winner ${cls}`}>{label}</span>
                     </div>
                   );
