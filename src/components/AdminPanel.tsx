@@ -64,22 +64,22 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
   useEffect(() => {
     const fetchData = () => {
-      fetch('/api/admin/users')
+      fetch(`/api/admin/users?t=${Date.now()}`)
         .then(res => res.json())
         .then(data => { if (Array.isArray(data)) setUsers(data); })
         .catch(console.error);
         
-      fetch('/api/admin/transactions')
+      fetch(`/api/admin/transactions?t=${Date.now()}`)
         .then(res => res.json())
         .then(data => { if (Array.isArray(data)) setTransactions(data); })
         .catch(console.error);
 
-      fetch('/api/admin/round-outcomes')
+      fetch(`/api/admin/round-outcomes?t=${Date.now()}`)
         .then(res => res.json())
         .then(data => { if (Array.isArray(data)) setRoundOutcomes(data); })
         .catch(console.error);
 
-      fetch('/api/admin/chat/users')
+      fetch(`/api/admin/chat/users?t=${Date.now()}`)
         .then(res => res.json())
         .then(data => { if (Array.isArray(data)) setSupportUsers(data); })
         .catch(console.error);
@@ -92,7 +92,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
   useEffect(() => {
     if (selectedUserHistory && userHistoryTab === 'bets') {
-      fetch('/api/users/bet-history/' + selectedUserHistory)
+      fetch(`/api/users/bet-history/${selectedUserHistory}?t=${Date.now()}`)
         .then(res => res.json())
         .then(data => { if (Array.isArray(data)) setAdminBetHistory(data); })
         .catch(console.error);
@@ -108,7 +108,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
         liveBetsRoundRef.current = roundId;
         setLiveBets({ dragon: 0, tiger: 0, tie: 0, total: 0, betCount: 0 });
       }
-      fetch(`/api/bets/round/${roundId}`)
+      fetch(`/api/bets/round/${roundId}?t=${Date.now()}`)
         .then(r => r.json())
         .then(data => { if (data && data.totals) setLiveBets({ ...data.totals, betCount: data.betCount || 0 }); })
         .catch(() => {});
@@ -124,7 +124,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     
     const fetchChat = async () => {
       try {
-        const res = await fetch(`/api/chat/${selectedSupportUser}`);
+        const res = await fetch(`/api/chat/${selectedSupportUser}?t=${Date.now()}`);
         const data = await res.json();
         setSupportMessages(data);
         
@@ -466,7 +466,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                           <td>
                             <div className="action-buttons">
                               <button className="action-btn edit" onClick={() => { setEditBalanceUser(user.id); setNewBalance(user.balance.toString()); }} title="Edit Balance">💰</button>
-                              <button className="btn-secondary" onClick={() => handleUserHistory(user.username)}>View History</button>
+                              <button className="btn-secondary" onClick={() => handleUserHistory(user.id)}>View History</button>
                               <button className="action-btn delete" onClick={() => handleDeleteUser(user.id)} title="Delete User">🗑️</button>
                             </div>
                           </td>

@@ -36,7 +36,7 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
 
   useEffect(() => {
     if (isOpen) {
-      fetch('/api/history')
+      fetch(`/api/history?t=${Date.now()}`)
         .then(res => res.json())
         .then(data => {
           if (Array.isArray(data)) setServerHistory(data);
@@ -44,7 +44,7 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
         .catch(() => {});
         
       if (username) {
-        fetch('/api/users/bet-history/' + username)
+        fetch(`/api/users/bet-history/${username}?t=${Date.now()}`)
           .then(res => res.json())
           .then(data => {
             if (Array.isArray(data)) setBetHistory(data);
