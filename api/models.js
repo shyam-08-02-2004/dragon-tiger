@@ -86,6 +86,7 @@ const userBetHistorySchema = new mongoose.Schema({
   username: { type: String, required: true },
   roundId: { type: Number, required: true },
   roundNumber: { type: Number, required: true },
+  betSide: { type: String, default: '' },
   betAmount: { type: Number, required: true },
   winAmount: { type: Number, required: true },
   timestamp: { type: Date, default: Date.now }

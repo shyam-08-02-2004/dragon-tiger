@@ -382,13 +382,14 @@ app.get('/api/users/bet-history/:username', async (req, res) => {
 // Record a completed bet for a user
 app.post('/api/users/bet-history', async (req, res) => {
   try {
-    const { username, roundId, roundNumber, betAmount, winAmount } = req.body;
+    const { username, roundId, roundNumber, betAmount, winAmount, betSide } = req.body;
     
     // Create new bet history record
     const betRecord = new UserBetHistory({
       username,
       roundId,
       roundNumber,
+      betSide,
       betAmount,
       winAmount
     });

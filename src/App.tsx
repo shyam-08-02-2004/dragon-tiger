@@ -509,6 +509,11 @@ const App: React.FC = () => {
            syncBalanceToServer(newBalance);
            
            if (prev.totalBet > 0) {
+             const betSideStr = Object.entries(prev.bets)
+               .filter(([k, v]) => v && v > 0)
+               .map(([k, v]) => `${k.charAt(0).toUpperCase() + k.slice(1)}`)
+               .join(', ');
+
              fetch('/api/users/bet-history', {
                method: 'POST',
                headers: { 'Content-Type': 'application/json' },
@@ -516,6 +521,7 @@ const App: React.FC = () => {
                  username: currentUserRef.current.id,
                  roundId: getGlobalGameState().rawRoundId,
                  roundNumber: roundId,
+                 betSide: betSideStr,
                  betAmount: prev.totalBet,
                  winAmount: winnings
                })

@@ -913,12 +913,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                 </table>
               ) : (
                 <table className="admin-table">
-                  <thead><tr><th>Time</th><th>Round</th><th>Bet</th><th>Win</th><th>Result</th></tr></thead>
+                  <thead><tr><th>Time</th><th>Round</th><th>Bet On</th><th>Bet</th><th>Win</th><th>Result</th></tr></thead>
                   <tbody>
                     {adminBetHistory.map(b => (
                       <tr key={b._id || Math.random()}>
                         <td>{new Date(b.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</td>
                         <td>#{b.roundNumber}</td>
+                        <td style={{ color: '#7ec8e3' }}>{b.betSide || '-'}</td>
                         <td>₹{b.betAmount}</td>
                         <td>₹{b.winAmount}</td>
                         <td style={{ color: b.winAmount > 0 ? '#2ecc71' : '#e74c3c', fontWeight: 'bold' }}>
@@ -927,7 +928,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                       </tr>
                     ))}
                     {adminBetHistory.length === 0 && (
-                      <tr><td colSpan={5} className="text-center">Aaj koi bet nahi lagayi hai.</td></tr>
+                      <tr><td colSpan={6} className="text-center">Aaj koi bet nahi lagayi hai.</td></tr>
                     )}
                   </tbody>
                 </table>

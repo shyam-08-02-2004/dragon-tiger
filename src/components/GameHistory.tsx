@@ -164,8 +164,9 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
             <div className="gh-table-header">
               <span className="gh-col-round" style={{ flex: '0 0 60px' }}>Time</span>
               <span className="gh-col-game">Round</span>
+              <span className="gh-col-winner" style={{ flex: '0 0 70px', textAlign: 'center' }}>Bet On</span>
               <span className="gh-col-winner" style={{ flex: '0 0 70px', textAlign: 'center' }}>Bet/Win</span>
-              <span className="gh-col-winner" style={{ flex: '0 0 60px' }}>Result</span>
+              <span className="gh-col-winner" style={{ flex: '0 0 50px' }}>Result</span>
             </div>
             <div className="gh-list">
               {betHistory.length === 0 ? (
@@ -179,10 +180,13 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
                     <span className="gh-col-game" style={{ fontSize: '12px', color: '#fff' }}>
                       #{b.roundNumber}
                     </span>
-                    <span className="gh-col-winner" style={{ flex: '0 0 70px', textAlign: 'center', fontSize: '12px', color: '#aaa' }}>
+                    <span className="gh-col-winner" style={{ flex: '0 0 70px', textAlign: 'center', fontSize: '11px', color: '#7ec8e3' }}>
+                      {b.betSide || '-'}
+                    </span>
+                    <span className="gh-col-winner" style={{ flex: '0 0 70px', textAlign: 'center', fontSize: '11px', color: '#aaa' }}>
                       ₹{b.betAmount} / <span style={{ color: '#f1c40f' }}>₹{b.winAmount}</span>
                     </span>
-                    <span className="gh-col-winner" style={{ flex: '0 0 60px', color: b.winAmount > 0 ? '#2ecc71' : '#e74c3c' }}>
+                    <span className="gh-col-winner" style={{ flex: '0 0 50px', fontSize: '11px', color: b.winAmount > 0 ? '#2ecc71' : '#e74c3c' }}>
                       {b.winAmount > 0 ? 'WIN' : 'LOST'}
                     </span>
                   </div>
