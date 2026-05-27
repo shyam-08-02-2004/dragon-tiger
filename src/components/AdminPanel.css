@@ -675,7 +675,58 @@ html, body {
   }
   
   .admin-table {
-    min-width: 800px;
+    min-width: 0;
+  }
+  
+  /* Mobile Card View for Tables */
+  .admin-table, .admin-table tbody, .admin-table tr, .admin-table td {
+    display: block;
+    width: 100%;
+  }
+  
+  .admin-table thead {
+    display: none;
+  }
+  
+  .admin-table tr {
+    margin-bottom: 20px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 196, 0, 0.2);
+    border-radius: 12px;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  
+  .admin-table td {
+    text-align: right;
+    padding: 12px 10px 12px 40%;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    font-size: 14px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .admin-table td:last-child {
+    border-bottom: none;
+  }
+  
+  .admin-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 35%;
+    text-align: left;
+    font-weight: bold;
+    color: var(--gold);
+    text-transform: uppercase;
+    font-size: 12px;
+    pointer-events: none;
   }
 
   .outcome-selector { 

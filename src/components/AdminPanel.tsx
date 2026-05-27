@@ -443,10 +443,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                       if (user.id === 'babu') return null;
                       return (
                         <tr key={user.id}>
-                          <td className="fw-bold">{user.id}</td>
-                          <td>{user.username}</td>
-                          <td><span className="password-mask">{user.password}</span></td>
-                          <td>
+                          <td data-label="Mobile" className="fw-bold">{user.id}</td>
+                          <td data-label="Username">{user.username}</td>
+                          <td data-label="Password"><span className="password-mask">{user.password}</span></td>
+                          <td data-label="Balance">
                             {editBalanceUser === user.id ? (
                               <div className="edit-balance-group">
                                 <span className="currency-symbol">₹</span>
@@ -458,12 +458,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                               <span className="balance-display gold">₹{user.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                             )}
                           </td>
-                          <td>
+                          <td data-label="Deposited">
                             <span style={{ color: user.hasDeposited ? '#2ecc71' : '#e74c3c', fontWeight: 'bold' }}>
                               {user.hasDeposited ? 'YES' : 'NO'}
                             </span>
                           </td>
-                          <td>
+                          <td data-label="Actions">
                             <div className="action-buttons">
                               <button className="action-btn edit" onClick={() => { setEditBalanceUser(user.id); setNewBalance(user.balance.toString()); }} title="Edit Balance">💰</button>
                               <button className="btn-secondary" onClick={() => handleUserHistory(user.id)}>View History</button>
@@ -701,17 +701,17 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   <tbody>
                     {transactions.slice().reverse().map((tx) => (
                       <tr key={tx.id}>
-                        <td>{new Date(tx.timestamp).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}</td>
-                        <td className="fw-bold">{tx.username}</td>
-                        <td className={tx.type === 'deposit' ? 'green' : 'gold'}>{tx.type.toUpperCase()}</td>
-                        <td className="gold">₹{tx.amount}</td>
-                        <td style={{ fontSize: '12px', maxWidth: '120px', wordBreak: 'break-all' }}>
+                        <td data-label="Time">{new Date(tx.timestamp).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}</td>
+                        <td data-label="User" className="fw-bold">{tx.username}</td>
+                        <td data-label="Type" className={tx.type === 'deposit' ? 'green' : 'gold'}>{tx.type.toUpperCase()}</td>
+                        <td data-label="Amount" className="gold">₹{tx.amount}</td>
+                        <td data-label="UTR/UPI" style={{ fontSize: '12px', maxWidth: '120px', wordBreak: 'break-all' }}>
                           {tx.utr && <span style={{ color: '#aaa' }}>UTR: {tx.utr}</span>}
                           {tx.upiId && <span style={{ color: '#7ec8e3' }}>UPI: {tx.upiId}</span>}
                           {!tx.utr && !tx.upiId && '-'}
                         </td>
-                        <td><span className={`status-badge ${tx.status}`}>{tx.status.toUpperCase()}</span></td>
-                        <td>
+                        <td data-label="Status"><span className={`status-badge ${tx.status}`}>{tx.status.toUpperCase()}</span></td>
+                        <td data-label="Actions">
                           {tx.status === 'pending' ? (
                             <div className="action-buttons">
                               <button className="action-btn edit" title="Approve" onClick={() => handleTransactionAction(tx.id, 'approve')}>✅</button>
@@ -900,10 +900,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   <tbody>
                     {transactions.filter(t => t.username === selectedUserHistory).slice().reverse().map(tx => (
                       <tr key={tx.id}>
-                        <td>{new Date(tx.timestamp).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}</td>
-                        <td className={tx.type === 'deposit' ? 'green' : 'gold'}>{tx.type.toUpperCase()}</td>
-                        <td>₹{tx.amount}</td>
-                        <td><span className={`status-badge ${tx.status}`}>{tx.status}</span></td>
+                        <td data-label="Time">{new Date(tx.timestamp).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}</td>
+                        <td data-label="Type" className={tx.type === 'deposit' ? 'green' : 'gold'}>{tx.type.toUpperCase()}</td>
+                        <td data-label="Amount">₹{tx.amount}</td>
+                        <td data-label="Status"><span className={`status-badge ${tx.status}`}>{tx.status}</span></td>
                       </tr>
                     ))}
                     {transactions.filter(t => t.username === selectedUserHistory).length === 0 && (
@@ -915,14 +915,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                 <table className="admin-table">
                   <thead><tr><th>Time</th><th>Round</th><th>Bet On</th><th>Bet</th><th>Win</th><th>Result</th></tr></thead>
                   <tbody>
-                    {adminBetHistory.map(b => (
-                      <tr key={b._id || Math.random()}>
-                        <td>{new Date(b.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</td>
-                        <td>#{b.roundNumber}</td>
-                        <td style={{ color: '#7ec8e3' }}>{b.betSide || '-'}</td>
-                        <td>₹{b.betAmount}</td>
-                        <td>₹{b.winAmount}</td>
-                        <td style={{ color: b.winAmount > 0 ? '#2ecc71' : '#e74c3c', fontWeight: 'bold' }}>
+                    {adminBetHistory.map((b, i) => (
+                      <tr key={b.timestamp + i}>
+                        <td data-label="Time">{new Date(b.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</td>
+                        <td data-label="Round">#{b.roundNumber}</td>
+                        <td data-label="Bet On" style={{ color: '#7ec8e3' }}>{b.betSide || '-'}</td>
+                        <td data-label="Bet">₹{b.betAmount}</td>
+                        <td data-label="Win">₹{b.winAmount}</td>
+                        <td data-label="Result" style={{ color: b.winAmount > 0 ? '#2ecc71' : '#e74c3c', fontWeight: 'bold' }}>
                           {b.winAmount > 0 ? 'WIN' : 'LOST'}
                         </td>
                       </tr>
