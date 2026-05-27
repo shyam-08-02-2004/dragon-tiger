@@ -552,6 +552,7 @@ const App: React.FC = () => {
         lastWin={lastWin} 
         roundNumber={roundNumber} 
         username={currentUser?.username || ''} 
+        userId={currentUser?.id || ''}
         hasDeposited={currentUser?.hasDeposited || false}
         onLogout={handleLogout}
         onShowHistory={() => setShowHistory(true)}
