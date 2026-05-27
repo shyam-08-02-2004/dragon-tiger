@@ -7,13 +7,12 @@ interface HeaderProps {
   lastWin: number;
   roundNumber: number;
   username: string;
-  userId: string;
   hasDeposited: boolean;
   onLogout: () => void;
   onShowHistory?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username, userId, hasDeposited, onLogout, onShowHistory }) => {
+const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username, hasDeposited, onLogout, onShowHistory }) => {
   const [showWallet, setShowWallet] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -54,17 +53,6 @@ const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username
           <span className="username-badge">👤 {username} ▾</span>
           {showDropdown && (
             <div className="user-dropdown">
-              <div className="user-dropdown-details">
-                <div className="detail-row">
-                  <span className="detail-label">Name:</span>
-                  <span className="detail-value">{username}</span>
-                </div>
-                <div className="detail-row">
-                  <span className="detail-label">Number:</span>
-                  <span className="detail-value">{userId}</span>
-                </div>
-              </div>
-              <div className="dropdown-divider"></div>
               <button onClick={(e) => { e.stopPropagation(); onLogout(); }} className="logout-action-btn">
                 🚪 Logout
               </button>
