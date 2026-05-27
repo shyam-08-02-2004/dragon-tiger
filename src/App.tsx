@@ -11,6 +11,7 @@ import RoadMap from './components/RoadMap';
 import WalletModal from './components/WalletModal';
 import GameHistory from './components/GameHistory';
 import HelpCenter from './components/HelpCenter';
+import WinPopup from './components/WinPopup';
 import type { GameState, BetType, GameResult } from './types/game';
 import { getGlobalGameState, getDeterministicCards, setTimeOffset } from './syncEngine';
 import {
@@ -594,6 +595,8 @@ const App: React.FC = () => {
         <div className="bg-tiger">🐯</div>
         <div className="bg-pattern" />
       </div>
+
+      <WinPopup winAmount={lastWin} />
 
       <Header 
         balance={balance} 
