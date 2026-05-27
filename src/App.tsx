@@ -380,7 +380,7 @@ const App: React.FC = () => {
     setState(prev => {
       if (prev.phase !== 'betting') return prev;
       const cost = prev.selectedChip;
-      if (prev.balance < cost) return prev;
+      if (Number(prev.balance) < cost) return prev;
       const current = prev.bets[type] || 0;
       const newBets = { ...prev.bets, [type]: current + cost };
       const totalBet = Object.values(newBets).reduce((a, b) => a + (b || 0), 0);
@@ -422,15 +422,26 @@ const App: React.FC = () => {
       };
       lastLocalBalanceUpdate.current = Date.now();
       syncBalanceToServer(newState.balance, prev.balance);
+
+      // Sync cleared bets to server for admin live view
+      if (currentUser && currentUser.id !== 'babu') {
+        const global = getGlobalGameState();
+        fetch('/api/bets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ roundId: global.roundId, username: currentUser.id, bets: {} })
+        }).catch(() => {});
+      }
+
       return newState;
     });
-  }, []);
+  }, [currentUser]);
 
   const handleDoubleBet = useCallback(() => {
     setState(prev => {
       if (prev.phase !== 'betting') return prev;
       const cost = prev.totalBet;
-      if (prev.balance < cost || cost === 0) return prev;
+      if (Number(prev.balance) < cost || cost === 0) return prev;
       const newBets: Partial<Record<BetType, number>> = {};
       for (const [k, v] of Object.entries(prev.bets)) {
         newBets[k as BetType] = (v || 0) * 2;
@@ -443,9 +454,20 @@ const App: React.FC = () => {
       };
       lastLocalBalanceUpdate.current = Date.now();
       syncBalanceToServer(newState.balance, prev.balance);
+
+      // Sync doubled bets to server for admin live view
+      if (currentUser && currentUser.id !== 'babu') {
+        const global = getGlobalGameState();
+        fetch('/api/bets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ roundId: global.roundId, username: currentUser.id, bets: newBets })
+        }).catch(() => {});
+      }
+
       return newState;
     });
-  }, []);
+  }, [currentUser]);
 
   
   const handleDeal = async (roundId?: number, seed?: number) => {

@@ -398,6 +398,274 @@
   transform: translateY(-1px);
 }
 
+/* ===== MOBILE RESPONSIVENESS ===== */
+@media (max-width: 768px) {
+  .header {
+    padding: 10px 16px;
+    gap: 10px;
+  }
+  
+  .header-left {
+    gap: 10px;
+  }
+  
+  .logo-group {
+    gap: 6px;
+  }
+  
+  .logo-dragon,
+  .logo-tiger-icon {
+    font-size: 24px;
+  }
+  
+  .logo-main,
+  .logo-tiger {
+    font-size: 14px;
+    letter-spacing: 1px;
+  }
+  
+  .logo-separator {
+    font-size: 8px;
+    letter-spacing: 2px;
+  }
+  
+  .live-badge {
+    font-size: 9px;
+    padding: 3px 8px;
+  }
+  
+  .round-number {
+    font-size: 16px;
+  }
+  
+  .history-btn {
+    font-size: 10px;
+    padding: 4px 10px;
+    margin-top: 4px;
+  }
+  
+  .hamburger-menu {
+    width: 38px;
+    height: 38px;
+  }
+  
+  .hamburger-menu span {
+    width: 18px;
+    height: 3px;
+  }
+  
+  .username-badge {
+    font-size: 12px;
+    letter-spacing: 0.5px;
+  }
+  
+  .user-dropdown-profile {
+    width: 220px;
+  }
+  
+  .udp-header {
+    padding: 12px;
+  }
+  
+  .udp-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+  
+  .udp-username {
+    font-size: 13px;
+  }
+  
+  .udp-reg {
+    font-size: 10px;
+  }
+  
+  .udp-body {
+    padding: 10px 12px;
+  }
+  
+  .udp-row {
+    padding: 6px 0;
+  }
+  
+  .udp-label {
+    font-size: 11px;
+  }
+  
+  .udp-value {
+    font-size: 12px;
+  }
+  
+  .udp-footer {
+    padding: 10px;
+    gap: 6px;
+  }
+  
+  .udp-btn {
+    padding: 8px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 8px 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .header-left {
+    gap: 8px;
+    min-width: 100%;
+  }
+  
+  .logo-group {
+    gap: 4px;
+  }
+  
+  .logo-dragon,
+  .logo-tiger-icon {
+    font-size: 20px;
+  }
+  
+  .logo-main,
+  .logo-tiger {
+    font-size: 12px;
+    letter-spacing: 0.5px;
+  }
+  
+  .logo-separator {
+    font-size: 7px;
+    letter-spacing: 1px;
+  }
+  
+  .live-badge {
+    font-size: 8px;
+    padding: 2px 6px;
+    gap: 4px;
+  }
+  
+  .live-dot {
+    width: 5px;
+    height: 5px;
+  }
+  
+  .header-center {
+    flex: 1;
+  }
+  
+  .round-info {
+    gap: 1px;
+  }
+  
+  .round-label {
+    font-size: 8px;
+    letter-spacing: 2px;
+  }
+  
+  .round-number {
+    font-size: 14px;
+  }
+  
+  .history-btn {
+    font-size: 9px;
+    padding: 3px 8px;
+    margin-top: 2px;
+  }
+  
+  .header-right {
+    gap: 12px;
+    min-width: 100%;
+  }
+  
+  .user-info {
+    gap: 6px;
+    padding: 4px 8px 4px 4px;
+  }
+  
+  .hamburger-menu {
+    width: 34px;
+    height: 34px;
+    padding: 6px 4px;
+  }
+  
+  .hamburger-menu span {
+    width: 16px;
+    height: 2.5px;
+  }
+  
+  .username-badge {
+    font-size: 10px;
+    letter-spacing: 0px;
+    max-width: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .user-dropdown-profile {
+    width: 200px;
+    right: -10px;
+  }
+  
+  .udp-header {
+    padding: 10px;
+    gap: 8px;
+  }
+  
+  .udp-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  
+  .udp-details {
+    min-width: 0;
+  }
+  
+  .udp-username {
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .udp-reg {
+    font-size: 9px;
+  }
+  
+  .udp-body {
+    padding: 8px 10px;
+  }
+  
+  .udp-row {
+    padding: 5px 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .udp-label {
+    font-size: 10px;
+  }
+  
+  .udp-value {
+    font-size: 11px;
+  }
+  
+  .udp-footer {
+    padding: 8px;
+    gap: 6px;
+  }
+  
+  .udp-btn {
+    padding: 8px;
+    font-size: 11px;
+  }
+}
+
 .premium-wallet-btn {
   display: flex;
   align-items: center;

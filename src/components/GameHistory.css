@@ -264,34 +264,254 @@
   letter-spacing: 1px;
 }
 
-/* ===== MOBILE ===== */
-@media (max-width: 600px) {
-  .gh-panel {
-    width: 98%;
-    max-width: none;
-    max-height: 90vh;
-    border-radius: 14px;
   }
+}
+/* Enhanced Mobile Responsive Styles for GameHistory */
+
+/* ===== TABLET (768px and below) ===== */
+@media (max-width: 768px) {
+  .gh-panel {
+    width: 96%;
+    max-width: 480px;
+    max-height: 85vh;
+  }
+  
   .gh-title {
-    font-size: 12px;
+    font-size: 13px;
     letter-spacing: 2px;
   }
+  
+  .gh-stats {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  
+  .gh-stat {
+    padding: 6px 4px;
+  }
+  
+  .gh-stat-icon {
+    font-size: 16px;
+  }
+  
+  .gh-stat-num {
+    font-size: 16px;
+  }
+  
+  .gh-stat-lbl {
+    font-size: 8px;
+  }
+  
+  .gh-table-header {
+    padding: 8px 12px;
+    font-size: 9px;
+  }
+  
+  .gh-row {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  
+  .gh-col-round {
+    flex: 0 0 60px;
+  }
+  
+  .gh-col-winner {
+    flex: 0 0 90px;
+    font-size: 12px;
+  }
+}
+
+/* ===== MOBILE (600px and below) ===== */
+@media (max-width: 600px) {
+  .gh-overlay {
+    padding: 8px;
+  }
+  
+  .gh-panel {
+    width: 100%;
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: 12px;
+  }
+  
+  .gh-header {
+    padding: 12px 14px;
+  }
+  
+  .gh-title {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+  }
+  
+  .gh-icon {
+    font-size: 16px;
+  }
+  
+  .gh-close {
+    padding: 4px 10px;
+    font-size: 14px;
+  }
+  
   .gh-stats {
     padding: 8px 10px;
     gap: 6px;
   }
-  .gh-stat-num {
+  
+  .gh-stat {
+    padding: 5px 4px;
+  }
+  
+  .gh-stat-icon {
     font-size: 15px;
   }
+  
+  .gh-stat-num {
+    font-size: 14px;
+  }
+  
+  .gh-stat-lbl {
+    font-size: 7.5px;
+    letter-spacing: 0.5px;
+  }
+  
+  .gh-table-header {
+    padding: 6px 10px;
+    font-size: 8.5px;
+    letter-spacing: 1px;
+  }
+  
+  .gh-list {
+    padding: 4px 8px;
+    gap: 3px;
+  }
+  
   .gh-row {
-    padding: 7px 10px;
-    font-size: 11px;
+    padding: 6px 8px;
+    font-size: 10px;
+    border-radius: 8px;
   }
+  
   .gh-col-round {
-    flex: 0 0 55px;
+    flex: 0 0 50px;
+    font-size: 9px;
   }
+  
+  .gh-col-game {
+    font-size: 9px;
+  }
+  
   .gh-col-winner {
-    flex: 0 0 85px;
+    flex: 0 0 75px;
+    font-size: 10px;
+  }
+  
+  .gh-empty {
+    padding: 30px 20px;
+    font-size: 12px;
+  }
+  
+  .gh-footer {
+    font-size: 8px;
+    padding: 8px;
+  }
+}
+
+/* ===== SMALL MOBILE (480px and below) ===== */
+@media (max-width: 480px) {
+  .gh-overlay {
+    padding: 4px;
+  }
+  
+  .gh-panel {
+    width: 100%;
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: 10px 10px 0 0;
+  }
+  
+  .gh-header {
+    padding: 10px 12px;
+  }
+  
+  .gh-header-left {
+    gap: 8px;
+  }
+  
+  .gh-title {
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+  
+  .gh-icon {
+    font-size: 14px;
+  }
+  
+  .gh-close {
+    padding: 3px 8px;
+    font-size: 12px;
+  }
+  
+  .gh-stats {
+    padding: 6px 8px;
+    gap: 4px;
+  }
+  
+  .gh-stat {
+    padding: 4px 2px;
+  }
+  
+  .gh-stat-icon {
+    font-size: 13px;
+  }
+  
+  .gh-stat-num {
+    font-size: 12px;
+  }
+  
+  .gh-stat-lbl {
+    font-size: 7px;
+    letter-spacing: 0px;
+  }
+  
+  .gh-table-header {
+    padding: 5px 8px;
+    font-size: 7.5px;
+    letter-spacing: 0.5px;
+  }
+  
+  .gh-list {
+    padding: 3px 6px;
+    gap: 2px;
+  }
+  
+  .gh-row {
+    padding: 5px 6px;
+    font-size: 9px;
+    border-radius: 6px;
+  }
+  
+  .gh-row .gh-col-round {
+    flex: 0 0 45px;
+    font-size: 8px;
+  }
+  
+  .gh-row .gh-col-game {
+    font-size: 8px;
+  }
+  
+  .gh-row .gh-col-winner {
+    flex: 0 0 65px;
+    font-size: 9px;
+  }
+  
+  .gh-empty {
+    padding: 20px 15px;
     font-size: 11px;
+  }
+  
+  .gh-footer {
+    font-size: 7.5px;
+    padding: 6px;
   }
 }

@@ -53,7 +53,7 @@ app.post('/api/auth/signup', async (req, res) => {
     return res.status(400).json({ error: 'Mobile number already registered.' });
   }
   
-  const newUser = new User({ id, username, password, balance: 50, hasDeposited: false });
+  const newUser = new User({ id, username, password, balance: 0, hasDeposited: false });
   await newUser.save();
   res.json(newUser);
 });
@@ -81,6 +81,11 @@ app.put('/api/users/:id/balance', async (req, res) => {
   const { balance, prevBalance } = req.body;
   const numBalance = Number(balance) || 0;
   
+  // Prevent negative balance
+  if (numBalance < 0) {
+    return res.status(400).json({ error: 'Balance cannot be negative' });
+  }
+  
   const user = await User.findOne({ id: req.params.id });
   if (!user) return res.status(404).json({ error: 'Not found' });
   
@@ -89,6 +94,8 @@ app.put('/api/users/:id/balance', async (req, res) => {
     // Apply the delta instead of overwriting.
     const delta = numBalance - Number(prevBalance);
     user.balance += delta;
+    // Ensure balance doesn't go negative from delta
+    if (user.balance < 0) user.balance = 0;
   } else {
     user.balance = numBalance;
   }
@@ -129,6 +136,9 @@ app.post('/api/transactions', async (req, res) => {
     const upi = req.body.upiId;
     if (!upi || !/^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(upi.trim())) {
       return res.status(400).json({ error: 'Please enter a valid UPI ID.' });
+    }
+    if (!req.body.amount || req.body.amount <= 0) {
+      return res.status(400).json({ error: 'Withdrawal amount must be greater than zero.' });
     }
     let user = await User.findOne({ id: req.body.username });
     if (!user) {
