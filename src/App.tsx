@@ -681,6 +681,7 @@ const App: React.FC = () => {
           rawRoundId={getGlobalGameState().rawRoundId}
           isOpen={showHistory}
           onClose={() => setShowHistory(false)}
+          username={currentUser.id || currentUser.username}
         />
       )}
 
