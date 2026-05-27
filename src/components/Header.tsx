@@ -90,6 +90,11 @@ const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username
                 <button className="udp-btn udp-wallet" onClick={(e) => { e.stopPropagation(); setShowDropdown(false); onShowWallet(); }}>
                   💰 Wallet
                 </button>
+                {onShowSupport && (
+                  <button className="udp-btn udp-support" onClick={(e) => { e.stopPropagation(); setShowDropdown(false); onShowSupport(); }}>
+                    💬 Support
+                  </button>
+                )}
                 <button className="udp-btn udp-logout" onClick={(e) => { e.stopPropagation(); onLogout(); }}>
                   🚪 Logout
                 </button>
@@ -111,13 +116,6 @@ const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username
           </span>
           <div className="wallet-add-btn">+</div>
         </div>
-        
-        {onShowSupport && (
-          <button className="header-support-btn" onClick={onShowSupport} title="Help Center">
-            <span className="support-icon">💬</span>
-            <span className="support-text">Support</span>
-          </button>
-        )}
       </div>
     </header>
   );
