@@ -691,26 +691,30 @@ html, body {
   /* Chat Layout on Mobile */
   .admin-card.admin-chat-layout {
     padding: 0;
-    height: auto;
-    max-height: 75vh;
-    max-height: 75dvh;
+    height: 75vh; /* Explicit height for flexbox children to scroll properly */
+    height: 75dvh;
+    max-height: none;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   .admin-chat-layout {
-    max-height: 500px;
-    max-height: 500px;
-    height: auto;
+    max-height: none;
   }
 
   .admin-chat-layout .admin-chat-sidebar {
     width: 100%;
     border-right: none;
+    flex: 1;
     max-height: 100%;
+    overflow-y: auto;
   }
 
   .admin-chat-layout .admin-chat-main {
     display: none;
+    flex: 1;
+    overflow: hidden; /* Main container handles flex, messages scroll */
   }
 
   .admin-chat-layout.chat-active .admin-chat-sidebar {
@@ -720,6 +724,7 @@ html, body {
   .admin-chat-layout.chat-active .admin-chat-main {
     display: flex;
     width: 100%;
+    flex-direction: column;
   }
 
   .admin-chat-back {
@@ -728,19 +733,31 @@ html, body {
   }
   
   .admin-chat-header {
-    padding: 20px;
+    padding: 15px;
     flex-shrink: 0;
   }
   
   .admin-chat-messages {
-    padding: 20px;
-    max-height: 300px;
+    padding: 15px;
+    flex: 1;
+    overflow-y: auto;
+    max-height: none; /* Let flex handle the height */
   }
   
   .admin-chat-input {
-    padding: 20px;
+    padding: 15px;
     gap: 10px;
     flex-shrink: 0;
+  }
+  
+  .admin-chat-input input {
+    padding: 12px 15px;
+    font-size: 14px;
+  }
+  
+  .admin-chat-input button {
+    padding: 0 20px;
+    font-size: 14px;
   }
 }
 
