@@ -1,4 +1,4 @@
-﻿.admin-layout {
+.admin-layout {
   display: flex;
   height: 100vh;
   background-color: var(--dark-bg);
@@ -242,6 +242,8 @@ html, body {
   vertical-align: middle;
   font-size: 15px;
   transition: background 0.2s ease;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .admin-table-v2 tbody tr:hover td {
@@ -703,6 +705,9 @@ html, body {
   .action-buttons { width: 100%; justify-content: center; }
   .action-btn { margin: 0 7px; }
 
+/* Ensure mobile tables shrink */
+    .admin-table-v2 { min-width: 0; }
+
   .outcome-selector { 
     grid-template-columns: 1fr; 
     gap: 15px;
@@ -803,20 +808,6 @@ html, body {
 
   .admin-card {
     padding: 15px;
-  }
-
-  .admin-card h3 {
-    font-size: 18px;
-  }
-
-  .admin-table-v2 {
-    min-width: 600px;
-    font-size: 13px;
-  }
-
-  .admin-table-v2 th,
-  .admin-table-v2 td {
-    padding: 12px 8px;
   }
 
   .nav-btn {
