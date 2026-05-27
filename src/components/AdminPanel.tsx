@@ -13,7 +13,7 @@ interface AdminPanelProps {
 const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [users, setUsers] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'users' | 'game' | 'transactions' | 'support'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'game' | 'transactions' | 'support'>(() => (sessionStorage.getItem('dt_adminTab') as any) || 'users');
   const [simPhase, setSimPhase] = useState<'betting' | 'dealing' | 'result'>('betting');
   const [simTimer, setSimTimer] = useState<number>(15);
   const [simRoundId, setSimRoundId] = useState<number>(0);
@@ -21,13 +21,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [simTigerCard, setSimTigerCard] = useState<Card | null>(null);
   const [simResult, setSimResult] = useState<GameResult | null>(null);
   const simTimerRef = useRef<any | null>(null);
-  const [selectedUserHistory, setSelectedUserHistory] = useState<string | null>(null);
-  const [userHistoryTab, setUserHistoryTab] = useState<'transactions' | 'bets'>('transactions');
+  const [selectedUserHistory, setSelectedUserHistory] = useState<string | null>(() => sessionStorage.getItem('dt_adminUserHist') || null);
+  const [userHistoryTab, setUserHistoryTab] = useState<'transactions' | 'bets'>(() => (sessionStorage.getItem('dt_adminUserHistTab') as any) || 'transactions');
   const [adminBetHistory, setAdminBetHistory] = useState<any[]>([]);
   const [editBalanceUser, setEditBalanceUser] = useState<string | null>(null);
   const [newBalance, setNewBalance] = useState<string>('');
   const [liveBets, setLiveBets] = useState<{ dragon: number; tiger: number; tie: number; total: number; betCount: number }>({ dragon: 0, tiger: 0, tie: 0, total: 0, betCount: 0 });
-  const [showGameHistory, setShowGameHistory] = useState(false);
+  const [showGameHistory, setShowGameHistory] = useState(() => sessionStorage.getItem('dt_adminShowGameHist') === 'true');
 
   // Round outcome control
   const [roundOutcomes, setRoundOutcomes] = useState<{ roundId: number; outcome: string }[]>([]);
@@ -36,8 +36,29 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const liveBetsRoundRef = useRef<number>(0);
 
   const [supportUsers, setSupportUsers] = useState<any[]>([]);
-  const [selectedSupportUser, setSelectedSupportUser] = useState<string | null>(null);
+  const [selectedSupportUser, setSelectedSupportUser] = useState<string | null>(() => sessionStorage.getItem('dt_adminSupportUser') || null);
   const [supportMessages, setSupportMessages] = useState<any[]>([]);
+
+  // State Setters with sessionStorage wrappers
+  const handleTabChange = (tab: 'users' | 'game' | 'transactions' | 'support') => {
+    setActiveTab(tab); sessionStorage.setItem('dt_adminTab', tab);
+  };
+  const handleUserHistory = (val: string | null) => {
+    setSelectedUserHistory(val);
+    if (val) sessionStorage.setItem('dt_adminUserHist', val);
+    else sessionStorage.removeItem('dt_adminUserHist');
+  };
+  const handleUserHistoryTab = (tab: 'transactions' | 'bets') => {
+    setUserHistoryTab(tab); sessionStorage.setItem('dt_adminUserHistTab', tab);
+  };
+  const handleShowGameHist = (val: boolean) => {
+    setShowGameHistory(val); sessionStorage.setItem('dt_adminShowGameHist', String(val));
+  };
+  const handleSupportUser = (val: string | null) => {
+    setSelectedSupportUser(val);
+    if (val) sessionStorage.setItem('dt_adminSupportUser', val);
+    else sessionStorage.removeItem('dt_adminSupportUser');
+  };
   const [newSupportMsg, setNewSupportMsg] = useState('');
   const supportEndRef = useRef<HTMLDivElement>(null);
 
@@ -383,18 +404,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
         </div>
         
         <nav className="admin-nav">
-          <button className={`nav-btn ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>
-            👥 User Management
-          </button>
-          <button className={`nav-btn ${activeTab === 'game' ? 'active' : ''}`} onClick={() => setActiveTab('game')}>
-            🎮 Game Control
-          </button>
-          <button className={`nav-btn ${activeTab === 'transactions' ? 'active' : ''}`} onClick={() => setActiveTab('transactions')}>
-            💸 Transactions
-          </button>
-          <button className={`nav-btn ${activeTab === 'support' ? 'active' : ''}`} onClick={() => setActiveTab('support')}>
-            💬 Support
-          </button>
+          <button className={`admin-nav-btn ${activeTab === 'users' ? 'active' : ''}`} onClick={() => handleTabChange('users')}>👥 Users</button>
+          <button className={`admin-nav-btn ${activeTab === 'game' ? 'active' : ''}`} onClick={() => handleTabChange('game')}>🎲 Game Control</button>
+          <button className={`admin-nav-btn ${activeTab === 'transactions' ? 'active' : ''}`} onClick={() => handleTabChange('transactions')}>💳 Transactions</button>
+          <button className={`admin-nav-btn ${activeTab === 'support' ? 'active' : ''}`} onClick={() => handleTabChange('support')}>💬 Support</button>
         </nav>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: 'auto' }}>
@@ -453,7 +466,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                           <td>
                             <div className="action-buttons">
                               <button className="action-btn edit" onClick={() => { setEditBalanceUser(user.id); setNewBalance(user.balance.toString()); }} title="Edit Balance">💰</button>
-                              <button className="action-btn" onClick={() => setSelectedUserHistory(user.id)} title="View History" style={{ background: '#3498db' }}>📜</button>
+                              <button className="btn-secondary" onClick={() => handleUserHistory(user.username)}>View History</button>
                               <button className="action-btn delete" onClick={() => handleDeleteUser(user.id)} title="Delete User">🗑️</button>
                             </div>
                           </td>
@@ -481,7 +494,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   border: '2px solid rgba(241,196,15,0.5)', borderRadius: '14px', marginBottom: '24px', position: 'relative'
                 }}>
                   <button 
-                    onClick={() => setShowGameHistory(true)}
+                    onClick={() => handleShowGameHist(true)}
                     style={{ position: 'absolute', top: '20px', right: '20px', background: '#3498db', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
                   >
                     📜 Game History
@@ -727,7 +740,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   {supportUsers.map(u => (
                     <div 
                       key={u.userId}
-                      onClick={() => setSelectedSupportUser(u.userId)}
+                      onClick={() => handleSupportUser(u.userId)}
                       style={{ 
                         padding: '15px 20px', 
                         cursor: 'pointer', 
@@ -754,7 +767,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                 {selectedSupportUser ? (
                   <>
                     <div className="admin-chat-header">
-                      <button className="admin-chat-back" onClick={() => setSelectedSupportUser(null)}>
+                      <button className="admin-chat-back" onClick={() => handleSupportUser(null)}>
                         ← Back
                       </button>
                       <span style={{ fontWeight: 'bold', fontSize: '16px' }}>{selectedSupportUser}</span>
@@ -858,19 +871,19 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
           <div className="wallet-modal">
             <div className="wallet-header">
               <h2>History: {selectedUserHistory}</h2>
-              <button className="close-btn" onClick={() => setSelectedUserHistory(null)}>✕</button>
+              <button className="close-btn" onClick={() => handleUserHistory(null)}>✕</button>
             </div>
             
             <div className="wallet-tabs" style={{ marginBottom: '15px' }}>
               <button
                 className={`wallet-tab ${userHistoryTab === 'transactions' ? 'active' : ''}`}
-                onClick={() => setUserHistoryTab('transactions')}
+                onClick={() => handleUserHistoryTab('transactions')}
               >
                 Transactions
               </button>
               <button
                 className={`wallet-tab ${userHistoryTab === 'bets' ? 'active' : ''}`}
-                onClick={() => setUserHistoryTab('bets')}
+                onClick={() => handleUserHistoryTab('bets')}
               >
                 Bet History
               </button>
@@ -926,7 +939,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
           currentRound={simRoundId}
           rawRoundId={getGlobalGameState().rawRoundId}
           isOpen={showGameHistory}
-          onClose={() => setShowGameHistory(false)}
+          onClose={() => handleShowGameHist(false)}
         />
       )}
     </div>
