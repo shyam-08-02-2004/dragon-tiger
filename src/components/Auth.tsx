@@ -238,6 +238,27 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     setError('');
   };
 
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  const changeMode = (newMode: 'login' | 'signup' | 'forgot') => {
+    setIsTransitioning(true);
+    setTimeout(() => {
+      resetForm();
+      setMode(newMode);
+      setStep(1);
+      setTimeout(() => setIsTransitioning(false), 50);
+    }, 200);
+  };
+
+  const changeStep = (newStep: 1 | 2 | 3) => {
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setStep(newStep);
+      setError('');
+      setTimeout(() => setIsTransitioning(false), 50);
+    }, 200);
+  };
+
   const getFormSubmitHandler = () => {
     if (mode === 'login') return handleLoginSubmit;
     if (mode === 'signup') {
@@ -261,7 +282,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   };
 
   const getTitleText = () => {
-    if (mode === 'login') return 'WELCOME BACK';
+    if (mode === 'login') return 'VIP ACCESS';
     if (mode === 'signup') {
       if (step === 1) return 'JOIN THE ACTION';
       if (step === 2) return 'VERIFY MOBILE';
@@ -282,21 +303,15 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
         <div className="otp-toast">
           <div className="otp-toast-header">
             <span className="otp-toast-icon">💬</span>
-            <span>New Message</span>
+            <span>Secure Message</span>
           </div>
           <div className="otp-toast-body">
-            Your Dragon Tiger verification code is <strong>{generatedOtp}</strong>
+            Your VIP verification code is <strong>{generatedOtp}</strong>
           </div>
         </div>
       )}
 
-      <div className="bg-decoration">
-        <div className="bg-dragon">🐉</div>
-        <div className="bg-tiger">🐯</div>
-        <div className="bg-pattern" />
-      </div>
-
-      <div className="auth-card">
+      <div className={`auth-card ${isTransitioning ? 'mode-transition' : ''}`}>
         <div className="auth-header">
           <div className="logo-group">
             <span className="logo-dragon">🐉</span>
@@ -354,12 +369,12 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
               </div>
 
               <div style={{ textAlign: 'right', marginTop: '-10px' }}>
-                <button 
-                  type="button" 
-                  className="toggle-btn" 
-                  style={{ fontSize: '11px', textDecoration: 'none' }}
-                  onClick={() => { resetForm(); setMode('forgot'); }}
-                >
+                  <button 
+                    type="button" 
+                    className="toggle-btn" 
+                    style={{ fontSize: '12px', textDecoration: 'none' }}
+                    onClick={() => changeMode('forgot')}
+                  >
                   Forgot Password?
                 </button>
               </div>
@@ -465,21 +480,18 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           <button 
             type="button" 
             className="toggle-btn"
-            onClick={() => { resetForm(); setMode(mode === 'login' ? 'signup' : 'login'); }}
+            onClick={() => changeMode(mode === 'login' ? 'signup' : 'login')}
           >
             {mode === 'login' ? 'Sign up here' : 'Login here'}
           </button>
         </div>
 
         {mode !== 'login' && step > 1 && (
-          <div className="auth-toggle" style={{ marginTop: '10px' }}>
+          <div className="auth-toggle" style={{ marginTop: '15px' }}>
             <button 
               type="button" 
               className="toggle-btn"
-              onClick={() => {
-                setStep((prev) => (prev - 1) as 1 | 2);
-                setError('');
-              }}
+              onClick={() => changeStep((step - 1) as 1 | 2)}
             >
               Go Back
             </button>

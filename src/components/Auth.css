@@ -4,20 +4,29 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  padding: 4px 8px;
+  padding: 20px;
   overflow: hidden;
-  background-color: var(--dark-bg);
+  background-image: url('/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.auth-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(10, 30, 15, 0.4) 0%, rgba(5, 10, 5, 0.95) 100%);
+  z-index: 1;
 }
 
 .auth-card {
-  background: linear-gradient(
-    180deg,
-    rgba(17, 17, 24, 0.95) 0%,
-    rgba(10, 10, 15, 0.98) 100%
-  );
-  border: 1px solid rgba(212, 160, 23, 0.3);
+  background: rgba(10, 15, 10, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 196, 0, 0.4);
   border-radius: 24px;
-  padding: 4px 8px;
+  padding: 40px;
   width: 100%;
   max-width: 440px;
   position: relative;
@@ -25,8 +34,9 @@
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.8),
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 0 40px rgba(212, 160, 23, 0.15);
-  animation: slideDown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    0 0 40px rgba(255, 196, 0, 0.15);
+  animation: slideUpFade 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
 }
 
 .auth-card::before {
@@ -40,54 +50,74 @@
   border-radius: 2px;
 }
 
+.auth-card.mode-transition {
+  transform: translateY(20px) scale(0.95);
+  opacity: 0.6;
+}
+
+@keyframes slideUpFade {
+  from {
+    transform: translateY(40px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
 .auth-header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 30px;
+  gap: 15px;
+  margin-bottom: 40px;
 }
 
 .auth-header .logo-group {
-  transform: scale(1.2);
+  transform: scale(1.4);
+  margin-bottom: 10px;
 }
 
 .auth-title {
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--gold);
   letter-spacing: 4px;
-  text-shadow: 0 0 15px rgba(212, 160, 23, 0.4);
+  text-shadow: 0 0 20px rgba(255, 196, 0, 0.6);
   text-align: center;
+  margin: 0;
 }
 
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 24px;
 }
 
 .auth-error {
-  background: rgba(231, 76, 60, 0.15);
-  border: 1px solid rgba(231, 76, 60, 0.4);
-  color: #e74c3c;
-  padding: 4px 8px;
-  border-radius: 8px;
-  font-size: 13px;
+  background: rgba(211, 47, 47, 0.15);
+  border: 1px solid rgba(211, 47, 47, 0.5);
+  color: #ff4d4d;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 14px;
   text-align: center;
   animation: pulse-red 2s infinite;
+  box-shadow: 0 0 15px rgba(211, 47, 47, 0.3);
 }
 
 .input-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  position: relative;
 }
 
 .input-group label {
   font-family: var(--font-tech);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-secondary);
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -95,20 +125,21 @@
 
 .input-group input {
   background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 4px 8px;
-  border-radius: 12px;
+  border: none;
+  border-bottom: 2px solid rgba(255, 196, 0, 0.2);
+  padding: 12px 16px;
+  border-radius: 8px 8px 0 0;
   color: var(--text-primary);
   font-family: var(--font-ui);
   font-size: 16px;
-  transition: var(--transition);
+  transition: all 0.3s ease;
 }
 
 .input-group input:focus {
   outline: none;
-  border-color: var(--gold);
-  background: rgba(0, 0, 0, 0.6);
-  box-shadow: 0 0 15px rgba(212, 160, 23, 0.2);
+  border-bottom-color: var(--gold);
+  background: rgba(0, 0, 0, 0.7);
+  box-shadow: inset 0 -30px 30px -30px rgba(255, 196, 0, 0.3);
 }
 
 .input-group input::placeholder {
@@ -116,34 +147,55 @@
 }
 
 .auth-submit-btn {
-  margin-top: 10px;
-  background: linear-gradient(
-    135deg,
-    rgba(212, 160, 23, 0.8) 0%,
-    rgba(154, 112, 18, 0.9) 100%
-  );
-  border-color: var(--gold);
-  color: #000;
-  text-shadow: none;
-  box-shadow: 0 6px 24px rgba(212, 160, 23, 0.3);
-  width: 100%;
+  margin-top: 20px;
+  background: linear-gradient(135deg, #ffd700 0%, #b38f00 100%);
+  border: 2px solid #ffea00;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: 2px;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(255, 196, 0, 0.4), inset 0 2px 5px rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
   justify-content: center;
 }
 
+.auth-submit-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  transform: skewX(-20deg);
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% { left: -100%; }
+  20% { left: 200%; }
+  100% { left: 200%; }
+}
+
 .auth-submit-btn:hover {
-  background: linear-gradient(
-    135deg,
-    rgba(245, 200, 66, 0.9) 0%,
-    rgba(212, 160, 23, 1) 100%
-  );
-  box-shadow: 0 8px 30px rgba(212, 160, 23, 0.5);
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(255, 196, 0, 0.6), inset 0 2px 5px rgba(255, 255, 255, 0.8);
+  background: linear-gradient(135deg, #ffeaa7 0%, #d4a017 100%);
 }
 
 .auth-toggle {
-  margin-top: 24px;
+  margin-top: 30px;
   text-align: center;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-muted);
 }
 
@@ -155,66 +207,80 @@
   font-size: inherit;
   cursor: pointer;
   padding: 0;
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: underline;
   transition: var(--transition);
+  margin-left: 5px;
 }
 
 .toggle-btn:hover {
   color: var(--gold-light);
-  text-shadow: 0 0 10px rgba(212, 160, 23, 0.5);
+  text-shadow: 0 0 15px rgba(255, 196, 0, 0.8);
 }
 
 @media (max-width: 480px) {
-  .auth-card { padding: 4px 8px; }
-  .auth-title { font-size: 18px; }
-  .input-group input { padding: 4px 8px; font-size: 14px; }
+  .auth-card {
+    padding: 25px;
+  }
+  .auth-title {
+    font-size: 20px;
+  }
+  .input-group input {
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+  .auth-submit-btn {
+    padding: 14px;
+    font-size: 16px;
+  }
 }
 
 /* ---------------- OTP TOAST ANIMATION ---------------- */
 .otp-toast {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  background: rgba(20, 25, 35, 0.95);
-  border: 1px solid rgba(255, 215, 0, 0.3);
-  border-left: 4px solid var(--gold-main);
-  border-radius: 8px;
-  padding: 4px 8px;
-  min-width: 280px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-  backdrop-filter: blur(10px);
+  top: 30px;
+  right: 30px;
+  background: rgba(10, 20, 12, 0.95);
+  border: 1px solid rgba(46, 125, 50, 0.5);
+  border-left: 4px solid var(--green-light);
+  border-radius: 12px;
+  padding: 16px 20px;
+  min-width: 320px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.8), 0 0 20px rgba(46, 125, 50, 0.3);
+  backdrop-filter: blur(15px);
   z-index: 9999;
   animation: slideInRight 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   color: #fff;
 }
 
 .otp-toast-header {
-  font-size: 12px;
+  font-size: 13px;
   color: #a0aec0;
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 5px;
+  gap: 8px;
+  margin-bottom: 8px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
 }
 
 .otp-toast-icon {
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .otp-toast-body {
-  font-size: 15px;
-  line-height: 1.4;
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 .otp-toast-body strong {
-  color: var(--gold-main);
-  font-size: 20px;
-  letter-spacing: 2px;
+  color: var(--green-light);
+  font-size: 24px;
+  letter-spacing: 4px;
   display: block;
-  margin-top: 5px;
+  margin-top: 8px;
+  font-family: var(--font-tech);
+  text-shadow: 0 0 10px rgba(46, 125, 50, 0.5);
 }
 
 @keyframes slideInRight {
@@ -230,9 +296,9 @@
 
 @media (max-width: 480px) {
   .otp-toast {
-    top: 10px;
-    right: 10px;
-    left: 10px;
+    top: 20px;
+    right: 20px;
+    left: 20px;
     min-width: unset;
     animation: slideDown 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   }
