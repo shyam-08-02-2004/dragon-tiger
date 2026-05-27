@@ -487,18 +487,22 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
             <div className="admin-grid">
               <div className="admin-card">
 
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                  <h2 style={{ margin: 0 }}>🎮 Game Control</h2>
+                  <button 
+                    onClick={() => handleShowGameHist(true)}
+                    style={{ background: '#3498db', color: '#fff', border: 'none', padding: '10px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}
+                  >
+                    📜 <span className="hide-mobile">Game History</span>
+                  </button>
+                </div>
+
                 {/* ── Current Round Info ── */}
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: '20px', padding: '20px',
                   background: 'linear-gradient(135deg, rgba(241,196,15,0.15), rgba(0,0,0,0))',
-                  border: '2px solid rgba(241,196,15,0.5)', borderRadius: '14px', marginBottom: '24px', position: 'relative'
+                  border: '2px solid rgba(241,196,15,0.5)', borderRadius: '14px', marginBottom: '24px'
                 }}>
-                  <button 
-                    onClick={() => handleShowGameHist(true)}
-                    style={{ position: 'absolute', top: '20px', right: '20px', background: '#3498db', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
-                  >
-                    📜 Game History
-                  </button>
                   <div style={{ textAlign: 'center', minWidth: '100px' }}>
                     <div style={{ fontSize: '11px', color: '#aaa', textTransform: 'uppercase', letterSpacing: '1px' }}>Live Round</div>
                     <div style={{ fontSize: '54px', fontWeight: '900', color: '#f1c40f', lineHeight: 1 }}>#{simRoundId}</div>
