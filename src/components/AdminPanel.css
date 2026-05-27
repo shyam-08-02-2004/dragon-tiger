@@ -219,12 +219,12 @@ html, body {
   background: rgba(0, 0, 0, 0.2);
 }
 
-.admin-table {
+.admin-table-v2 {
   width: 100%;
   border-collapse: collapse;
 }
 
-.admin-table th {
+.admin-table-v2 th {
   text-align: left;
   padding: 20px;
   font-size: 13px;
@@ -236,7 +236,7 @@ html, body {
   border-bottom: 2px solid rgba(255, 196, 0, 0.2);
 }
 
-.admin-table td {
+.admin-table-v2 td {
   padding: 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   vertical-align: middle;
@@ -244,7 +244,7 @@ html, body {
   transition: background 0.2s ease;
 }
 
-.admin-table tbody tr:hover td {
+.admin-table-v2 tbody tr:hover td {
   background: rgba(255, 196, 0, 0.05);
 }
 
@@ -674,80 +674,118 @@ html, body {
     -webkit-overflow-scrolling: touch;
   }
   
-  .admin-table {
+  .admin-table-v2 {
     min-width: 0;
   }
   
-  /* Mobile Card View for Tables */
-  .admin-table, .admin-table tbody, .admin-table tr, .admin-table td {
+  /* Mobile Card View for All Tables */
+  .admin-table-v2 thead {
+    display: none;
+  }
+  
+  .table-responsive {
+    background: transparent;
+    border: none;
+    overflow-x: hidden;
+  }
+  
+  .admin-table-v2, .admin-table-v2 tbody, .admin-table-v2 tr, .admin-table-v2 td {
     display: block;
     width: 100%;
   }
   
-  .admin-table thead {
-    display: none;
-  }
-  
-  .admin-table tr {
+  .admin-table-v2 tr {
+    background: linear-gradient(145deg, rgba(30, 35, 40, 0.9), rgba(15, 20, 25, 0.9));
+    border: 1px solid rgba(255, 196, 0, 0.15);
+    border-radius: 16px;
     margin-bottom: 20px;
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 196, 0, 0.2);
-    border-radius: 12px;
-    padding: 10px;
-    box-sizing: border-box;
-  }
-  
-  .admin-table td {
-    text-align: right;
-    padding: 12px 10px 12px 40%;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
     position: relative;
-    font-size: 14px;
-    box-sizing: border-box;
+    overflow: hidden;
     display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 10px;
+    display: -webkit-flex;
+    flex-direction: column;
+    -webkit-flex-direction: column;
   }
   
-  .admin-table td:last-child {
-    border-bottom: none;
-  }
-  
-  .admin-table td::before {
-    content: attr(data-label);
+  .admin-table-v2 tr::before {
+    content: "";
     position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 35%;
-    text-align: left;
-    font-weight: bold;
-    color: var(--gold);
+    top: 0; left: 0; width: 4px; height: 100%;
+    background: var(--gold);
+    border-radius: 4px 0 0 4px;
+  }
+  
+  .admin-table-v2 td {
+    text-align: right;
+    padding: 6px 5px !important;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    position: relative;
+    font-size: 14px !important;
+    display: flex;
+    display: -webkit-flex;
+    justify-content: space-between;
+    -webkit-justify-content: space-between;
+    align-items: center;
+    -webkit-align-items: center;
+  }
+  
+  .admin-table-v2 td:last-child {
+    border-bottom: none;
+    justify-content: center;
+    -webkit-justify-content: center;
+    margin-top: 5px;
+    margin-bottom: 0;
+  }
+  
+  .admin-table-v2 td::before {
+    content: attr(data-label);
+    font-family: var(--font-tech);
+    color: #888;
     text-transform: uppercase;
-    font-size: 12px;
-    pointer-events: none;
+    font-size: 11px;
+    letter-spacing: 1px;
+    font-weight: bold;
+    margin-right: 15px;
+  }
+  
+  .action-buttons {
+    width: 100%;
+    justify-content: center;
+    -webkit-justify-content: center;
+  }
+  
+  .action-btn {
+    margin: 0 7px;
   }
 
   .outcome-selector { 
     grid-template-columns: 1fr; 
-    gap: 15px;
+  }
+  
+  .outcome-selector button {
+    margin-bottom: 10px;
   }
   
   .edit-balance-group { 
     flex-wrap: wrap; 
+    -webkit-flex-wrap: wrap;
     margin-top: 10px;
   }
 
   /* Chat Layout on Mobile */
   .admin-card.admin-chat-layout {
     padding: 0;
-    height: 75vh; /* Explicit height for flexbox children to scroll properly */
+    height: 75vh;
     height: 75dvh;
     max-height: none;
     overflow: hidden;
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
+    -webkit-flex-direction: column;
   }
 
   .admin-chat-layout {
@@ -758,6 +796,7 @@ html, body {
     width: 100%;
     border-right: none;
     flex: 1;
+    -webkit-flex: 1;
     max-height: 100%;
     overflow-y: auto;
   }
@@ -765,7 +804,8 @@ html, body {
   .admin-chat-layout .admin-chat-main {
     display: none;
     flex: 1;
-    overflow: hidden; /* Main container handles flex, messages scroll */
+    -webkit-flex: 1;
+    overflow: hidden;
   }
 
   .admin-chat-layout.chat-active .admin-chat-sidebar {
@@ -774,8 +814,10 @@ html, body {
 
   .admin-chat-layout.chat-active .admin-chat-main {
     display: flex;
+    display: -webkit-flex;
     width: 100%;
     flex-direction: column;
+    -webkit-flex-direction: column;
   }
 
   .admin-chat-back {
@@ -786,24 +828,27 @@ html, body {
   .admin-chat-header {
     padding: 15px;
     flex-shrink: 0;
+    -webkit-flex-shrink: 0;
   }
   
   .admin-chat-messages {
     padding: 15px;
     flex: 1;
+    -webkit-flex: 1;
     overflow-y: auto;
-    max-height: none; /* Let flex handle the height */
+    max-height: none;
   }
   
   .admin-chat-input {
     padding: 15px;
-    gap: 10px;
     flex-shrink: 0;
+    -webkit-flex-shrink: 0;
   }
   
   .admin-chat-input input {
     padding: 12px 15px;
     font-size: 14px;
+    margin-right: 10px;
   }
   
   .admin-chat-input button {
@@ -835,13 +880,13 @@ html, body {
     font-size: 18px;
   }
 
-  .admin-table {
-    min-width: 600px;
+  .admin-table-v2 {
+    min-width: unset !important;
     font-size: 13px;
   }
 
-  .admin-table th,
-  .admin-table td {
+  .admin-table-v2 th,
+  .admin-table-v2 td {
     padding: 12px 8px;
   }
 
@@ -867,4 +912,16 @@ html, body {
     width: 100px;
     padding: 6px 12px;
   }
+}
+
+/* ----- DESKTOP ANIMATIONS FOR ADMIN TABLES ----- */
+.admin-table-v2 tr {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  -webkit-transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.admin-table-v2 tbody tr:hover {
+  background: rgba(255, 196, 0, 0.08) !important;
+  transform: scale(1.01);
+  -webkit-transform: scale(1.01);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }

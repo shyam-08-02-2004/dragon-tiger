@@ -44,7 +44,7 @@ const initialState: GameState = {
   tigerCard: null,
   result: null,
   bets: {},
-  balance: INITIAL_BALANCE,
+  balance: 0,
   selectedChip: 10,
   lastWin: 0,
   totalBet: 0,
@@ -357,13 +357,12 @@ const App: React.FC = () => {
   }, []);
 
   
-  const syncBalanceToServer = (newBal: number) => {
-    const user = currentUserRef.current;
-    if (user && user.id !== 'babu') {
-      fetch(`/api/users/${user.id}/balance`, {
+  const syncBalanceToServer = async (newBalance: number, previousBalance?: number) => {
+    if (currentUser && currentUser.id !== 'babu') {
+      fetch(`/api/users/${currentUser.id}/balance`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ balance: newBal })
+        body: JSON.stringify({ balance: newBalance, prevBalance: previousBalance })
       }).catch(e => console.error(e));
 
       // Update sessionStorage immediately so refresh doesn't show stale balance
@@ -371,7 +370,7 @@ const App: React.FC = () => {
       if (savedStr) {
         try {
           const saved = JSON.parse(savedStr);
-          sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify({ ...saved, balance: newBal }));
+          sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify({ ...saved, balance: newBalance }));
         } catch(e) {}
       }
     }
@@ -392,7 +391,7 @@ const App: React.FC = () => {
         totalBet,
       };
       lastLocalBalanceUpdate.current = Date.now();
-      syncBalanceToServer(newState.balance);
+      syncBalanceToServer(newState.balance, prev.balance);
 
       // Sync bets to server for admin live view
       if (currentUser && currentUser.id !== 'babu') {
@@ -422,7 +421,7 @@ const App: React.FC = () => {
         totalBet: 0,
       };
       lastLocalBalanceUpdate.current = Date.now();
-      syncBalanceToServer(newState.balance);
+      syncBalanceToServer(newState.balance, prev.balance);
       return newState;
     });
   }, []);
@@ -443,7 +442,7 @@ const App: React.FC = () => {
         totalBet: cost * 2,
       };
       lastLocalBalanceUpdate.current = Date.now();
-      syncBalanceToServer(newState.balance);
+      syncBalanceToServer(newState.balance, prev.balance);
       return newState;
     });
   }, []);
@@ -511,9 +510,11 @@ const App: React.FC = () => {
         if (newHistory.length > 2000) newHistory.shift();
         
         const newBalance = Number(prev.balance) + winnings;
-        lastLocalBalanceUpdate.current = Date.now();
         if (currentUserRef.current && currentUserRef.current.id !== 'babu') {
-           syncBalanceToServer(newBalance);
+           if (prev.totalBet > 0) {
+             lastLocalBalanceUpdate.current = Date.now();
+             syncBalanceToServer(newBalance, prev.balance);
+           }
            
            if (prev.totalBet > 0) {
              const betSideStr = Object.entries(prev.bets)
@@ -686,15 +687,9 @@ const App: React.FC = () => {
         balance={balance} 
         onClose={() => setWalletOpen(false)} 
         onWithdrawSuccess={(amount) => {
-          setState(prev => ({ ...prev, balance: prev.balance - amount }));
-          setCurrentUser(prev => {
-            if (prev) {
-              const updated = { ...prev, balance: prev.balance - amount };
-              sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify(updated));
-              return updated;
-            }
-            return null;
-          });
+          // Balance is not deducted here anymore.
+          // It will be updated automatically via the regular game loop syncs
+          // once the admin approves it on the server.
         }}
       />}
 
@@ -729,26 +724,17 @@ const App: React.FC = () => {
 
       {/* Notifications overlay */}
       {notifications.length > 0 && (
-        <div style={{ position: 'fixed', top: '20px', left: '50%', transform: 'translateX(-50%)', zIndex: 10000, display: 'flex', flexDirection: 'column', gap: '10px', width: '90%', maxWidth: '400px' }}>
+        <div className="global-notification-container">
           {notifications.map(notif => (
-            <div key={notif.id} style={{
-                background: 'rgba(20,20,20,0.95)',
-                border: `2px solid ${notif.type === 'warning' ? '#f39c12' : notif.type === 'success' ? '#2ecc71' : notif.type === 'info' ? '#f1c40f' : '#3498db'}`,
-                borderRadius: '12px',
-                padding: '16px',
-                color: '#fff',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '8px'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <strong style={{ color: notif.type === 'warning' ? '#f39c12' : notif.type === 'success' ? '#2ecc71' : notif.type === 'info' ? '#f1c40f' : '#3498db', fontSize: '16px' }}>
-                  {notif.type === 'warning' ? '⚠️ Important Notice' : notif.type === 'success' ? '✅ Success' : 'ℹ️ Information'}
-                </strong>
-                <button onClick={() => handleDismissNotification(notif.id)} style={{ background: 'transparent', border: 'none', color: '#aaa', fontSize: '20px', cursor: 'pointer' }}>✕</button>
+            <div key={notif.id} className={`premium-global-toast ${notif.type}`}>
+              <div className="toast-icon-bar">
+                {notif.type === 'warning' ? '⚠️' : notif.type === 'success' ? '✅' : 'ℹ️'}
               </div>
-              <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.5' }}>{notif.message}</p>
+              <div className="toast-content">
+                <strong>{notif.type === 'warning' ? 'Important Notice' : notif.type === 'success' ? 'Success' : 'Information'}</strong>
+                <p>{notif.message}</p>
+              </div>
+              <button className="toast-close" onClick={() => handleDismissNotification(notif.id)}>✕</button>
             </div>
           ))}
         </div>

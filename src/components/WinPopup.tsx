@@ -8,23 +8,36 @@ interface WinPopupProps {
 
 const WinPopup: React.FC<WinPopupProps> = ({ winAmount, onClose }) => {
   const [show, setShow] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
+    let closeTimer: number;
+    let removeTimer: number;
+
     if (winAmount > 0) {
       setShow(true);
-      const timer = setTimeout(() => {
-        setShow(false);
-        if (onClose) onClose();
-      }, 2000); // Hide after 2 seconds
-      return () => clearTimeout(timer);
+      setIsClosing(false);
+      
+      closeTimer = window.setTimeout(() => {
+        setIsClosing(true);
+        removeTimer = window.setTimeout(() => {
+          setShow(false);
+          if (onClose) onClose();
+        }, 300); // matches CSS animation duration
+      }, 3000); // 3 seconds visible
     }
+    
+    return () => {
+      if (closeTimer) clearTimeout(closeTimer);
+      if (removeTimer) clearTimeout(removeTimer);
+    };
   }, [winAmount, onClose]);
 
   if (!show || winAmount <= 0) return null;
 
   return (
-    <div className="win-popup-overlay">
-      <div className="win-popup-container">
+    <div className={`win-popup-overlay ${isClosing ? 'closing' : ''}`} style={{ zIndex: 9999 }}>
+      <div className={`win-popup-container ${isClosing ? 'closing' : ''}`}>
         
         {/* Top Decorative Ribbon/Badge */}
         <div className="win-badge">

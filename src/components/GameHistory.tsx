@@ -83,7 +83,7 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
   if (!isOpen) return null;
 
   return (
-    <div className="gh-overlay" onClick={onClose}>
+    <div className="gh-overlay" onClick={onClose} style={{ zIndex: 9999 }}>
       <div className="gh-panel" onClick={(e) => e.stopPropagation()}>
 
         {/* Header */}

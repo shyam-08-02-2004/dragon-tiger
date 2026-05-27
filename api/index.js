@@ -78,9 +78,22 @@ app.get('/api/users/:id', async (req, res) => {
 });
 
 app.put('/api/users/:id/balance', async (req, res) => {
-  const { balance } = req.body;
+  const { balance, prevBalance } = req.body;
   const numBalance = Number(balance) || 0;
-  const user = await User.findOneAndUpdate({ id: req.params.id }, { balance: numBalance }, { new: true });
+  
+  const user = await User.findOne({ id: req.params.id });
+  if (!user) return res.status(404).json({ error: 'Not found' });
+  
+  if (prevBalance !== undefined && user.balance !== Number(prevBalance)) {
+    // Backend balance changed independently (e.g. admin approved withdrawal or manual edit).
+    // Apply the delta instead of overwriting.
+    const delta = numBalance - Number(prevBalance);
+    user.balance += delta;
+  } else {
+    user.balance = numBalance;
+  }
+  
+  await user.save();
   res.json(user);
 });
 
@@ -131,25 +144,13 @@ app.post('/api/transactions', async (req, res) => {
     if (user.balance < req.body.amount) {
       return res.status(400).json({ error: 'Insufficient balance for withdrawal.' });
     }
-    if (req.body.username !== 'babu') {
-      user.balance -= req.body.amount;
-      await user.save();
-    }
+    // We do NOT deduct the balance here. We deduct it when the Admin approves it.
   }
   const tx = new Transaction(req.body);
   await tx.save();
 
-  // If this is a withdrawal request, send a notification to the user
+  // Notify admin of withdrawal request
   if (req.body.type === 'withdraw') {
-    const notif = new Notification({
-      id: 'notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
-      username: req.body.username,
-      message: 'Withdrawal request sent to Admin for approval.',
-      type: 'info'
-    });
-    await notif.save();
-
-    // Notify admin of withdrawal request
     const adminNotif = new Notification({
       id: 'admin_notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
       username: 'babu',
@@ -173,16 +174,17 @@ app.post('/api/admin/transactions/:txId/action', async (req, res) => {
       if (tx.type === 'deposit') {
         user.balance += tx.amount;
         user.hasDeposited = true;
+      } else if (tx.type === 'withdraw') {
+        if (user.balance >= tx.amount) {
+          user.balance -= tx.amount;
+        } else {
+          return res.status(400).json({ error: 'User does not have enough balance anymore to approve this withdrawal.' });
+        }
       }
-      // Note: Withdrawal balance is already deducted upon request creation.
       await user.save();
     }
   } else if (action === 'reject') {
-    const user = await User.findOne({ id: tx.username });
-    if (user && tx.type === 'withdraw') {
-      user.balance += tx.amount;
-      await user.save();
-    }
+    // Rejection doesn't require refunding since we didn't deduct initially.
   }
   
   tx.status = action === 'approve' ? 'approved' : 'rejected';
@@ -192,7 +194,7 @@ app.post('/api/admin/transactions/:txId/action', async (req, res) => {
   if (action === 'approve') {
     let msg = `Request Successful`;
     if (tx.type === 'withdraw') {
-      msg = 'Payment pending me chala gaya 5-6 din me wallet me aa jayega';
+      msg = 'Payment status pending';
     }
     const notif = new Notification({
       id: 'notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),

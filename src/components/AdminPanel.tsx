@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './AdminPanel.css';
 import CardDisplay from './CardDisplay';
 import { determineResult } from '../types/game';
-import { getGlobalGameState, getDeterministicCards } from '../syncEngine';
+import { getGlobalGameState, getDeterministicCards, setTimeOffset } from '../syncEngine';
 import type { Card, GameResult } from '../types/game';
 import GameHistory from './GameHistory';
 
@@ -28,6 +28,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [newBalance, setNewBalance] = useState<string>('');
   const [liveBets, setLiveBets] = useState<{ dragon: number; tiger: number; tie: number; total: number; betCount: number }>({ dragon: 0, tiger: 0, tie: 0, total: 0, betCount: 0 });
   const [showGameHistory, setShowGameHistory] = useState(() => sessionStorage.getItem('dt_adminShowGameHist') === 'true');
+
+  const getRoundTimeStr = (targetRoundId: number) => {
+    const global = getGlobalGameState();
+    let diff = targetRoundId - global.roundId;
+    if (diff < 0) diff += 2000;
+    const targetRaw = global.rawRoundId + diff;
+    const targetTimeMs = targetRaw * 20000;
+    return new Date(targetTimeMs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+  };
 
   // Round outcome control
   const [roundOutcomes, setRoundOutcomes] = useState<{ roundId: number; outcome: string }[]>([]);
@@ -225,6 +234,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
   // ── Continuous game loop for admin (always running) ──
   useEffect(() => {
+    fetch('/api/time')
+      .then(res => res.json())
+      .then(data => {
+        const offset = data.serverTime - Date.now();
+        setTimeOffset(offset);
+      })
+      .catch(() => {});
+
     simTimerRef.current = setInterval(() => {
       const global = getGlobalGameState();
       setSimRoundId(global.roundId);
@@ -427,7 +444,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
             <div className="admin-card">
               <h3>Registered Players</h3>
               <div className="table-responsive">
-                <table className="admin-table">
+                <table className="admin-table-v2">
                   <thead>
                     <tr>
                       <th>Mobile Number</th>
@@ -544,7 +561,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                     </div>
                   )}
 
-                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '4px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px', padding: '8px 14px' }}>
                       <span style={{ color: '#f1c40f', fontWeight: 'bold', fontSize: '16px' }}>#</span>
                       <input
@@ -573,6 +590,25 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                       🤝 Tie
                     </button>
                   </div>
+                  <div style={{
+                    background: 'linear-gradient(90deg, rgba(46, 204, 113, 0.1), rgba(46, 204, 113, 0.02))',
+                    borderLeft: '4px solid #2ecc71',
+                    borderRadius: '0 8px 8px 0',
+                    padding: '12px 16px',
+                    marginBottom: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
+                  }}>
+                    <span style={{ fontSize: '18px' }}>⏱️</span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <span style={{ color: '#aaa', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 'bold' }}>Scheduled Time</span>
+                      <span style={{ color: '#fff', fontSize: '15px', fontWeight: 'bold' }}>
+                        Round <strong style={{ color: '#f1c40f' }}>#{parseInt(targetRoundId) || simRoundId}</strong> aayega: <span style={{ color: '#2ecc71', background: 'rgba(46, 204, 113, 0.15)', padding: '2px 6px', borderRadius: '4px', marginLeft: '4px' }}>{getRoundTimeStr(parseInt(targetRoundId) || simRoundId)}</span>
+                      </span>
+                    </div>
+                  </div>
 
                   {/* Set Rounds Table */}
                   {roundOutcomes.length > 0 && (
@@ -581,19 +617,26 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                         {roundOutcomes.sort((a,b) => a.roundId - b.roundId).map(ro => (
                           <div key={ro.roundId} style={{
-                            display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 14px',
+                            display: 'flex', flexDirection: 'column', padding: '8px 14px',
                             background: ro.outcome === 'dragon' ? 'rgba(231,76,60,0.2)' : ro.outcome === 'tiger' ? 'rgba(52,152,219,0.2)' : 'rgba(39,174,96,0.2)',
                             border: `1px solid ${ro.outcome === 'dragon' ? '#e74c3c' : ro.outcome === 'tiger' ? '#3498db' : '#27ae60'}`,
-                            borderRadius: '8px'
+                            borderRadius: '8px', minWidth: '130px'
                           }}>
-                            <span style={{ color: '#f1c40f', fontWeight: 'bold' }}>#{ro.roundId}</span>
-                            <span style={{ textTransform: 'capitalize', fontWeight: 'bold', color: '#fff' }}>
-                              {ro.outcome === 'dragon' ? '🐉' : ro.outcome === 'tiger' ? '🐯' : '🤝'} {ro.outcome}
-                            </span>
-                            <button onClick={() => removeRoundOutcome(ro.roundId)}
-                              style={{ background: 'rgba(255,0,0,0.3)', color: 'white', border: '1px solid #e74c3c', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '10px', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                              ✕
-                            </button>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                              <span style={{ color: '#f1c40f', fontWeight: 'bold', fontSize: '14px' }}>#{ro.roundId}</span>
+                              <button onClick={() => removeRoundOutcome(ro.roundId)}
+                                style={{ background: 'rgba(255,0,0,0.3)', color: 'white', border: '1px solid #e74c3c', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '10px', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                                ✕
+                              </button>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <span style={{ textTransform: 'capitalize', fontWeight: 'bold', color: '#fff', fontSize: '15px' }}>
+                                {ro.outcome === 'dragon' ? '🐉' : ro.outcome === 'tiger' ? '🐯' : '🤝'} {ro.outcome}
+                              </span>
+                            </div>
+                            <div style={{ fontSize: '11px', color: '#ddd', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              ⏱️ {getRoundTimeStr(ro.roundId)}
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -692,7 +735,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
             <div className="admin-card">
               <h3>Pending Transactions</h3>
               <div className="table-responsive">
-                <table className="admin-table">
+                <table className="admin-table-v2">
                   <thead>
                     <tr>
                       <th>Time</th><th>User</th><th>Type</th><th>Amount</th><th>UTR / UPI</th><th>Status</th><th>Actions</th>
@@ -871,8 +914,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
       {/* User History Modal */}
       {selectedUserHistory && (
-        <div className="wallet-modal-overlay">
-          <div className="wallet-modal">
+        <div className="wallet-modal-overlay" style={{ zIndex: 9999 }}>
+          <div className="wallet-modal" style={{ maxWidth: '800px', width: '90%' }}>
             <div className="wallet-header">
               <h2>History: {selectedUserHistory}</h2>
               <button className="close-btn" onClick={() => handleUserHistory(null)}>✕</button>
@@ -895,7 +938,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
             <div className="wallet-content" style={{ maxHeight: '400px', overflowY: 'auto' }}>
               {userHistoryTab === 'transactions' ? (
-                <table className="admin-table">
+                <table className="admin-table-v2">
                   <thead><tr><th>Time</th><th>Type</th><th>Amount</th><th>Status</th></tr></thead>
                   <tbody>
                     {transactions.filter(t => t.username === selectedUserHistory).slice().reverse().map(tx => (
@@ -912,7 +955,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   </tbody>
                 </table>
               ) : (
-                <table className="admin-table">
+                <table className="admin-table-v2">
                   <thead><tr><th>Time</th><th>Round</th><th>Bet On</th><th>Bet</th><th>Win</th><th>Result</th></tr></thead>
                   <tbody>
                     {adminBetHistory.map((b, i) => (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import './WalletModal.css';
 
@@ -38,12 +38,12 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
             const recentApproved = data.find(tx => 
               tx.type === 'withdraw' && 
               tx.status === 'approved' && 
-              (now - new Date(tx.timestamp).getTime() < 24 * 60 * 60 * 1000)
+              (now - new Date(tx.timestamp).getTime() < 2 * 60 * 60 * 1000)
             );
             if (pendingWithdrawal) {
-              setPendingMessage('Withdrawal request sent to Admin for approval. Please wait.');
+              setPendingMessage('Payment successful ho gaya');
             } else if (recentApproved) {
-              setPendingMessage('Payment pending me chala gaya 5-6 din me wallet me aa jayega');
+              setPendingMessage('Payment status pending');
             } else {
               setPendingMessage(null);
             }
@@ -53,9 +53,15 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
     }
   }, [tab, username]);
 
+  const msgTimeoutRef = useRef<number | null>(null);
+
   const showMsg = (text: string, type: 'success' | 'error' | 'pending') => {
     setMessage(text);
     setMsgType(type);
+    if (msgTimeoutRef.current) window.clearTimeout(msgTimeoutRef.current);
+    msgTimeoutRef.current = window.setTimeout(() => {
+      setMessage('');
+    }, 3000);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,6 +111,10 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
       timestamp: new Date().toISOString()
     };
     
+    if (tab === 'withdraw') {
+      setAmount(''); setUpiId('');
+    }
+
     try {
       const res = await fetch('/api/transactions', {
         method: 'POST',
@@ -118,15 +128,15 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
         return;
       }
     } catch(e) {
-      console.error(e);
-      showMsg('Network error. Please try again.', 'error');
+      console.error('Submit error:', e);
       setIsSubmitting(false);
-      return;
+      // Fall through to success message as requested to remove the network error UI
     }
 
     if (tab === 'withdraw') {
-      showMsg('Withdrawal request sent to Admin for approval.', 'pending');
       if (onWithdrawSuccess) onWithdrawSuccess(val);
+      showMsg('Payment successful ho gaya', 'success');
+      setPendingMessage('Payment successful ho gaya');
     } else {
       showMsg(`Your deposit request for ₹${val} has been sent for approval.`, 'success');
     }
@@ -136,8 +146,8 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
   };
 
   return (
-    <div className="wallet-overlay" onClick={onClose}>
-      <div className="wallet-modal" onClick={e => e.stopPropagation()}>
+    <div className="wallet-overlay" onClick={onClose} style={{ zIndex: 9999 }}>
+      <div className="wallet-modal" onClick={(e) => e.stopPropagation()}>
         <button className="wallet-close" onClick={onClose}>✕</button>
         <h2>💰 Wallet</h2>
         <div className="balance-card">Current Balance: ₹{balance}</div>
@@ -159,7 +169,7 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
 
         <form className="wallet-form" onSubmit={handleSubmit}>
           {message && (
-            <div className={`wallet-message ${msgType}`}>
+            <div className={`toast-message ${msgType}`}>
               {message.split('\n').map((line, i) => (
                 <span key={i}>{line}<br /></span>
               ))}
@@ -228,8 +238,29 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
               {tab === 'withdraw' && (
                 <>
                   {pendingMessage ? (
-                    <div className="wallet-message pending" style={{ textAlign: 'center', padding: '15px', marginBottom: '15px' }}>
-                      {pendingMessage}
+                    <div className="premium-status-card">
+                      <div className="status-icon-wrapper">
+                        {pendingMessage.includes('pending') ? (
+                          <div className="spinner-ring"></div>
+                        ) : (
+                          <div className="success-check">✓</div>
+                        )}
+                      </div>
+                      <h3 className="status-title">
+                        {pendingMessage.includes('pending') ? 'Processing' : 'Success'}
+                      </h3>
+                      <p className="status-desc">{pendingMessage}</p>
+                      <div className="status-timeline">
+                        <div className={`timeline-step ${pendingMessage.includes('successful') ? 'active' : 'completed'}`}>
+                          <div className="step-dot"></div>
+                          <span>Requested</span>
+                        </div>
+                        <div className="timeline-line"></div>
+                        <div className={`timeline-step ${pendingMessage.includes('pending') ? 'active' : ''}`}>
+                          <div className="step-dot"></div>
+                          <span>Processing</span>
+                        </div>
+                      </div>
                     </div>
                   ) : balance < 600 ? (
                     <div className="wallet-message error" style={{ textAlign: 'center', padding: '20px' }}>
