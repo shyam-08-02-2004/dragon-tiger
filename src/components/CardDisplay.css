@@ -406,5 +406,6 @@
   .card-rank { font-size: 14px; }
   .card-suit { font-size: 12px; }
   .card-slot { padding: 8px; }
+
   .card-label { font-size: 11px; letter-spacing: 2px; }
 }

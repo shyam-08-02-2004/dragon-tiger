@@ -287,12 +287,7 @@ const App: React.FC = () => {
     } catch(e) { console.error(e); }
   };
 
-  useEffect(() => {
-    // Auto-request fullscreen for immersive casino experience
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    }
-  }, []);
+// Fullscreen request removed per user request
 
   // Global continuous game loop timer
   useEffect(() => {

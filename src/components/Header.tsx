@@ -16,13 +16,6 @@ const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username
   const [showWallet, setShowWallet] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const toggleFullScreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-    } else {
-      if (document.exitFullscreen) document.exitFullscreen();
-    }
-  };
 
   return (
     <header className="header" id="main-header">
@@ -55,7 +48,7 @@ const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username
       </div>
 
       <div className="header-right">
-        <button className="fullscreen-btn" onClick={toggleFullScreen} title="Toggle Fullscreen">🖥️</button>
+
         <div className="user-info dropdown-container" onClick={() => setShowDropdown(!showDropdown)}>
           <span className="username-badge">👤 {username} ▾</span>
           {showDropdown && (

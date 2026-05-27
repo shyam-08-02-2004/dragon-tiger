@@ -236,6 +236,7 @@
   animation: countUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+/* Responsive adjustments */
 @media (max-width: 768px) {
   .header {
     padding: 10px 16px;
@@ -273,3 +274,4 @@
     width: 100%;
   }
 }
+
