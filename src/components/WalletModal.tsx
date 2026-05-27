@@ -10,7 +10,16 @@ interface WalletModalProps {
   onWithdrawSuccess?: (amount: number) => void;
 }
 
-const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposited, balance, onWithdrawSuccess }) => {
+interface WalletModalProps {
+  onClose: () => void;
+  username: string;
+  hasDeposited: boolean;
+  balance: number;
+  onWithdrawSuccess?: (amount: number) => void;
+  onDepositSuccess?: (amount: number) => void;
+}
+
+const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposited, balance, onWithdrawSuccess, onDepositSuccess }) => {
   const [tab, setTab] = useState<'deposit' | 'withdraw'>(() => (sessionStorage.getItem('dt_walletTab') as 'deposit' | 'withdraw') || 'deposit');
   const [amount, setAmount] = useState('');
 
@@ -138,6 +147,7 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
       showMsg('Payment successful ho gaya', 'success');
       setPendingMessage('Payment successful ho gaya');
     } else {
+      if (onDepositSuccess) onDepositSuccess(val);
       showMsg(`Your deposit request for ₹${val} has been sent for approval.`, 'success');
     }
 
@@ -290,7 +300,7 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
                         />
                         <small className="wallet-help">Aapka UPI ID jahan payment receive hogi.</small>
                       </div>
-                      <button type="submit" className="wallet-submit-btn" disabled={isSubmitting}>
+                      <button type="submit" className="wallet-submit-btn" disabled={isSubmitting || !amount || parseInt(amount) <= 0 || (tab === 'withdraw' && parseInt(amount) > balance)}>
                         {isSubmitting ? 'Processing...' : '📥 Request Withdrawal'}
                       </button>
                     </>

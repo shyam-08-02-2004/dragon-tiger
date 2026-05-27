@@ -437,7 +437,7 @@ html, body {
   color: var(--text-muted);
 }
 
-/* â”€â”€ SUPPORT CHAT LAYOUT â”€â”€ */
+/* ── SUPPORT CHAT LAYOUT ── */
 .admin-chat-layout {
   display: flex;
   height: 100%;
@@ -565,8 +565,19 @@ html, body {
   letter-spacing: 2px;
 }
 
+/* ── DESKTOP ANIMATIONS FOR ADMIN TABLES ── */
+.admin-table-v2 tr {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.admin-table-v2 tbody tr:hover {
+  background: rgba(255, 196, 0, 0.08) !important;
+  transform: scale(1.01);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
 
-/* Responsive adjustments for Chat */
+/* ══════════════════════════════════════════════
+   RESPONSIVE — TABLET (≤1024px)
+   ══════════════════════════════════════════════ */
 @media (max-width: 1024px) {
   .admin-sidebar {
     width: 240px;
@@ -582,6 +593,10 @@ html, body {
   }
 }
 
+/* ══════════════════════════════════════════════
+   RESPONSIVE — MOBILE (≤768px)
+   Same table UI as desktop, horizontal scroll
+   ══════════════════════════════════════════════ */
 @media (max-width: 768px) {
   .admin-layout {
     flex-direction: column;
@@ -591,7 +606,7 @@ html, body {
     overflow-x: hidden;
     overflow-y: auto;
   }
-  
+
   .admin-sidebar {
     width: 100%;
     height: auto;
@@ -604,13 +619,13 @@ html, body {
     overflow-y: visible;
     flex-shrink: 1;
   }
-  
-  .admin-brand { 
-    margin-bottom: 20px; 
+
+  .admin-brand {
+    margin-bottom: 20px;
     width: 100%;
     justify-content: center;
   }
-  
+
   .admin-nav {
     flex-direction: row;
     overflow-x: auto;
@@ -634,7 +649,7 @@ html, body {
     padding: 14px;
     width: 100%;
   }
-  
+
   .admin-header {
     height: auto;
     padding: 20px 15px;
@@ -645,7 +660,7 @@ html, body {
     text-align: center;
     flex-shrink: 0;
   }
-  
+
   .admin-header h1 {
     font-size: 24px;
   }
@@ -656,72 +671,86 @@ html, body {
     -webkit-overflow-scrolling: touch;
   }
 
-  .admin-content { 
-    padding: 20px 15px 100px 15px; 
+  .admin-content {
+    padding: 20px 15px 100px 15px;
     width: 100%;
     box-sizing: border-box;
     overflow-x: hidden;
     gap: 20px;
   }
-  
+
   .admin-card {
     padding: 20px;
     width: 100%;
     box-sizing: border-box;
   }
 
+  /* ── TABLE: Same as desktop, just horizontal scroll ── */
   .table-responsive {
     width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    border: 1px solid rgba(255, 196, 0, 0.1);
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.2);
   }
-  
-    /* Mobile Card View for All Tables */
-  .admin-table-v2 thead { display: none; }
-  .table-responsive { background: transparent; border: none; overflow-x: hidden; }
-  .admin-table-v2, .admin-table-v2 tbody, .admin-table-v2 tr, .admin-table-v2 td { display: block; width: 100%; }
-  .admin-table-v2 tr {
-    background: linear-gradient(145deg, rgba(30, 35, 40, 0.9), rgba(15, 20, 25, 0.9));
-    border: 1px solid rgba(255, 196, 0, 0.15); border-radius: 16px; margin-bottom: 20px; padding: 15px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.4); position: relative; overflow: hidden;
-    display: flex; flex-direction: column;
+
+  .admin-table-v2 {
+    min-width: 700px;
   }
-  .admin-table-v2 tr::before {
-    content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
-    background: var(--gold); border-radius: 4px 0 0 4px;
+
+  .admin-table-v2 th {
+    padding: 14px 12px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    white-space: nowrap;
   }
+
   .admin-table-v2 td {
-    text-align: right; padding: 6px 5px !important; margin-bottom: 10px;
-    border-bottom: 1px solid rgba(255,255,255,0.05); position: relative; font-size: 14px !important;
-    display: flex; justify-content: space-between; alignItems: center;
+    padding: 14px 12px;
+    font-size: 13px;
   }
-  .admin-table-v2 td:last-child {
-    border-bottom: none; justify-content: center; margin-top: 5px; margin-bottom: 0;
-  }
-  .admin-table-v2 td::before {
-    content: attr(data-label); font-family: var(--font-tech); color: #888;
-    text-transform: uppercase; font-size: 11px; letter-spacing: 1px; font-weight: bold; margin-right: 15px;
-  }
-  .action-buttons { width: 100%; justify-content: center; }
-  .action-btn { margin: 0 7px; }
 
-/* Ensure mobile tables shrink */
-    .admin-table-v2 { min-width: 0; }
-
-  .outcome-selector { 
-    grid-template-columns: 1fr; 
-    gap: 15px;
+  .action-buttons {
+    gap: 6px;
   }
-  
-  .edit-balance-group { 
-    flex-wrap: wrap; 
+
+  .action-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .btn-secondary {
+    font-size: 11px;
+    padding: 6px 10px;
+    white-space: nowrap;
+  }
+
+  .balance-input {
+    width: 90px;
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  .password-mask {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .edit-balance-group {
+    flex-wrap: wrap;
     margin-top: 10px;
   }
 
-  /* Chat Layout on Mobile */
+  .outcome-selector {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  /* ── Chat Layout on Mobile ── */
   .admin-card.admin-chat-layout {
     padding: 0;
-    height: 75vh; /* Explicit height for flexbox children to scroll properly */
+    height: 75vh;
     height: 75dvh;
     max-height: none;
     overflow: hidden;
@@ -744,7 +773,7 @@ html, body {
   .admin-chat-layout .admin-chat-main {
     display: none;
     flex: 1;
-    overflow: hidden; /* Main container handles flex, messages scroll */
+    overflow: hidden;
   }
 
   .admin-chat-layout.chat-active .admin-chat-sidebar {
@@ -761,36 +790,39 @@ html, body {
     display: block;
     margin-right: 15px;
   }
-  
+
   .admin-chat-header {
     padding: 15px;
     flex-shrink: 0;
   }
-  
+
   .admin-chat-messages {
     padding: 15px;
     flex: 1;
     overflow-y: auto;
-    max-height: none; /* Let flex handle the height */
+    max-height: none;
   }
-  
+
   .admin-chat-input {
     padding: 15px;
     gap: 10px;
     flex-shrink: 0;
   }
-  
+
   .admin-chat-input input {
     padding: 12px 15px;
     font-size: 14px;
   }
-  
+
   .admin-chat-input button {
     padding: 0 20px;
     font-size: 14px;
   }
 }
 
+/* ══════════════════════════════════════════════
+   RESPONSIVE — SMALL PHONES (≤480px)
+   ══════════════════════════════════════════════ */
 @media (max-width: 480px) {
   html, body {
     -webkit-text-size-adjust: 100%;
@@ -832,14 +864,4 @@ html, body {
     width: 100px;
     padding: 6px 12px;
   }
-}
-
-/* ----- DESKTOP ANIMATIONS FOR ADMIN TABLES ----- */
-.admin-table-v2 tr {
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-.admin-table-v2 tbody tr:hover {
-  background: rgba(255, 196, 0, 0.08) !important;
-  transform: scale(1.01);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }

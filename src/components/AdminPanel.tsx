@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './AdminPanel.css';
 import './WalletModal.css';
 import CardDisplay from './CardDisplay';
