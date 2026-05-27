@@ -900,7 +900,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   <tbody>
                     {adminBetHistory.map(b => (
                       <tr key={b._id || Math.random()}>
-                        <td>{new Date(b.timestamp).toLocaleTimeString()}</td>
+                        <td>{new Date(b.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</td>
                         <td>#{b.roundNumber}</td>
                         <td>₹{b.betAmount}</td>
                         <td>₹{b.winAmount}</td>

@@ -168,7 +168,7 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
                 betHistory.map(b => (
                   <div key={b._id || Math.random()} className="gh-row" style={{ borderLeftColor: b.winAmount > 0 ? '#2ecc71' : '#e74c3c' }}>
                     <span className="gh-col-round" style={{ flex: '0 0 60px', fontSize: '10px' }}>
-                      {new Date(b.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {new Date(b.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
                     </span>
                     <span className="gh-col-game" style={{ fontSize: '12px', color: '#fff' }}>
                       #{b.roundNumber}
