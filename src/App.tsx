@@ -498,12 +498,17 @@ const App: React.FC = () => {
         
         const winnings = calculateWinnings(prev.bets, result, dragonCard, tigerCard);
         const lastWin = winnings;
-        const newHistory = [
-          ...prev.history,
+        let newHistory = prev.history;
+        if (roundId === 1) {
+          newHistory = []; // Reset history at the start of a new cycle
+        }
+        
+        newHistory = [
+          ...newHistory,
           { id: roundId, dragonCard, tigerCard, result, win: winnings },
         ];
         
-        if (newHistory.length > 100) newHistory.shift();
+        if (newHistory.length > 2000) newHistory.shift();
         
         const newBalance = Number(prev.balance) + winnings;
         lastLocalBalanceUpdate.current = Date.now();

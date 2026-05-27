@@ -701,7 +701,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   <tbody>
                     {transactions.slice().reverse().map((tx) => (
                       <tr key={tx.id}>
-                        <td>{new Date(tx.timestamp).toLocaleString()}</td>
+                        <td>{new Date(tx.timestamp).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}</td>
                         <td className="fw-bold">{tx.username}</td>
                         <td className={tx.type === 'deposit' ? 'green' : 'gold'}>{tx.type.toUpperCase()}</td>
                         <td className="gold">₹{tx.amount}</td>
@@ -900,7 +900,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   <tbody>
                     {transactions.filter(t => t.username === selectedUserHistory).slice().reverse().map(tx => (
                       <tr key={tx.id}>
-                        <td>{new Date(tx.timestamp).toLocaleString()}</td>
+                        <td>{new Date(tx.timestamp).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}</td>
                         <td className={tx.type === 'deposit' ? 'green' : 'gold'}>{tx.type.toUpperCase()}</td>
                         <td>₹{tx.amount}</td>
                         <td><span className={`status-badge ${tx.status}`}>{tx.status}</span></td>

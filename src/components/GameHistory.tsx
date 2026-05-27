@@ -55,9 +55,10 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
   }, [isOpen, username]);
   const pastRounds = useMemo(() => {
     const rounds: PastRound[] = [];
-    // Generate last 100 completed rounds (exclude current round)
-    for (let i = 1; i <= 100; i++) {
-      const pastRawId = rawRoundId - i;
+    const currentCycleStartRawId = rawRoundId - (currentRound - 1);
+    
+    // Show history for the current cycle up to 2000 rounds
+    for (let pastRawId = rawRoundId - 1; pastRawId >= currentCycleStartRawId; pastRawId--) {
       if (pastRawId < 0) break;
       const pastRoundId = (pastRawId % 2000) + 1;
       
@@ -199,7 +200,7 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
         {/* Footer */}
         {activeTab === 'game' && (
           <div className="gh-footer">
-            📊 Showing last {pastRounds.length} of 100 rounds
+            📊 Showing last {pastRounds.length} rounds of current cycle
           </div>
         )}
       </div>
