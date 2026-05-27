@@ -79,8 +79,8 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       return;
     }
 
-    if (!/^\d{10}$/.test(mobileNumber.trim())) {
-      setError('Mobile number must be exactly 10 digits.');
+    if (!/^[6-9]\d{9}$/.test(mobileNumber.trim())) {
+      setError('Please enter a valid 10-digit mobile number.');
       return;
     }
 
@@ -159,8 +159,8 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       return;
     }
 
-    if (!/^\d{10}$/.test(mobileNumber.trim())) {
-      setError('Mobile number must be exactly 10 digits.');
+    if (!/^[6-9]\d{9}$/.test(mobileNumber.trim())) {
+      setError('Please enter a valid 10-digit mobile number.');
       return;
     }
 
@@ -389,7 +389,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                   id="mobileNumber"
                   maxLength={10}
                   value={mobileNumber}
-                  onChange={(e) => setMobileNumber(e.target.value)}
+                  onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, ''))}
                   placeholder="Enter 10-digit mobile number"
                   autoComplete="off"
                 />
