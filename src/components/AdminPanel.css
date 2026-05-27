@@ -2,7 +2,7 @@
   display: flex;
   min-height: 100vh;
   background-color: var(--dark-bg);
-  background-image: url('/background.jpg');
+  background-image: url('/bg-fire.jpg');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
