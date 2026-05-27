@@ -61,9 +61,13 @@ const App: React.FC = () => {
     const saved = sessionStorage.getItem('dragonTigerCurrentUser');
     return saved ? JSON.parse(saved) : null;
   });
-  const [showWallet, setShowWallet] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
-  const [showHelpCenter, setShowHelpCenter] = useState(false);
+  const [showWallet, setShowWallet] = useState(() => sessionStorage.getItem('dt_showWallet') === 'true');
+  const [showHistory, setShowHistory] = useState(() => sessionStorage.getItem('dt_showHistory') === 'true');
+  const [showHelpCenter, setShowHelpCenter] = useState(() => sessionStorage.getItem('dt_showHelp') === 'true');
+
+  const setWalletOpen = (val: boolean) => { setShowWallet(val); sessionStorage.setItem('dt_showWallet', String(val)); };
+  const setHistoryOpen = (val: boolean) => { setShowHistory(val); sessionStorage.setItem('dt_showHistory', String(val)); };
+  const setHelpOpen = (val: boolean) => { setShowHelpCenter(val); sessionStorage.setItem('dt_showHelp', String(val)); };
   const [isTimeSynced, setIsTimeSynced] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [state, setState] = useState<GameState>(() => {
@@ -108,7 +112,7 @@ const App: React.FC = () => {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    const handleOpenHelp = () => setShowHelpCenter(true);
+    const handleOpenHelp = () => setHelpOpen(true);
     document.addEventListener('openHelpCenter', handleOpenHelp);
     return () => document.removeEventListener('openHelpCenter', handleOpenHelp);
   }, []);
@@ -278,7 +282,7 @@ const App: React.FC = () => {
   useEffect(() => {
     if (isAuthenticated && currentUser && currentUser.username !== 'babu') {
       if (state.phase === 'betting' && state.balance === 0 && state.totalBet === 0) {
-        setShowWallet(true);
+        setWalletOpen(true);
       }
     }
   }, [isAuthenticated, currentUser, state.phase, state.balance, state.totalBet]);
@@ -592,7 +596,7 @@ const App: React.FC = () => {
         username={currentUser?.username || ''} 
         hasDeposited={currentUser?.hasDeposited || false}
         onLogout={handleLogout}
-        onShowHistory={() => setShowHistory(true)}
+        onShowHistory={() => setHistoryOpen(true)}
       />
 
       <main className="game-main" id="game-main">
@@ -661,7 +665,7 @@ const App: React.FC = () => {
         username={currentUser.id || currentUser.username} 
         hasDeposited={currentUser.hasDeposited || false} 
         balance={balance} 
-        onClose={() => setShowWallet(false)} 
+        onClose={() => setWalletOpen(false)} 
         onWithdrawSuccess={(amount) => {
           setState(prev => ({ ...prev, balance: prev.balance - amount }));
           setCurrentUser(prev => {
@@ -680,7 +684,7 @@ const App: React.FC = () => {
           currentRound={roundNumber}
           rawRoundId={getGlobalGameState().rawRoundId}
           isOpen={showHistory}
-          onClose={() => setShowHistory(false)}
+          onClose={() => setHistoryOpen(false)}
           username={currentUser.id || currentUser.username}
         />
       )}
@@ -689,7 +693,7 @@ const App: React.FC = () => {
         <HelpCenter 
           userId={currentUser.id || currentUser.username}
           isOpen={showHelpCenter}
-          onClose={() => setShowHelpCenter(false)}
+          onClose={() => setHelpOpen(false)}
         />
       )}
 
@@ -703,7 +707,7 @@ const App: React.FC = () => {
           <span className="footer-version">v2.0</span>
           <span className="footer-sep">|</span>
           <button 
-            onClick={() => setShowHelpCenter(true)}
+            onClick={() => setHelpOpen(true)}
             style={{ background: 'transparent', border: 'none', color: '#3498db', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}
           >
             💬 Support

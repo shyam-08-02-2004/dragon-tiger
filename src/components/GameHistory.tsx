@@ -26,8 +26,13 @@ const winnerInfo = (winner: GameResult) => {
 
 const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isOpen, onClose, username }) => {
   const [serverHistory, setServerHistory] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'game' | 'bets'>('game');
+  const [activeTab, setActiveTab] = useState<'game' | 'bets'>(() => (sessionStorage.getItem('dt_historyTab') as 'game' | 'bets') || 'game');
   const [betHistory, setBetHistory] = useState<any[]>([]);
+
+  const handleTabChange = (tab: 'game' | 'bets') => {
+    setActiveTab(tab);
+    sessionStorage.setItem('dt_historyTab', tab);
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -93,13 +98,13 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
         {username && (
           <div style={{ display: 'flex', borderBottom: '1px solid #333', background: '#1a1a1a' }}>
             <button 
-              onClick={() => setActiveTab('game')}
+              onClick={() => handleTabChange('game')}
               style={{ flex: 1, padding: '12px', background: activeTab === 'game' ? '#2c3e50' : 'transparent', color: activeTab === 'game' ? '#f1c40f' : '#aaa', border: 'none', borderBottom: activeTab === 'game' ? '2px solid #f1c40f' : 'none', fontWeight: 'bold', cursor: 'pointer' }}
             >
               Game History
             </button>
             <button 
-              onClick={() => setActiveTab('bets')}
+              onClick={() => handleTabChange('bets')}
               style={{ flex: 1, padding: '12px', background: activeTab === 'bets' ? '#2c3e50' : 'transparent', color: activeTab === 'bets' ? '#f1c40f' : '#aaa', border: 'none', borderBottom: activeTab === 'bets' ? '2px solid #f1c40f' : 'none', fontWeight: 'bold', cursor: 'pointer' }}
             >
               My Bets

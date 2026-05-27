@@ -11,8 +11,14 @@ interface WalletModalProps {
 }
 
 const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposited, balance, onWithdrawSuccess }) => {
-  const [tab, setTab] = useState<'deposit' | 'withdraw'>('deposit');
+  const [tab, setTab] = useState<'deposit' | 'withdraw'>(() => (sessionStorage.getItem('dt_walletTab') as 'deposit' | 'withdraw') || 'deposit');
   const [amount, setAmount] = useState('');
+
+  const handleTabChange = (newTab: 'deposit' | 'withdraw') => {
+    setTab(newTab);
+    sessionStorage.setItem('dt_walletTab', newTab);
+    setMessage('');
+  };
   const [utr, setUtr] = useState('');
   const [upiId, setUpiId] = useState('');
   const [message, setMessage] = useState('');
@@ -139,13 +145,13 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
         <div className="wallet-tabs">
           <button
             className={`wallet-tab ${tab === 'deposit' ? 'active' : ''}`}
-            onClick={() => { setTab('deposit'); setMessage(''); setDepositStep(1); }}
+            onClick={() => { handleTabChange('deposit'); setDepositStep(1); }}
           >
             ➕ Deposit
           </button>
           <button
             className={`wallet-tab ${tab === 'withdraw' ? 'active' : ''}`}
-            onClick={() => { setTab('withdraw'); setMessage(''); }}
+            onClick={() => handleTabChange('withdraw')}
           >
             💸 Withdraw
           </button>
