@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { getDeterministicCards } from '../syncEngine';
 import { determineResult } from '../types/game';
 import type { GameResult } from '../types/game';
@@ -24,6 +24,18 @@ const winnerInfo = (winner: GameResult) => {
 };
 
 const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isOpen, onClose }) => {
+  const [serverHistory, setServerHistory] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetch('/api/history')
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) setServerHistory(data);
+        })
+        .catch(() => {});
+    }
+  }, [isOpen]);
   const pastRounds = useMemo(() => {
     const rounds: PastRound[] = [];
     // Generate last 100 completed rounds (exclude current round)
@@ -31,12 +43,19 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
       const pastRawId = rawRoundId - i;
       if (pastRawId < 0) break;
       const pastRoundId = (pastRawId % 2000) + 1;
-      const { dragonCard, tigerCard } = getDeterministicCards(pastRoundId, pastRawId);
-      const winner = determineResult(dragonCard, tigerCard);
-      rounds.push({ round: pastRoundId, rawRoundId: pastRawId, winner });
+      
+      const forced = serverHistory.find(h => h.roundId === pastRawId);
+      
+      if (forced) {
+        rounds.push({ round: pastRoundId, rawRoundId: pastRawId, winner: forced.result as GameResult });
+      } else {
+        const { dragonCard, tigerCard } = getDeterministicCards(pastRoundId, pastRawId);
+        const winner = determineResult(dragonCard, tigerCard);
+        rounds.push({ round: pastRoundId, rawRoundId: pastRawId, winner });
+      }
     }
     return rounds;
-  }, [currentRound, rawRoundId]);
+  }, [currentRound, rawRoundId, serverHistory]);
 
   // Stats
   const dragonCount = pastRounds.filter(r => r.winner === 'dragon').length;

@@ -114,6 +114,23 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    // Fetch server history to populate RoadMap correctly on load
+    fetch('/api/history')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const loadedHistory = data.slice(-100).map((h: any) => ({
+            id: h.roundNumber,
+            result: h.result as GameResult,
+            dragonCard: { suit: '', rank: '', value: 0 },
+            tigerCard: { suit: '', rank: '', value: 0 },
+            win: 0
+          }));
+          setState(prev => ({ ...prev, history: loadedHistory }));
+        }
+      })
+      .catch(() => {});
+
     fetch('/api/time')
       .then(res => res.json())
       .then(data => {
@@ -487,6 +504,13 @@ const App: React.FC = () => {
         if (currentUserRef.current && currentUserRef.current.id !== 'babu') {
            syncBalanceToServer(newBalance);
         }
+
+        // Record real outcome to server (for late joiners and GameHistory)
+        fetch('/api/history/record', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ roundId: getGlobalGameState().rawRoundId, result })
+        }).catch(() => {});
 
         // Cleanup old forced outcomes after result
         fetch('/api/admin/settings/cleanup', {
