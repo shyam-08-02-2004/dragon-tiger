@@ -92,14 +92,18 @@ const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username
           )}
         </div>
         <div 
-          className="stat-block premium-wallet" 
+          className="premium-wallet-btn" 
           id="balance-display" 
           onClick={onShowWallet} 
           title="Add/Withdraw Funds"
-          style={{ flexDirection: 'row', alignItems: 'center', gap: '6px', padding: '6px 12px', background: 'rgba(0,0,0,0.3)', borderRadius: '20px', cursor: 'pointer', border: '1px solid rgba(212,160,23,0.3)' }}
         >
-          <span style={{ fontSize: '18px' }}>🪙</span>
-          <span className="stat-value gold" style={{ fontSize: '15px', fontWeight: 'bold' }}>₹{balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+          <div className="wallet-icon-container">
+            <span className="wallet-coin">🪙</span>
+          </div>
+          <span className="wallet-balance">
+            ₹{balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
+          <div className="wallet-add-btn">+</div>
         </div>
       </div>
     </header>

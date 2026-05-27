@@ -357,6 +357,65 @@
   transform: translateY(-1px);
 }
 
+.premium-wallet-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px 4px 10px;
+  background: linear-gradient(90deg, rgba(20,20,20,0.6), rgba(40,30,10,0.8));
+  border: 1px solid rgba(212, 160, 23, 0.4);
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.premium-wallet-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  border-color: rgba(241, 196, 15, 0.8);
+  box-shadow: 0 6px 15px rgba(212, 160, 23, 0.2), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+.wallet-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: float 3s ease-in-out infinite;
+}
+
+.wallet-coin {
+  font-size: 20px;
+  filter: drop-shadow(0 2px 4px rgba(212, 160, 23, 0.5));
+}
+
+.wallet-balance {
+  font-family: var(--font-tech);
+  font-size: 16px;
+  font-weight: 800;
+  color: #f1c40f;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  letter-spacing: 0.5px;
+}
+
+.wallet-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #f1c40f, #e67e22);
+  color: #000;
+  border-radius: 50%;
+  font-weight: 900;
+  font-size: 16px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+  transition: transform 0.2s;
+}
+
+.premium-wallet-btn:hover .wallet-add-btn {
+  transform: rotate(90deg);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .header {
@@ -378,6 +437,17 @@
   .round-number {
     font-size: 16px;
   }
+  .wallet-balance {
+    font-size: 14px;
+  }
+  .wallet-coin {
+    font-size: 18px;
+  }
+  .wallet-add-btn {
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -393,5 +463,12 @@
   }
   .header-center {
     width: 100%;
+  }
+  .premium-wallet-btn {
+    padding: 4px 6px 4px 8px;
+    gap: 6px;
+  }
+  .wallet-balance {
+    font-size: 13px;
   }
 }
