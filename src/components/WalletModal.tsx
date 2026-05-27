@@ -11,8 +11,9 @@ interface WalletModalProps {
 }
 
 const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposited, balance, onWithdrawSuccess }) => {
-  const [tab, setTab] = useState<'deposit' | 'withdraw'>('deposit');
+  const [tab, setTab] = useState<'deposit' | 'withdraw' | 'history'>('deposit');
   const [amount, setAmount] = useState('');
+  const [betHistory, setBetHistory] = useState<any[]>([]);
   const [utr, setUtr] = useState('');
   const [upiId, setUpiId] = useState('');
   const [message, setMessage] = useState('');
@@ -42,6 +43,13 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
               setPendingMessage(null);
             }
           }
+        })
+        .catch(console.error);
+    } else if (tab === 'history') {
+      fetch('/api/users/bet-history/' + username)
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) setBetHistory(data);
         })
         .catch(console.error);
     }
@@ -148,6 +156,12 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
             onClick={() => { setTab('withdraw'); setMessage(''); }}
           >
             💸 Withdraw
+          </button>
+          <button
+            className={`wallet-tab ${tab === 'history' ? 'active' : ''}`}
+            onClick={() => { setTab('history'); setMessage(''); }}
+          >
+            📜 History
           </button>
         </div>
 
@@ -259,6 +273,44 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
                     </>
                   )}
                 </>
+              )}
+
+              {tab === 'history' && (
+                <div style={{ maxHeight: '350px', overflowY: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid #444', textAlign: 'left' }}>
+                        <th style={{ padding: '8px' }}>Time</th>
+                        <th style={{ padding: '8px' }}>Round</th>
+                        <th style={{ padding: '8px' }}>Bet</th>
+                        <th style={{ padding: '8px' }}>Win</th>
+                        <th style={{ padding: '8px' }}>Result</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {betHistory.map(b => (
+                        <tr key={b._id || Math.random()} style={{ borderBottom: '1px solid #333' }}>
+                          <td style={{ padding: '8px', fontSize: '12px' }}>
+                            {new Date(b.timestamp).toLocaleTimeString()}
+                          </td>
+                          <td style={{ padding: '8px' }}>#{b.roundNumber}</td>
+                          <td style={{ padding: '8px' }}>₹{b.betAmount}</td>
+                          <td style={{ padding: '8px' }}>₹{b.winAmount}</td>
+                          <td style={{ padding: '8px', color: b.winAmount > 0 ? '#2ecc71' : '#e74c3c', fontWeight: 'bold' }}>
+                            {b.winAmount > 0 ? 'WIN' : 'LOST'}
+                          </td>
+                        </tr>
+                      ))}
+                      {betHistory.length === 0 && (
+                        <tr>
+                          <td colSpan={5} style={{ textAlign: 'center', padding: '20px' }}>
+                            Aaj koi bet nahi lagayi hai.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </>
           )}

@@ -80,3 +80,15 @@ const chatMessageSchema = new mongoose.Schema({
   timestamp: { type: Date, default: Date.now }
 });
 export const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage', chatMessageSchema);
+
+// Daily User Bet History
+const userBetHistorySchema = new mongoose.Schema({
+  username: { type: String, required: true },
+  roundId: { type: Number, required: true },
+  roundNumber: { type: Number, required: true },
+  betAmount: { type: Number, required: true },
+  winAmount: { type: Number, required: true },
+  timestamp: { type: Date, default: Date.now }
+});
+export const UserBetHistory = mongoose.models.UserBetHistory || mongoose.model('UserBetHistory', userBetHistorySchema);
+

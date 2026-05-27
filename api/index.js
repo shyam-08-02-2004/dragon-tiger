@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import { User, Transaction, AdminSettings, RoundBet, Notification, RoundHistory, ChatMessage } from './models.js';
+import { User, Transaction, AdminSettings, RoundBet, Notification, RoundHistory, ChatMessage, UserBetHistory } from './models.js';
 
 const app = express();
 app.use(cors());
@@ -354,6 +354,49 @@ app.put('/api/notifications/:notifId/read', async (req, res) => {
     res.json(notif);
   } catch(e) {
     res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ── USER BET HISTORY ──
+
+// Fetch daily bet history for a user
+app.get('/api/users/bet-history/:username', async (req, res) => {
+  try {
+    const { username } = req.params;
+    // Get start of today (local time roughly, assuming server time aligns with user roughly or just use UTC boundaries)
+    // To match 11:59 PM reset, we use start of current day.
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const history = await UserBetHistory.find({ 
+      username, 
+      timestamp: { $gte: startOfDay } 
+    }).sort({ timestamp: -1 });
+
+    res.json(history);
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Record a completed bet for a user
+app.post('/api/users/bet-history', async (req, res) => {
+  try {
+    const { username, roundId, roundNumber, betAmount, winAmount } = req.body;
+    
+    // Create new bet history record
+    const betRecord = new UserBetHistory({
+      username,
+      roundId,
+      roundNumber,
+      betAmount,
+      winAmount
+    });
+    
+    await betRecord.save();
+    res.json({ success: true });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
   }
 });
 

@@ -503,6 +503,20 @@ const App: React.FC = () => {
         lastLocalBalanceUpdate.current = Date.now();
         if (currentUserRef.current && currentUserRef.current.id !== 'babu') {
            syncBalanceToServer(newBalance);
+           
+           if (prev.totalBet > 0) {
+             fetch('/api/users/bet-history', {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({
+                 username: currentUserRef.current.id,
+                 roundId: getGlobalGameState().rawRoundId,
+                 roundNumber: roundId,
+                 betAmount: prev.totalBet,
+                 winAmount: winnings
+               })
+             }).catch(() => {});
+           }
         }
 
         // Record real outcome to server (for late joiners and GameHistory)

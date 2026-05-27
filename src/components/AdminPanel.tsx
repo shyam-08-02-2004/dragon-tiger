@@ -22,6 +22,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [simResult, setSimResult] = useState<GameResult | null>(null);
   const simTimerRef = useRef<any | null>(null);
   const [selectedUserHistory, setSelectedUserHistory] = useState<string | null>(null);
+  const [userHistoryTab, setUserHistoryTab] = useState<'transactions' | 'bets'>('transactions');
+  const [adminBetHistory, setAdminBetHistory] = useState<any[]>([]);
   const [editBalanceUser, setEditBalanceUser] = useState<string | null>(null);
   const [newBalance, setNewBalance] = useState<string>('');
   const [liveBets, setLiveBets] = useState<{ dragon: number; tiger: number; tie: number; total: number; betCount: number }>({ dragon: 0, tiger: 0, tie: 0, total: 0, betCount: 0 });
@@ -66,6 +68,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (selectedUserHistory && userHistoryTab === 'bets') {
+      fetch('/api/users/bet-history/' + selectedUserHistory)
+        .then(res => res.json())
+        .then(data => { if (Array.isArray(data)) setAdminBetHistory(data); })
+        .catch(console.error);
+    }
+  }, [selectedUserHistory, userHistoryTab]);
 
   // ── Live bet polling every 2 seconds ──
   useEffect(() => {
@@ -849,23 +860,61 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
               <h2>History: {selectedUserHistory}</h2>
               <button className="close-btn" onClick={() => setSelectedUserHistory(null)}>✕</button>
             </div>
+            
+            <div className="wallet-tabs" style={{ marginBottom: '15px' }}>
+              <button
+                className={`wallet-tab ${userHistoryTab === 'transactions' ? 'active' : ''}`}
+                onClick={() => setUserHistoryTab('transactions')}
+              >
+                Transactions
+              </button>
+              <button
+                className={`wallet-tab ${userHistoryTab === 'bets' ? 'active' : ''}`}
+                onClick={() => setUserHistoryTab('bets')}
+              >
+                Bet History
+              </button>
+            </div>
+
             <div className="wallet-content" style={{ maxHeight: '400px', overflowY: 'auto' }}>
-              <table className="admin-table">
-                <thead><tr><th>Time</th><th>Type</th><th>Amount</th><th>Status</th></tr></thead>
-                <tbody>
-                  {transactions.filter(t => t.username === selectedUserHistory).slice().reverse().map(tx => (
-                    <tr key={tx.id}>
-                      <td>{new Date(tx.timestamp).toLocaleString()}</td>
-                      <td className={tx.type === 'deposit' ? 'green' : 'gold'}>{tx.type.toUpperCase()}</td>
-                      <td>₹{tx.amount}</td>
-                      <td><span className={`status-badge ${tx.status}`}>{tx.status}</span></td>
-                    </tr>
-                  ))}
-                  {transactions.filter(t => t.username === selectedUserHistory).length === 0 && (
-                    <tr><td colSpan={4} className="text-center">No transactions found.</td></tr>
-                  )}
-                </tbody>
-              </table>
+              {userHistoryTab === 'transactions' ? (
+                <table className="admin-table">
+                  <thead><tr><th>Time</th><th>Type</th><th>Amount</th><th>Status</th></tr></thead>
+                  <tbody>
+                    {transactions.filter(t => t.username === selectedUserHistory).slice().reverse().map(tx => (
+                      <tr key={tx.id}>
+                        <td>{new Date(tx.timestamp).toLocaleString()}</td>
+                        <td className={tx.type === 'deposit' ? 'green' : 'gold'}>{tx.type.toUpperCase()}</td>
+                        <td>₹{tx.amount}</td>
+                        <td><span className={`status-badge ${tx.status}`}>{tx.status}</span></td>
+                      </tr>
+                    ))}
+                    {transactions.filter(t => t.username === selectedUserHistory).length === 0 && (
+                      <tr><td colSpan={4} className="text-center">No transactions found.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              ) : (
+                <table className="admin-table">
+                  <thead><tr><th>Time</th><th>Round</th><th>Bet</th><th>Win</th><th>Result</th></tr></thead>
+                  <tbody>
+                    {adminBetHistory.map(b => (
+                      <tr key={b._id || Math.random()}>
+                        <td>{new Date(b.timestamp).toLocaleTimeString()}</td>
+                        <td>#{b.roundNumber}</td>
+                        <td>₹{b.betAmount}</td>
+                        <td>₹{b.winAmount}</td>
+                        <td style={{ color: b.winAmount > 0 ? '#2ecc71' : '#e74c3c', fontWeight: 'bold' }}>
+                          {b.winAmount > 0 ? 'WIN' : 'LOST'}
+                        </td>
+                      </tr>
+                    ))}
+                    {adminBetHistory.length === 0 && (
+                      <tr><td colSpan={5} className="text-center">Aaj koi bet nahi lagayi hai.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
         </div>
