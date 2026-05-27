@@ -53,7 +53,12 @@ const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username
       <div className="header-right">
 
         <div className="user-info dropdown-container" onClick={() => setShowDropdown(!showDropdown)}>
-          <span className="username-badge">👤 {username} ▾</span>
+          <div className="hamburger-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <span className="username-badge">{username}</span>
           {showDropdown && (
             <div className="user-dropdown-profile">
               <div className="udp-header">
