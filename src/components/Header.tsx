@@ -16,6 +16,14 @@ const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username
   const [showWallet, setShowWallet] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      if (document.exitFullscreen) document.exitFullscreen();
+    }
+  };
+
   return (
     <header className="header" id="main-header">
       <div className="header-left">
@@ -44,34 +52,21 @@ const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username
             📋 History
           </button>
         )}
-
       </div>
 
       <div className="header-right">
-        <div className="user-info" onClick={() => setShowDropdown(!showDropdown)} style={{ position: 'relative', cursor: 'pointer' }}>
+        <button className="fullscreen-btn" onClick={toggleFullScreen} title="Toggle Fullscreen">🖥️</button>
+        <div className="user-info dropdown-container" onClick={() => setShowDropdown(!showDropdown)}>
           <span className="username-badge">👤 {username} ▾</span>
           {showDropdown && (
-            <div className="user-dropdown" style={{
-              position: 'absolute', top: '100%', right: 0, marginTop: '5px',
-              background: 'rgba(20,20,25,0.95)', border: '1px solid rgba(255,215,0,0.3)',
-              borderRadius: '8px', padding: '5px', zIndex: 1000, boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
-            }}>
-              <button 
-                onClick={(e) => { e.stopPropagation(); onLogout(); }} 
-                style={{
-                  background: 'transparent', border: 'none', color: '#e74c3c', 
-                  padding: '8px 16px', width: '100%', textAlign: 'left',
-                  cursor: 'pointer', fontWeight: 'bold', fontSize: '14px',
-                  display: 'flex', alignItems: 'center', gap: '8px',
-                  whiteSpace: 'nowrap'
-                }}
-              >
+            <div className="user-dropdown">
+              <button onClick={(e) => { e.stopPropagation(); onLogout(); }} className="logout-action-btn">
                 🚪 Logout
               </button>
             </div>
           )}
         </div>
-        <div className="stat-block" id="balance-display" onClick={() => setShowWallet(true)} style={{ cursor: 'pointer', background: 'rgba(255, 215, 0, 0.1)', border: '1px solid rgba(255, 215, 0, 0.3)' }} title="Add/Withdraw Funds">
+        <div className="stat-block premium-wallet" id="balance-display" onClick={() => setShowWallet(true)} title="Add/Withdraw Funds">
           <span className="stat-label">WALLET ➕</span>
           <span className="stat-value gold">₹{balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
         </div>
