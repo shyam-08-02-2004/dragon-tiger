@@ -122,8 +122,8 @@ const App: React.FC = () => {
           const loadedHistory = data.slice(-100).map((h: any) => ({
             id: h.roundNumber,
             result: h.result as GameResult,
-            dragonCard: { suit: '', rank: '', value: 0 },
-            tigerCard: { suit: '', rank: '', value: 0 },
+            dragonCard: { suit: '♠' as any, rank: 'A' as any, value: 0 },
+            tigerCard: { suit: '♠' as any, rank: 'A' as any, value: 0 },
             win: 0
           }));
           setState(prev => ({ ...prev, history: loadedHistory }));
