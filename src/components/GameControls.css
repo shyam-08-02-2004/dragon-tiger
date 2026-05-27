@@ -2,19 +2,19 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
-  padding: 16px 24px;
+  gap: 6px;
+  padding: 4px 8px;
 }
 
 /* ---- Dealer ---- */
 .dealer-message {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid rgba(212, 160, 23, 0.15);
   border-radius: 12px;
-  padding: 10px 18px;
+  padding: 4px 8px;
   width: 100%;
   max-width: 600px;
 }
@@ -38,7 +38,7 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding: 14px 40px;
+  padding: 4px 8px;
   border-radius: 16px;
   border: 2px solid;
   animation: countUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -162,8 +162,8 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 48px;
+  gap: 6px;
+  padding: 4px 8px;
   border-radius: 14px;
   border: 2px solid;
   cursor: pointer;
@@ -246,7 +246,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   color: var(--text-secondary);
   font-family: var(--font-display);
   font-size: 14px;
@@ -255,7 +255,7 @@
 
 .card-spinner {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   font-size: 24px;
 }
 
@@ -270,7 +270,7 @@
 .idle-indicator {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   color: var(--text-muted);
   font-family: var(--font-tech);
   font-size: 12px;
@@ -287,17 +287,17 @@
 
 @media (max-width: 480px) {
   .game-controls {
-    padding: 10px;
+    padding: 4px 8px;
   }
   .dealer-message {
-    padding: 8px 12px;
+    padding: 4px 8px;
   }
   .main-action-btn {
-    padding: 12px 24px;
+    padding: 4px 8px;
     font-size: 14px;
   }
   .result-banner {
-    padding: 10px 20px;
+    padding: 4px 8px;
   }
   .banner-text {
     font-size: 18px;

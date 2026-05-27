@@ -101,8 +101,10 @@ const App: React.FC = () => {
   const stateRef = useRef<GameState>(state);
   const msgIdx = useRef<number>(0);
   const lastLocalBalanceUpdate = useRef<number>(0);
+  const currentUserRef = useRef<UserAccount | null>(currentUser);
 
   useEffect(() => { stateRef.current = state; }, [state]);
+  useEffect(() => { currentUserRef.current = currentUser; }, [currentUser]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -333,8 +335,9 @@ const App: React.FC = () => {
 
   
   const syncBalanceToServer = (newBal: number) => {
-    if (currentUser && currentUser.id !== 'babu') {
-      fetch(`/api/users/${currentUser.id}/balance`, {
+    const user = currentUserRef.current;
+    if (user && user.id !== 'babu') {
+      fetch(`/api/users/${user.id}/balance`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ balance: newBal })
@@ -481,7 +484,7 @@ const App: React.FC = () => {
         
         const newBalance = Number(prev.balance) + winnings;
         lastLocalBalanceUpdate.current = Date.now();
-        if (currentUser && currentUser.id !== 'babu') {
+        if (currentUserRef.current && currentUserRef.current.id !== 'babu') {
            syncBalanceToServer(newBalance);
         }
 

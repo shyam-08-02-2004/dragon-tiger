@@ -152,6 +152,7 @@
   transition: all 0.2s;
   margin-top: 6px;
 }
+
 .history-btn:hover {
   background: rgba(212, 160, 23, 0.25);
   box-shadow: 0 0 12px rgba(212, 160, 23, 0.3);
@@ -217,19 +218,6 @@
 
 .stat-value {
   font-family: var(--font-tech);
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-
-.stat-value.gold {
-  color: var(--gold);
-  text-shadow: 0 0 8px rgba(212, 160, 23, 0.4);
-}
-
-.stat-value.green {
-  color: var(--green-light);
-  text-shadow: 0 0 8px rgba(46, 204, 113, 0.5);
 }
 
 .win-flash {
@@ -239,7 +227,7 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .header {
-    padding: 10px 16px;
+    padding: 12px 24px;
     flex-wrap: wrap;
     gap: 8px;
   }
@@ -262,8 +250,8 @@
 @media (max-width: 480px) {
   .header {
     flex-direction: column;
-    padding: 8px;
-    gap: 12px;
+    padding: 4px 8px;
+    gap: 6px;
   }
   .header-left,
   .header-right {
@@ -274,4 +262,3 @@
     width: 100%;
   }
 }
-

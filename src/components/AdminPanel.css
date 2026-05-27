@@ -18,7 +18,7 @@
 .admin-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
   margin-bottom: 40px;
 }
 
@@ -37,14 +37,14 @@
 .admin-nav {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   flex: 1;
 }
 
 .nav-btn {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
   background: transparent;
   border: none;
   color: var(--text-secondary);
@@ -180,7 +180,7 @@
 .edit-balance-group {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .balance-input {
@@ -215,7 +215,7 @@
 
 .action-buttons {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 
 .action-btn {
@@ -239,7 +239,7 @@
 .outcome-selector {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 6px;
   margin-top: 24px;
   margin-bottom: 24px;
 }
@@ -257,7 +257,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 6px;
 }
 
 .outcome-btn:hover {
@@ -318,7 +318,7 @@
   
   .admin-sidebar {
     width: 100%;
-    padding: 15px;
+    padding: 4px 8px;
     flex-direction: column;
     border-right: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -336,7 +336,7 @@
     flex-direction: row;
     overflow-x: auto;
     width: 100%;
-    gap: 10px;
+    gap: 6px;
     padding-bottom: 10px;
   }
 
@@ -358,7 +358,7 @@
     height: auto;
     padding: 15px;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
     align-items: center;
     text-align: center;
   }
@@ -394,7 +394,7 @@
 
   .outcome-selector { 
     grid-template-columns: 1fr; 
-    gap: 10px;
+    gap: 6px;
   }
   
   .edit-balance-group { 
@@ -404,7 +404,7 @@
 
   .sim-arena {
     flex-direction: column;
-    gap: 15px;
+    gap: 6px;
   }
   
   .sim-card-spot {
@@ -480,14 +480,14 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
 .admin-chat-input {
   padding: 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
-  gap: 10px;
+  gap: 6px;
 }
 
 .admin-chat-input input {
@@ -560,7 +560,7 @@
   
   .admin-chat-input {
     padding: 15px;
-    gap: 8px;
+    gap: 6px;
   }
   
   .admin-chat-input input {

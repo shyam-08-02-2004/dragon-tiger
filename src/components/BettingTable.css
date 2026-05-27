@@ -1,6 +1,6 @@
 .betting-table {
   width: 100%;
-  padding: 0 16px;
+  padding: 4px 8px;
 }
 
 .table-felt {
@@ -12,7 +12,7 @@
   );
   border: 2px solid rgba(212, 160, 23, 0.4);
   border-radius: 24px;
-  padding: 20px 16px;
+  padding: 4px 8px;
   position: relative;
   box-shadow:
     0 0 60px rgba(0, 0, 0, 0.6),
@@ -36,7 +36,7 @@
 .main-bets-row {
   display: flex;
   align-items: stretch;
-  gap: 12px;
+  gap: 6px;
   margin-bottom: 12px;
   max-width: 600px;
   margin-left: auto;
@@ -46,7 +46,7 @@
 .center-bets {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   flex: 1;
 }
 
@@ -57,7 +57,7 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
-  padding: 12px 8px;
+  padding: 4px 8px;
   border-radius: 12px;
   border: 2px solid rgba(255, 255, 255, 0.15);
   cursor: pointer;
@@ -191,7 +191,7 @@
 .side-bets-row {
   display: flex;
   align-items: stretch;
-  gap: 12px;
+  gap: 6px;
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
@@ -199,7 +199,7 @@
 
 .side-bets-group {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex: 1;
 }
 
@@ -331,11 +331,11 @@
 
 @media (max-width: 768px) {
   .table-felt {
-    padding: 12px 10px;
+    padding: 4px 8px;
   }
   .main-bets-row {
     flex-direction: row;
-    gap: 12px;
+    gap: 6px;
   }
   .center-bets {
     flex: 1;
@@ -348,7 +348,7 @@
     height: 100%;
     flex-direction: column;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     padding: 8px;
   }
   .tie-zone .bet-label {
@@ -369,7 +369,7 @@
 
 @media (max-width: 480px) {
   .table-felt {
-    padding: 10px 8px;
+    padding: 4px 8px;
     border-radius: 16px;
   }
   .main-bets-row {
@@ -420,7 +420,7 @@
   }
   .side-bets-row {
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
   }
   .side-bets-spacer {
     display: none;

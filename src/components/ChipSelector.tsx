@@ -18,7 +18,7 @@ const ChipSelector: React.FC<ChipSelectorProps> = ({
   onClearBets,
   onDoubleBet,
   totalBet,
-  phase
+  phase,
 }) => {
   const canBet = phase === 'betting';
 
@@ -56,11 +56,19 @@ const ChipSelector: React.FC<ChipSelectorProps> = ({
         <div className="action-buttons">
           <button
             id="double-bet-btn"
-            className={`action-btn double-btn ${!canBet || totalBet === 0 ? 'btn-disabled' : ''}`}
-            onClick={onDoubleBet}
-            disabled={!canBet || totalBet === 0}
+            className={`action-btn double-btn ${!canBet ? 'btn-disabled' : ''}`}
+            onClick={() => {
+              if (totalBet === 0) {
+                // No bets yet: double the selected chip value
+                const newChip = selectedChip * 2;
+                onSelectChip(newChip);
+              } else {
+                onDoubleBet();
+              }
+            }}
+            disabled={!canBet}
           >
-            <span className="btn-icon">2x</span>
+            <span className="btn-icon">2×</span>
             <span className="btn-text">DOUBLE</span>
           </button>
           <button
