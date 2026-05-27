@@ -170,3 +170,82 @@
   .auth-title { font-size: 18px; }
   .input-group input { padding: 12px; font-size: 14px; }
 }
+
+/* ---------------- OTP TOAST ANIMATION ---------------- */
+.otp-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(20, 25, 35, 0.95);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-left: 4px solid var(--gold-main);
+  border-radius: 8px;
+  padding: 15px;
+  min-width: 280px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+  animation: slideInRight 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  color: #fff;
+}
+
+.otp-toast-header {
+  font-size: 12px;
+  color: #a0aec0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.otp-toast-icon {
+  font-size: 16px;
+}
+
+.otp-toast-body {
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.otp-toast-body strong {
+  color: var(--gold-main);
+  font-size: 20px;
+  letter-spacing: 2px;
+  display: block;
+  margin-top: 5px;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .otp-toast {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    min-width: unset;
+    animation: slideDown 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+  
+  @keyframes slideDown {
+    from {
+      transform: translateY(-120%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}
+

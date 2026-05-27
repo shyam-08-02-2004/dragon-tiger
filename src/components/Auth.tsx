@@ -34,6 +34,8 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   
   const [generatedOtp, setGeneratedOtp] = useState('');
   const [error, setError] = useState('');
+  
+  const [showOtpToast, setShowOtpToast] = useState(false);
 
   // -------------------------
   // LOGIN LOGIC
@@ -95,7 +97,10 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     const randomOtp = Math.floor(100000 + Math.random() * 900000).toString();
     setGeneratedOtp(randomOtp);
     setStep(2);
-    alert(`OTP: ${randomOtp}`);
+    
+    // Show animated toast instead of alert
+    setShowOtpToast(true);
+    setTimeout(() => setShowOtpToast(false), 5000);
   };
 
   const handleSignupStep2 = (e: React.FormEvent) => {
@@ -171,7 +176,10 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     const randomOtp = Math.floor(100000 + Math.random() * 900000).toString();
     setGeneratedOtp(randomOtp);
     setStep(2);
-    alert(`OTP: ${randomOtp}`);
+    
+    // Show animated toast instead of alert
+    setShowOtpToast(true);
+    setTimeout(() => setShowOtpToast(false), 5000);
   };
 
   const handleForgotStep2 = (e: React.FormEvent) => {
@@ -268,6 +276,19 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
   return (
     <div className="auth-container">
+      {/* Animated OTP Toast */}
+      {showOtpToast && (
+        <div className="otp-toast">
+          <div className="otp-toast-header">
+            <span className="otp-toast-icon">💬</span>
+            <span>New Message</span>
+          </div>
+          <div className="otp-toast-body">
+            Your Dragon Tiger verification code is <strong>{generatedOtp}</strong>
+          </div>
+        </div>
+      )}
+
       <div className="bg-decoration">
         <div className="bg-dragon">🐉</div>
         <div className="bg-tiger">🐯</div>
