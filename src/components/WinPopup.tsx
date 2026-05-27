@@ -15,7 +15,7 @@ const WinPopup: React.FC<WinPopupProps> = ({ winAmount, onClose }) => {
       const timer = setTimeout(() => {
         setShow(false);
         if (onClose) onClose();
-      }, 2500); // Hide after 2.5 seconds (gives time for animation)
+      }, 2000); // Hide after 2 seconds
       return () => clearTimeout(timer);
     }
   }, [winAmount, onClose]);

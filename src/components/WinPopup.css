@@ -22,7 +22,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 @keyframes popIn {
@@ -142,7 +142,7 @@
   box-shadow: 0 8px 15px rgba(0,0,0,0.2);
   overflow: hidden;
   z-index: 2; /* Ticket is behind slot front lip */
-  animation: slideOutTicket 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.5s forwards;
+  animation: slideOutTicket 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s forwards;
 }
 
 @keyframes slideOutTicket {
@@ -158,7 +158,7 @@
   align-items: center;
   height: 100%;
   opacity: 0;
-  animation: fadeInText 0.5s ease-out 1.2s forwards;
+  animation: fadeInText 0.3s ease-out 0.6s forwards;
 }
 
 @keyframes fadeInText {
@@ -187,4 +187,31 @@
   width: 100%;
   height: 10px;
   background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.05) 100%);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .win-popup-container {
+    max-width: 300px;
+  }
+  .win-card {
+    padding: 35px 15px 25px;
+  }
+  .win-title {
+    font-size: 18px;
+  }
+  .receipt-amount {
+    font-size: 24px;
+  }
+  .win-badge-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+  }
+  .win-ribbon.left-ribbon {
+    left: -50px;
+  }
+  .win-ribbon.right-ribbon {
+    right: -50px;
+  }
 }
