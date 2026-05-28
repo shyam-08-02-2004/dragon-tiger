@@ -165,7 +165,7 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
       <div className="wallet-modal" onClick={(e) => e.stopPropagation()}>
         <button className="wallet-close" onClick={onClose}>✕</button>
         <h2>💰 Wallet</h2>
-        <div className="balance-card">Current Balance: ₹{balance}</div>
+        <div className="balance-card">Current Balance: ₹{Number(balance).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>
 
         <div className="wallet-tabs">
           <button
