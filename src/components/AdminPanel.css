@@ -693,15 +693,16 @@ html, body {
     border: 1px solid rgba(255, 196, 0, 0.1);
     border-radius: 12px;
     background: rgba(0, 0, 0, 0.2);
+    padding-bottom: 5px; /* give space for scrollbar */
   }
 
   .admin-table-v2 {
-    min-width: 700px;
+    min-width: 800px; /* Force wide table */
   }
 
   .admin-table-v2 th {
     padding: 14px 12px;
-    font-size: 11px;
+    font-size: 12px;
     letter-spacing: 1px;
     white-space: nowrap;
   }
@@ -709,6 +710,7 @@ html, body {
   .admin-table-v2 td {
     padding: 14px 12px;
     font-size: 13px;
+    white-space: nowrap;
   }
 
   .action-buttons {
