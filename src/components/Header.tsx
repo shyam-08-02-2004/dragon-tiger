@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './Header.css';
-import WalletModal from './WalletModal';
 
 interface HeaderProps {
   balance: number;
@@ -16,108 +15,41 @@ interface HeaderProps {
   onShowSupport?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ balance, lastWin, roundNumber, username, userId, password, hasDeposited, onLogout, onShowHistory, onShowWallet, onShowSupport }) => {
+const Header: React.FC<HeaderProps> = ({ balance, onShowWallet, username, userId, password, onLogout, onShowSupport }) => {
   const [showDropdown, setShowDropdown] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-
 
   return (
-    <header className="header" id="main-header">
-      <div className="header-left">
-        <div className="logo-group">
-          <span className="logo-dragon">🐉</span>
-          <div className="logo-text">
-            <span className="logo-main">Dragon</span>
-            <span className="logo-separator">vs</span>
-            <span className="logo-tiger">Tiger</span>
-          </div>
-          <span className="logo-tiger-icon">🐯</span>
+    <div className="top-bar">
+      <div className="hamburger" onClick={() => setShowDropdown(!showDropdown)}>
+        <span /><span /><span />
+      </div>
+      
+      {showDropdown && (
+        <div style={{ position: 'absolute', top: '50px', left: '15px', background: '#111', padding: '15px', borderRadius: '8px', zIndex: 100, border: '1px solid #444', minWidth: '200px' }}>
+          <div style={{ color: '#fff', marginBottom: '10px', fontWeight: 'bold' }}>👤 {username}</div>
+          <div style={{ color: '#aaa', fontSize: '12px', marginBottom: '15px' }}>ID: {userId}</div>
+          <button style={{ background: 'transparent', color: '#fff', border: 'none', padding: '8px 0', width: '100%', textAlign: 'left', cursor: 'pointer' }} onClick={onShowWallet}>💰 Wallet</button>
+          {onShowSupport && <button style={{ background: 'transparent', color: '#fff', border: 'none', padding: '8px 0', width: '100%', textAlign: 'left', cursor: 'pointer' }} onClick={onShowSupport}>💬 Support</button>}
+          <button style={{ background: 'transparent', color: '#e74c3c', border: 'none', padding: '8px 0', width: '100%', textAlign: 'left', cursor: 'pointer' }} onClick={onLogout}>🚪 Logout</button>
         </div>
-        <span className="live-badge">
-          <span className="live-dot"></span>
-          LIVE
-        </span>
+      )}
+
+      <div className="logo-center">
+        <span className="dragon" style={{color: '#27ae60'}}>🐉</span>
+        <div className="logo-text">
+          <span className="dragon">DRAGON</span>
+          <span className="vs">VS</span>
+          <span className="tiger">TIGER</span>
+        </div>
+        <span className="tiger" style={{color: '#e67e22'}}>🐯</span>
       </div>
 
-      <div className="header-center">
-        <div className="round-info">
-          <span className="round-label">ROUND</span>
-          <span className="round-number">#{roundNumber}</span>
-        </div>
-        {onShowHistory && (
-          <button className="history-btn" onClick={onShowHistory} title="Game History">
-            📋 History
-          </button>
-        )}
+      <div className="balance-pill" onClick={onShowWallet}>
+        <span style={{color: '#f1c40f'}}>🪙</span>
+        <span className="balance-val">₹ {balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+        <div className="balance-add">+</div>
       </div>
-
-      <div className="header-right">
-
-        <div className="user-info dropdown-container" onClick={() => setShowDropdown(!showDropdown)}>
-          <div className="hamburger-menu">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-          <span className="username-badge">{username}</span>
-          {showDropdown && (
-            <div className="user-dropdown-profile">
-              <div className="udp-header">
-                <div className="udp-avatar">👤</div>
-                <div className="udp-details">
-                  <div className="udp-username">{username}</div>
-                  <div className="udp-reg">Reg. No: #{userId || 'N/A'}</div>
-                </div>
-              </div>
-              <div className="udp-body">
-                <div className="udp-row">
-                  <span className="udp-label">Password:</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span className="udp-value">{showPassword ? (password || '••••••••') : '••••••••'}</span>
-                    {password && (
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); setShowPassword(!showPassword); }}
-                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '14px', padding: '0 4px', color: '#888' }}
-                        title="Show/Hide Password"
-                      >
-                        {showPassword ? '👁️' : '👁️‍🗨️'}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="udp-footer">
-                <button className="udp-btn udp-wallet" onClick={(e) => { e.stopPropagation(); setShowDropdown(false); onShowWallet(); }}>
-                  💰 Wallet
-                </button>
-                {onShowSupport && (
-                  <button className="udp-btn udp-support" onClick={(e) => { e.stopPropagation(); setShowDropdown(false); onShowSupport(); }}>
-                    💬 Support
-                  </button>
-                )}
-                <button className="udp-btn udp-logout" onClick={(e) => { e.stopPropagation(); onLogout(); }}>
-                  🚪 Logout
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-        <div 
-          className="premium-wallet-btn" 
-          id="balance-display" 
-          onClick={onShowWallet} 
-          title="Add/Withdraw Funds"
-        >
-          <div className="wallet-icon-container">
-            <span className="wallet-coin">🪙</span>
-          </div>
-          <span className="wallet-balance">
-            ₹{balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </span>
-          <div className="wallet-add-btn">+</div>
-        </div>
-      </div>
-    </header>
+    </div>
   );
 };
 

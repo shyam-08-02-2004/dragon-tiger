@@ -1,35 +1,27 @@
 import React from 'react';
 import type { RoundResult } from '../types/game';
-import './RoadMap.css';
 
 interface RoadMapProps {
   history: RoundResult[];
 }
 
-// Display full history without limit
 const RoadMap: React.FC<RoadMapProps> = ({ history }) => {
-  const visible = history;
+  // Show at most last 12 results in the horizontal row
+  const visible = history.slice(-12);
 
   return (
-    <div className="roadmap" id="roadmap">
-      <div className="roadmap-header">
-        <h3 className="roadmap-title">📊 RECENT HISTORY</h3>
-      </div>
-
-      {history.length === 0 ? (
-        <div className="roadmap-empty">
-          <span className="empty-icon">🃏</span>
-          <span>No rounds played yet</span>
+    <div className="roadmap-row">
+      {visible.map((round) => (
+        <div 
+          key={round.id} 
+          className={`roadmap-item ${round.result}`} 
+          title={`Round #${round.id}`}
+        >
+          {round.result === 'dragon' ? 'D' : round.result === 'tiger' ? 'T' : 'Tie'}
         </div>
-      ) : (
-        <div className="simple-history">
-          {visible.map((round, i) => (
-            <div key={round.id} className={`history-badge ${round.result}`} title={`Round #${round.id}`}>
-              {round.result === 'dragon' ? 'D' : round.result === 'tiger' ? 'T' : 'Tie'}
-            </div>
-          ))}
-        </div>
-      )}
+      ))}
+      {visible.length === 0 && <div style={{color: '#888', fontSize: '12px'}}>No history yet</div>}
+      <button className="roadmap-chart-btn">📈</button>
     </div>
   );
 };

@@ -89,16 +89,7 @@ app.put('/api/users/:id/balance', async (req, res) => {
   const user = await User.findOne({ id: req.params.id });
   if (!user) return res.status(404).json({ error: 'Not found' });
   
-  if (prevBalance !== undefined && user.balance !== Number(prevBalance)) {
-    // Backend balance changed independently (e.g. admin approved withdrawal or manual edit).
-    // Apply the delta instead of overwriting.
-    const delta = numBalance - Number(prevBalance);
-    user.balance += delta;
-    // Ensure balance doesn't go negative from delta
-    if (user.balance < 0) user.balance = 0;
-  } else {
     user.balance = numBalance;
-  }
   
   await user.save();
   res.json(user);

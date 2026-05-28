@@ -5,7 +5,8 @@
   color: var(--text-primary);
   font-family: var(--font-ui);
   position: relative;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: auto; /* allow scrolling both axes */
   touch-action: manipulation;
 }
 
@@ -140,14 +141,15 @@ html, body {
   transform: translateY(-2px);
 }
 
-.admin-main {
-  flex: 1;
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  overflow: hidden;
-  max-height: 100%;
-}
+  .admin-main {
+    flex: 1;
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    overflow-x: auto; /* enable horizontal scroll for content */
+    overflow-y: auto; /* enable vertical scroll */
+    max-height: 100%;
+  }
 
 .admin-header {
   height: 90px;
@@ -182,15 +184,16 @@ html, body {
   box-shadow: 0 0 15px rgba(46, 125, 50, 0.3);
 }
 
-.admin-content {
-  padding: 40px 50px 80px 50px;
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-}
+  .admin-content {
+    padding: 40px 50px 80px 50px;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: auto; /* allow horizontal scroll */
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    box-sizing: border-box;
+  }
 
 .admin-card {
   background: rgba(15, 20, 15, 0.6);
@@ -200,6 +203,7 @@ html, body {
   border-radius: 20px;
   padding: 30px;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  overflow-x: auto; /* enable horizontal scroll */
 }
 
 .admin-card h3 {
@@ -213,11 +217,16 @@ html, body {
 }
 
   .table-responsive {
+    width: 100%;
     overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch; /* iOS smooth scrolling */
+    -ms-overflow-style: -ms-autohiding-scrollbar; /* Edge legacy */
+    scrollbar-width: thin; /* Firefox */
     border-radius: 12px;
     border: 1px solid rgba(255, 196, 0, 0.1);
     background: rgba(0, 0, 0, 0.2);
-    -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
+    display: block; /* ensure block layout for scrolling */
   }
 
   .admin-table-v2 {
@@ -670,6 +679,7 @@ html, body {
   .admin-main {
     flex: 1;
     overflow-y: auto;
+    overflow-x: auto; /* enable horizontal scroll */
     -webkit-overflow-scrolling: touch;
   }
 
@@ -678,7 +688,7 @@ html, body {
     width: 100%;
     max-width: 100vw;
     box-sizing: border-box;
-    overflow-x: hidden;
+    overflow-x: auto; /* ensure horizontal scroll */
     gap: 20px;
   }
 
@@ -687,7 +697,7 @@ html, body {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-    overflow-x: hidden; /* Prevent card from expanding past screen */
+    overflow-x: visible; /* allow scroll inside */
   }
 
   /* ── TABLE: Same as desktop, just horizontal scroll ── */

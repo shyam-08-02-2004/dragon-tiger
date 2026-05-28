@@ -9,9 +9,11 @@ interface WalletModalProps {
   balance: number;
   onWithdrawSuccess?: (amount: number) => void;
   onDepositSuccess?: (amount: number) => void;
+  syncBalance?: (newBalance: number, previousBalance?: number) => Promise<void>;
+  setLastUpdate?: () => void;
 }
 
-const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposited, balance, onWithdrawSuccess, onDepositSuccess }) => {
+const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposited, balance, onWithdrawSuccess, onDepositSuccess, syncBalance, setLastUpdate }) => {
   const [tab, setTab] = useState<'deposit' | 'withdraw'>(() => (sessionStorage.getItem('dt_walletTab') as 'deposit' | 'withdraw') || 'deposit');
   const [amount, setAmount] = useState('');
 

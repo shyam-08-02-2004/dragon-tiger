@@ -92,13 +92,25 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [newSupportMsg, setNewSupportMsg] = useState('');
   const supportEndRef = useRef<HTMLDivElement>(null);
 
+  // Utility to fetch latest users
+  const fetchUsers = () => {
+    fetch('/api/admin/users')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setUsers(data);
+      })
+      .catch(console.error);
+  };
+
+  // Initial data load and periodic refresh
+  useEffect(() => {
+    fetchUsers();
+    const interval = setInterval(fetchUsers, 15000); // refresh every 15s
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     const fetchData = () => {
-      fetch(`/api/admin/users?t=${Date.now()}`)
-        .then(res => res.json())
-        .then(data => { if (Array.isArray(data)) setUsers(data); })
-        .catch(console.error);
-        
       fetch(`/api/admin/transactions?t=${Date.now()}`)
         .then(res => res.json())
         .then(data => { if (Array.isArray(data)) setTransactions(data); })
@@ -349,7 +361,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
       if (res.ok) {
         const data = await res.json();
         setRoundOutcomes(data.roundOutcomes || []);
-        setSaveMsg(`âœ… Round #${roundId} â†’ ${outcome.toUpperCase()} set ho gaya!`);
+        setSaveMsg(`✅ Round #${roundId} → ${outcome.toUpperCase()} set ho gaya!`);
         setTargetRoundId('');
         setTimeout(() => setSaveMsg(''), 4000);
       }
@@ -368,21 +380,41 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   };
 
   const handleUpdateBalance = async (id: string) => {
-    const amount = parseFloat(newBalance);
-    if (isNaN(amount) || amount < 0) { alert("Invalid balance amount"); return; }
-    try {
-      const res = await fetch(`/api/users/${id}/balance`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ balance: amount })
-      });
-      if (res.ok) {
-        setUsers(users.map(u => u.id === id ? { ...u, balance: amount } : u));
-        setEditBalanceUser(null);
-        setNewBalance('');
+  const amount = parseFloat(newBalance);
+  if (isNaN(amount) || amount < 0) { alert("Invalid balance amount"); return; }
+  try {
+    const res = await fetch(`/api/users/${id}/balance`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ balance: amount })
+    });
+    if (res.ok) {
+      // Update local users state using functional updater to avoid stale closure
+      setUsers(prev => prev.map(u => u.id === id ? { ...u, balance: amount } : u));
+      // Refresh from server to ensure consistency
+      fetchUsers();
+      // Update session storage for this user if present
+      const savedStr = sessionStorage.getItem('dragonTigerCurrentUser');
+      if (savedStr) {
+        const saved = JSON.parse(savedStr);
+        if (saved.id === id) {
+          sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify({ ...saved, balance: amount }));
+        }
       }
-    } catch (err) { console.error(err); }
-  };
+      // Update localStorage cache for the user
+      const usersStr = localStorage.getItem('dragonTigerUsers') || '{}';
+      try {
+        const users = JSON.parse(usersStr);
+        if (users[id]) {
+          users[id].balance = amount;
+          localStorage.setItem('dragonTigerUsers', JSON.stringify(users));
+        }
+      } catch (e) { console.error('Failed to sync local user balance', e); }
+      setEditBalanceUser(null);
+      setNewBalance('');
+    }
+  } catch (err) { console.error(err); }
+};
 
   const handleDeleteUser = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
@@ -422,13 +454,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   };
 
   const phaseColor = simPhase === 'betting' ? '#f39c12' : simPhase === 'dealing' ? '#3498db' : '#2ecc71';
-  const phaseLabel = simPhase === 'betting' ? `ðŸŽ¯ Betting Open (${simTimer}s)` : simPhase === 'dealing' ? 'ðŸƒ Dealing Cards...' : 'ðŸ† Round Over';
+  const phaseLabel = simPhase === 'betting' ? `🎯 Betting Open (${simTimer}s)` : simPhase === 'dealing' ? '🃏 Dealing Cards...' : '🏆 Round Over';
 
   return (
     <div className="admin-layout">
       <aside className="admin-sidebar">
         <div className="admin-brand">
-          <span className="admin-logo">ðŸ›¡ï¸</span>
+          <span className="admin-logo">🛡️</span>
           <h2>CASINO ADMIN</h2>
         </div>
 
@@ -447,14 +479,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
         </div>
         
         <nav className="admin-nav">
-          <button className={`admin-nav-btn ${activeTab === 'users' ? 'active' : ''}`} onClick={() => handleTabChange('users')}>ðŸ‘¥ Users</button>
-          <button className={`admin-nav-btn ${activeTab === 'game' ? 'active' : ''}`} onClick={() => handleTabChange('game')}>ðŸŽ² Game Control</button>
-          <button className={`admin-nav-btn ${activeTab === 'transactions' ? 'active' : ''}`} onClick={() => handleTabChange('transactions')}>ðŸ’³ Transactions</button>
-          <button className={`admin-nav-btn ${activeTab === 'support' ? 'active' : ''}`} onClick={() => handleTabChange('support')}>ðŸ’¬ Support</button>
+          <button className={`admin-nav-btn ${activeTab === 'users' ? 'active' : ''}`} onClick={() => handleTabChange('users')}>👥 Users</button>
+          <button className={`admin-nav-btn ${activeTab === 'game' ? 'active' : ''}`} onClick={() => handleTabChange('game')}>🎲 Game Control</button>
+          <button className={`admin-nav-btn ${activeTab === 'transactions' ? 'active' : ''}`} onClick={() => handleTabChange('transactions')}>💳 Transactions</button>
+          <button className={`admin-nav-btn ${activeTab === 'support' ? 'active' : ''}`} onClick={() => handleTabChange('support')}>💬 Support</button>
         </nav>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: 'auto' }}>
-          <button className="admin-logout-btn" onClick={onLogout} style={{ marginTop: 0 }}>ðŸšª Logout</button>
+          <button className="admin-logout-btn" onClick={onLogout} style={{ marginTop: 0 }}>🚪 Logout</button>
         </div>
       </aside>
 
@@ -492,13 +524,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                           <td data-label="Balance">
                             {editBalanceUser === user.id ? (
                               <div className="edit-balance-group">
-                                <span className="currency-symbol">â‚¹</span>
+                                <span className="currency-symbol">₹</span>
                                 <input type="number" value={newBalance} onChange={(e) => setNewBalance(e.target.value)} className="balance-input" autoFocus />
-                                <button className="save-btn" onClick={() => handleUpdateBalance(user.id)}>âœ“</button>
-                                <button className="cancel-btn" onClick={() => setEditBalanceUser(null)}>âœ•</button>
+                                <button className="save-btn" onClick={() => handleUpdateBalance(user.id)}>✓</button>
+                                <button className="cancel-btn" onClick={() => setEditBalanceUser(null)}>✕</button>
                               </div>
                             ) : (
-                              <span className="balance-display gold">â‚¹{user.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                              <span className="balance-display gold">₹{user.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                             )}
                           </td>
                           <td data-label="Deposited">
@@ -508,9 +540,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                           </td>
                           <td data-label="Actions">
                             <div className="action-buttons">
-                              <button className="action-btn edit" onClick={() => { setEditBalanceUser(user.id); setNewBalance(user.balance.toString()); }} title="Edit Balance">ðŸ’°</button>
+                              <button className="action-btn edit" onClick={() => { setEditBalanceUser(user.id); setNewBalance(user.balance.toString()); }} title="Edit Balance">💰</button>
                               <button className="btn-secondary" onClick={() => handleUserHistory(user.id)}>View History</button>
-                              <button className="action-btn delete" onClick={() => handleDeleteUser(user.id)} title="Delete User">ðŸ—‘ï¸</button>
+                              <button className="action-btn delete" onClick={() => handleDeleteUser(user.id)} title="Delete User">🗑️</button>
                             </div>
                           </td>
                         </tr>
@@ -531,12 +563,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
               <div className="admin-card">
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                  <h2 style={{ margin: 0 }}>ðŸŽ® Game Control</h2>
+                  <h2 style={{ margin: 0 }}>🎮 Game Control</h2>
                   <button 
                     onClick={() => handleShowGameHist(true)}
                     style={{ background: '#3498db', color: '#fff', border: 'none', padding: '10px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}
                   >
-                    ðŸ“œ <span className="hide-mobile">Game History</span>
+                    📜 <span className="hide-mobile">Game History</span>
                   </button>
                 </div>
 
@@ -576,7 +608,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   padding: '20px', background: 'rgba(155,89,182,0.08)', border: '2px solid rgba(155,89,182,0.5)',
                   borderRadius: '14px', marginBottom: '24px'
                 }}>
-                  <h3 style={{ color: '#9b59b6', margin: '0 0 6px 0' }}>ðŸŽ¯ Kisi Bhi Round Ka Result Set Karein</h3>
+                  <h3 style={{ color: '#9b59b6', margin: '0 0 6px 0' }}>🎯 Kisi Bhi Round Ka Result Set Karein</h3>
                   <p className="text-muted" style={{ margin: '0 0 16px 0', fontSize: '13px' }}>
                     Round number daalo (1â€“2000) aur choose karo Dragon / Tiger / Tie â€” agle us round mein wahi result aayega.
                   </p>
@@ -605,22 +637,22 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                     </div>
                     <button onClick={() => { const r = parseInt(targetRoundId) || simRoundId; setRoundOutcome(r, 'dragon'); }}
                       style={{ flex: 1, minWidth: '90px', padding: '12px 16px', border: '2px solid #e74c3c', background: 'rgba(231,76,60,0.2)', color: '#e74c3c', borderRadius: '10px', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer' }}>
-                      ðŸ‰ Dragon
+                      🐲 Dragon
                     </button>
                     <button onClick={() => { const r = parseInt(targetRoundId) || simRoundId; setRoundOutcome(r, 'tiger'); }}
                       style={{ flex: 1, minWidth: '90px', padding: '12px 16px', border: '2px solid #3498db', background: 'rgba(52,152,219,0.2)', color: '#3498db', borderRadius: '10px', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer' }}>
-                      ðŸ¯ Tiger
+                      🐯 Tiger
                     </button>
                     <button onClick={() => { const r = parseInt(targetRoundId) || simRoundId; setRoundOutcome(r, 'tie'); }}
                       style={{ flex: 1, minWidth: '90px', padding: '12px 16px', border: '2px solid #27ae60', background: 'rgba(39,174,96,0.2)', color: '#27ae60', borderRadius: '10px', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer' }}>
-                      ðŸ¤ Tie
+                      🤝 Tie
                     </button>
                   </div>
 
                   {/* Set Rounds Table */}
                   {roundOutcomes.length > 0 && (
                     <div>
-                      <div style={{ fontSize: '13px', color: '#aaa', marginBottom: '8px' }}>ðŸ“‹ Set kiye gaye rounds:</div>
+                      <div style={{ fontSize: '13px', color: '#aaa', marginBottom: '8px' }}>📋 Set kiye gaye rounds:</div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                         {roundOutcomes.sort((a,b) => a.roundId - b.roundId).map(ro => (
                           <div key={ro.roundId} style={{
@@ -631,11 +663,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                           }}>
                             <span style={{ color: '#f1c40f', fontWeight: 'bold' }}>#{ro.roundId}</span>
                             <span style={{ textTransform: 'capitalize', fontWeight: 'bold', color: '#fff' }}>
-                              {ro.outcome === 'dragon' ? 'ðŸ‰' : ro.outcome === 'tiger' ? 'ðŸ¯' : 'ðŸ¤'} {ro.outcome}
+                              {ro.outcome === 'dragon' ? '🐲' : ro.outcome === 'tiger' ? '🐯' : '🤝'} {ro.outcome}
                             </span>
                             <button onClick={() => removeRoundOutcome(ro.roundId)}
                               style={{ background: 'rgba(255,0,0,0.3)', color: 'white', border: '1px solid #e74c3c', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '10px', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                              âœ•
+                              ✕
                             </button>
                           </div>
                         ))}
@@ -653,7 +685,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                 <div className="admin-live-bets">
                   <div className="admin-live-bets-header">
                     <div>
-                      <h3 className="admin-live-bets-title">ðŸ“Š Live Bets — Round #{simRoundId}</h3>
+                      <h3 className="admin-live-bets-title">📊 Live Bets — Round #{simRoundId}</h3>
                       <div className="admin-live-bets-subtitle">
                         {simPhase === 'betting' ? 'Betting open now' : 'Betting closed for this round'}
                       </div>
@@ -673,17 +705,17 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                       <div className="admin-live-bets-columns">
                         <div className="admin-live-bets-row">
                           <div className="admin-live-bets-stat">
-                            <span>ðŸ‰ Dragon</span>
+                            <span>🐲 Dragon</span>
                             <strong>₹{liveBets.dragon}</strong>
                             <span>{dragonPct}%</span>
                           </div>
                           <div className="admin-live-bets-stat">
-                            <span>ðŸ¯ Tiger</span>
+                            <span>🐯 Tiger</span>
                             <strong>₹{liveBets.tiger}</strong>
                             <span>{tigerPct}%</span>
                           </div>
                           <div className="admin-live-bets-stat">
-                            <span>ðŸ¤ Tie</span>
+                            <span>🤝 Tie</span>
                             <strong>₹{liveBets.tie}</strong>
                             <span>{tiePct}%</span>
                           </div>
@@ -706,7 +738,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                 </div>
 
                 {/* â”€â”€ Live Game Preview â”€â”€ */}
-                <h3 style={{ marginBottom: '8px' }}>ðŸƒ Live Game Preview</h3>
+                <h3 style={{ marginBottom: '8px' }}>🃏 Live Game Preview</h3>
                 <div style={{ transform: 'scale(0.85)', transformOrigin: 'top center', minHeight: '200px' }}>
                   <div className="table-area" style={{ pointerEvents: 'none' }}>
                     <div className="cards-arena" id="cards-arena">
@@ -723,7 +755,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                     </div>
                     {simResult && simPhase === 'result' && (
                       <div style={{ textAlign: 'center', marginTop: '12px', fontSize: '22px', fontWeight: 'bold', color: '#f1c40f' }}>
-                        ðŸ† {simResult === 'dragon' ? 'ðŸ‰ Dragon Wins!' : simResult === 'tiger' ? 'ðŸ¯ Tiger Wins!' : 'ðŸ¤ Tie!'}
+                        🏆 {simResult === 'dragon' ? '🐲 Dragon Wins!' : simResult === 'tiger' ? '🐯 Tiger Wins!' : '🤝 Tie!'}
                       </div>
                     )}
                   </div>
@@ -750,7 +782,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                         <td data-label="Time">{new Date(tx.timestamp).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}</td>
                         <td data-label="User" className="fw-bold">{tx.username}</td>
                         <td data-label="Type" className={tx.type === 'deposit' ? 'green' : 'gold'}>{tx.type.toUpperCase()}</td>
-                        <td data-label="Amount" className="gold">â‚¹{tx.amount}</td>
+                        <td data-label="Amount" className="gold">₹{tx.amount}</td>
                         <td data-label="UTR/UPI" style={{ fontSize: '12px', maxWidth: '120px', wordBreak: 'break-all' }}>
                           {tx.utr && <span style={{ color: '#aaa' }}>UTR: {tx.utr}</span>}
                           {tx.upiId && <span style={{ color: '#7ec8e3' }}>UPI: {tx.upiId}</span>}
@@ -760,13 +792,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                         <td data-label="Actions">
                           {tx.status === 'pending' ? (
                             <div className="action-buttons">
-                              <button className="action-btn edit" title="Approve" onClick={() => handleTransactionAction(tx.id, 'approve')}>âœ…</button>
-                              <button className="action-btn delete" title="Reject" onClick={() => handleTransactionAction(tx.id, 'reject')}>âŒ</button>
-                              <button className="action-btn delete" title="Delete" onClick={() => handleDeleteTransaction(tx.id)} style={{ background: '#e74c3c', color: 'white' }}>ðŸ—‘ï¸</button>
+                              <button className="action-btn edit" title="Approve" onClick={() => handleTransactionAction(tx.id, 'approve')}>✅</button>
+                              <button className="action-btn delete" title="Reject" onClick={() => handleTransactionAction(tx.id, 'reject')}>❌</button>
+                              <button className="action-btn delete" title="Delete" onClick={() => handleDeleteTransaction(tx.id)} style={{ background: '#e74c3c', color: 'white' }}>🗑️</button>
                             </div>
                           ) : (
                             <div className="action-buttons">
-                              <button className="action-btn delete" title="Delete" onClick={() => handleDeleteTransaction(tx.id)} style={{ background: '#e74c3c', color: 'white' }}>ðŸ—‘ï¸</button>
+                              <button className="action-btn delete" title="Delete" onClick={() => handleDeleteTransaction(tx.id)} style={{ background: '#e74c3c', color: 'white' }}>🗑️</button>
                             </div>
                           )}
                         </td>
@@ -801,7 +833,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                         alignItems: 'center'
                       }}
                     >
-                      <span style={{ fontWeight: 'bold' }}>ðŸ‘¤ {u.userId}</span>
+                      <span style={{ fontWeight: 'bold' }}>👤 {u.userId}</span>
                       {u.unreadCount > 0 && (
                         <span style={{ background: '#e74c3c', color: 'white', borderRadius: '12px', padding: '2px 8px', fontSize: '12px', fontWeight: 'bold' }}>
                           {u.unreadCount}
@@ -818,11 +850,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   <>
                     <div className="admin-chat-header">
                       <button className="admin-chat-back" onClick={() => handleSupportUser(null)}>
-                        â† Back
+                        ← Back
                       </button>
                       <span style={{ fontWeight: 'bold', fontSize: '16px' }}>{selectedSupportUser}</span>
                       <button className="admin-chat-delete" onClick={handleDeleteChat} title="Delete Chat">
-                        ðŸ—‘ï¸
+                        🗑️
                       </button>
                     </div>
                     <div className="admin-chat-messages">
@@ -873,14 +905,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                                         onClick={() => { setEditingChatId(msg.id); setEditingChatText(msg.message); setActiveAdminMenuMsgId(null); }}
                                         style={{ background: 'none', border: 'none', color: '#f1c40f', fontSize: '12px', cursor: 'pointer', padding: 0 }}
                                       >
-                                        âœï¸ Edit
+                                        ✏️ Edit
                                       </button>
                                     )}
                                     <button 
                                       onClick={() => handleAdminDeleteMessage(msg.id)}
                                       style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: '12px', cursor: 'pointer', padding: 0 }}
                                     >
-                                      ðŸ—‘ï¸ Delete
+                                      🗑️ Delete
                                     </button>
                                   </div>
                                 )}
@@ -921,7 +953,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
           <div className="wallet-modal">
             <div className="wallet-header">
               <h2>History: {selectedUserHistory}</h2>
-              <button className="close-btn" onClick={() => handleUserHistory(null)}>âœ•</button>
+              <button className="close-btn" onClick={() => handleUserHistory(null)}>✕</button>
             </div>
             
             <div className="wallet-tabs" style={{ marginBottom: '15px' }}>
@@ -948,7 +980,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                       <tr key={tx.id}>
                         <td data-label="Time">{new Date(tx.timestamp).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}</td>
                         <td data-label="Type" className={tx.type === 'deposit' ? 'green' : 'gold'}>{tx.type.toUpperCase()}</td>
-                        <td data-label="Amount">â‚¹{tx.amount}</td>
+                        <td data-label="Amount">₹{tx.amount}</td>
                         <td data-label="Status"><span className={`status-badge ${tx.status}`}>{tx.status}</span></td>
                       </tr>
                     ))}
@@ -966,8 +998,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                         <td data-label="Time">{new Date(b.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</td>
                         <td data-label="Round">#{b.roundNumber}</td>
                         <td data-label="Bet On" style={{ color: '#7ec8e3' }}>{b.betSide || '-'}</td>
-                        <td data-label="Bet">â‚¹{b.betAmount}</td>
-                        <td data-label="Win">â‚¹{b.winAmount}</td>
+                        <td data-label="Bet">₹{b.betAmount}</td>
+                        <td data-label="Win">₹{b.winAmount}</td>
                         <td data-label="Result" style={{ color: b.winAmount > 0 ? '#2ecc71' : '#e74c3c', fontWeight: 'bold' }}>
                           {b.winAmount > 0 ? 'WIN' : 'LOST'}
                         </td>

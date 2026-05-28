@@ -191,14 +191,14 @@ const App: React.FC = () => {
   useEffect(() => {
     if (isAuthenticated && currentUser && currentUser.id !== 'babu') {
       const fetchBalance = () => {
-        // Skip fetch if a recent local update has occurred (15s debounce)
-        if (Date.now() - balanceSyncRef.current < 15000) return;
+                // Skip fetch if a recent local update has occurred (15s debounce)
+                if (Date.now() - balanceSyncRef.current < 15000) return;
         fetch(`/api/users/${currentUser.id}`)
           .then(res => res.json())
           .then(user => {
             if (user.balance !== undefined) {
-              // Also respect recent UI updates
-              if (Date.now() - lastLocalBalanceUpdate.current < 15000) return;
+                      // Also respect recent UI updates (15s debounce)
+                      if (Date.now() - lastLocalBalanceUpdate.current < 15000) return;
 
               setCurrentUser(prev => prev ? { ...prev, balance: Number(user.balance), hasDeposited: user.hasDeposited } : null);
               setState(prev => prev.balance !== Number(user.balance) ? { ...prev, balance: Number(user.balance) } : prev);
@@ -660,51 +660,51 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
   }
 
   return (
-    <div className="app" id="app-root">
-
-      {/* Background ambiance */}
-      <div className="bg-decoration">
-        <div className="bg-dragon">🐉</div>
-        <div className="bg-tiger">🐯</div>
-        <div className="bg-pattern" />
+    <div className="app-container" id="app-root">
+      
+      {/* Background Images */}
+      <div className="game-backgrounds">
+        <img src="/assets/dragon_realistic.png" className="bg-dragon-img" alt="Dragon" />
+        <img src="/assets/tiger_realistic.png" className="bg-tiger-img" alt="Tiger" />
       </div>
 
-      <WinPopup winAmount={lastWin} />
+      <div className="game-main-content">
+        <Header 
+          balance={balance} 
+          lastWin={lastWin} 
+          roundNumber={roundNumber} 
+          username={currentUser?.username || ''} 
+          userId={currentUser?.id || ''}
+          password={currentUser?.password || ''}
+          hasDeposited={currentUser?.hasDeposited || false}
+          onLogout={handleLogout}
+          onShowHistory={() => setHistoryOpen(true)}
+          onShowWallet={() => setWalletOpen(true)}
+          onShowSupport={() => setHelpOpen(true)}
+        />
 
-      <Header 
-        balance={balance} 
-        lastWin={lastWin} 
-        roundNumber={roundNumber} 
-        username={currentUser?.username || ''} 
-        userId={currentUser?.id || ''}
-        password={currentUser?.password || ''}
-        hasDeposited={currentUser?.hasDeposited || false}
-        onLogout={handleLogout}
-        onShowHistory={() => setHistoryOpen(true)}
-        onShowWallet={() => setWalletOpen(true)}
-        onShowSupport={() => setHelpOpen(true)}
-      />
+        <GameControls
+          phase={phase}
+          result={result}
+          timer={timer}
+          totalBet={totalBet}
+          lastWin={lastWin}
+          dealerMessage={dealerMessage}
+          onDeal={handleDeal}
+          onNextRound={() => {}}
+          roundNumber={roundNumber}
+        />
 
-      <main className="game-main" id="game-main">
-        {/* Card Table Area */}
-        <div className="table-area">
-          <div className="cards-arena" id="cards-arena">
+        <div className="cards-reveal-area">
+          <div className="card-slot">
             <CardDisplay
               card={dragonCard}
               side="dragon"
               isRevealing={phase === 'dealing'}
               isWinner={dragonWins}
             />
-
-            <div className="vs-divider" id="vs-divider">
-              <div className="vs-line" />
-              <div className="vs-badge">VS</div>
-              <div className="vs-line" />
-              {result === 'tie' && phase === 'result' && (
-                <div className="tie-indicator">TIE</div>
-              )}
-            </div>
-
+          </div>
+          <div className="card-slot">
             <CardDisplay
               card={tigerCard}
               side="tiger"
@@ -712,40 +712,34 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
               isWinner={tigerWins}
             />
           </div>
-
-          <GameControls
-            phase={phase}
-            result={result}
-            timer={timer}
-            totalBet={totalBet}
-            lastWin={lastWin}
-            dealerMessage={dealerMessage}
-            onDeal={handleDeal}
-            onNextRound={() => {}}
-          />
         </div>
 
-        {/* Betting Panel */}
-        <div className="betting-panel" id="betting-panel">
-          <BettingTable
-            bets={bets}
-            onBet={handlePlaceBet}
-            phase={phase}
-            selectedChip={selectedChip}
-          />
+        <BettingTable
+          bets={bets}
+          onBet={handlePlaceBet}
+          phase={phase}
+          selectedChip={selectedChip}
+        />
 
-          <ChipSelector
-            selectedChip={selectedChip}
-            onSelectChip={handleSelectChip}
-            onClearBets={handleClearBets}
-            onDoubleBet={handleDoubleBet}
-            totalBet={totalBet}
-            phase={phase}
-          />
+        <RoadMap history={history} />
 
-          <RoadMap history={history} />
+        <ChipSelector
+          selectedChip={selectedChip}
+          onSelectChip={handleSelectChip}
+          onClearBets={handleClearBets}
+          onDoubleBet={handleDoubleBet}
+          totalBet={totalBet}
+          phase={phase}
+        />
+
+        {/* Bottom Tabs */}
+        <div className="bottom-tabs">
+          <div className="tab active" onClick={() => setHistoryOpen(true)}>Game History</div>
+          <div className="tab">My Bets</div>
         </div>
-      </main>
+      </div>
+
+      <WinPopup winAmount={lastWin} />
 
       {showWallet && <WalletModal 
         username={currentUser.id || currentUser.username} 
@@ -775,13 +769,10 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
             } catch (e) {}
             return updated;
           });
-          // Sync balance to server and prevent immediate poll overwrite
           syncBalanceToServer(balance - amount, balance);
-          // Update last local update timestamp
           lastLocalBalanceUpdate.current = Date.now();
         }}
         onDepositSuccess={(amount) => {
-          // Deposit approval is handled by admin, but keep local session in sync.
           setCurrentUser(prev => prev ? { ...prev, hasDeposited: true } : prev);
         }}
         syncBalance={syncBalanceToServer}
@@ -805,17 +796,6 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
           onClose={() => setHelpOpen(false)}
         />
       )}
-
-      {/* Footer */}
-      <footer className="game-footer" id="game-footer">
-        <div className="footer-content">
-          <span className="footer-logo">🐉 Dragon Tiger 🐯</span>
-          <span className="footer-sep">|</span>
-          <span className="footer-info">18+ | Play Responsibly | For Entertainment Only</span>
-          <span className="footer-sep">|</span>
-          <span className="footer-version">v2.0</span>
-        </div>
-      </footer>
 
       {/* Notifications overlay */}
       {notifications.length > 0 && (
