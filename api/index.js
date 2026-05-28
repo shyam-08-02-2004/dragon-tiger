@@ -53,7 +53,7 @@ app.post('/api/auth/signup', async (req, res) => {
     return res.status(400).json({ error: 'Mobile number already registered.' });
   }
   
-  const newUser = new User({ id, username, password, balance: 0, hasDeposited: false });
+  const newUser = new User({ id, username, password, balance: 50, hasDeposited: false });
   await newUser.save();
   res.json(newUser);
 });
@@ -371,18 +371,15 @@ app.put('/api/notifications/:notifId/read', async (req, res) => {
 
 // ── USER BET HISTORY ──
 
-// Fetch daily bet history for a user
+// Fetch last 24-hour bet history for a user
 app.get('/api/users/bet-history/:username', async (req, res) => {
   try {
     const { username } = req.params;
-    // Get start of today (local time roughly, assuming server time aligns with user roughly or just use UTC boundaries)
-    // To match 11:59 PM reset, we use start of current day.
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
+    const since24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
     const history = await UserBetHistory.find({ 
       username, 
-      timestamp: { $gte: startOfDay } 
+      timestamp: { $gte: since24Hours } 
     }).sort({ timestamp: -1 });
 
     res.json(history);

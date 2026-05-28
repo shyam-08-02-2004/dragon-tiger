@@ -8,14 +8,6 @@ interface WalletModalProps {
   hasDeposited: boolean;
   balance: number;
   onWithdrawSuccess?: (amount: number) => void;
-}
-
-interface WalletModalProps {
-  onClose: () => void;
-  username: string;
-  hasDeposited: boolean;
-  balance: number;
-  onWithdrawSuccess?: (amount: number) => void;
   onDepositSuccess?: (amount: number) => void;
 }
 
@@ -63,6 +55,19 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
   }, [tab, username]);
 
   const msgTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    setMessage('');
+    setMsgType('error');
+    if (msgTimeoutRef.current) {
+      window.clearTimeout(msgTimeoutRef.current);
+      msgTimeoutRef.current = null;
+    }
+    setAmount('');
+    setUtr('');
+    setUpiId('');
+    setPendingMessage(null);
+  }, [tab]);
 
   const showMsg = (text: string, type: 'success' | 'error' | 'pending') => {
     setMessage(text);

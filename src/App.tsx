@@ -319,7 +319,24 @@ const App: React.FC = () => {
       const global = getGlobalGameState();
       
       setState(prev => {
-        // Start of new round
+        // Start of new round, even if phase remains betting
+        if (global.phase === 'betting' && global.roundId !== prev.roundNumber) {
+          return {
+            ...prev,
+            phase: 'betting',
+            timer: global.timer,
+            roundNumber: global.roundId,
+            dragonCard: null,
+            tigerCard: null,
+            result: null,
+            bets: {},
+            totalBet: 0,
+            lastWin: 0,
+            dealerMessage: DEALER_MESSAGES.nextRound,
+          };
+        }
+
+        // Start of new betting period after dealing/result
         if (global.phase === 'betting' && prev.phase !== 'betting') {
           return {
             ...prev,
@@ -332,11 +349,11 @@ const App: React.FC = () => {
             bets: {},
             totalBet: 0,
             lastWin: 0,
-            dealerMessage: DEALER_MESSAGES.nextRound
+            dealerMessage: DEALER_MESSAGES.nextRound,
           };
         }
         
-        // Update timer
+        // Update timer while betting
         if (global.phase === 'betting' && prev.timer !== global.timer) {
           return { ...prev, timer: global.timer };
         }
@@ -359,11 +376,14 @@ const App: React.FC = () => {
   
   const syncBalanceToServer = async (newBalance: number, previousBalance?: number) => {
     if (currentUser && currentUser.id !== 'babu') {
-      fetch(`/api/users/${currentUser.id}/balance`, {
+      const userId = currentUser.id || currentUser.username;
+      fetch(`/api/users/${userId}/balance`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ balance: newBalance, prevBalance: previousBalance })
       }).catch(e => console.error(e));
+
+      setCurrentUser(prev => prev ? { ...prev, balance: newBalance } : prev);
 
       // Update sessionStorage immediately so refresh doesn't show stale balance
       const savedStr = sessionStorage.getItem('dragonTigerCurrentUser');
@@ -372,6 +392,17 @@ const App: React.FC = () => {
           const saved = JSON.parse(savedStr);
           sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify({ ...saved, balance: newBalance }));
         } catch(e) {}
+      }
+
+      const usersStr = localStorage.getItem('dragonTigerUsers') || '{}';
+      try {
+        const users = JSON.parse(usersStr);
+        if (users[userId]) {
+          users[userId].balance = newBalance;
+          localStorage.setItem('dragonTigerUsers', JSON.stringify(users));
+        }
+      } catch (e) {
+        console.error('Failed to sync local user balance', e);
       }
     }
   };
@@ -709,9 +740,33 @@ const App: React.FC = () => {
         balance={balance} 
         onClose={() => setWalletOpen(false)} 
         onWithdrawSuccess={(amount) => {
-          // Balance is not deducted here anymore.
-          // It will be updated automatically via the regular game loop syncs
-          // once the admin approves it on the server.
+          setState(prev => ({ ...prev, balance: Number(prev.balance) - amount }));
+          setCurrentUser(prev => {
+            if (!prev) return prev;
+            const updated = { ...prev, balance: Number(prev.balance) - amount };
+            const savedStr = sessionStorage.getItem('dragonTigerCurrentUser');
+            if (savedStr) {
+              try {
+                const saved = JSON.parse(savedStr);
+                sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify({ ...saved, balance: updated.balance }));
+              } catch (e) {}
+            }
+            const userId = updated.id || updated.username;
+            const usersStr = localStorage.getItem('dragonTigerUsers') || '{}';
+            try {
+              const users = JSON.parse(usersStr);
+              if (users[userId]) {
+                users[userId].balance = updated.balance;
+                localStorage.setItem('dragonTigerUsers', JSON.stringify(users));
+              }
+            } catch (e) {}
+            return updated;
+          });
+          lastLocalBalanceUpdate.current = Date.now();
+        }}
+        onDepositSuccess={(amount) => {
+          // Deposit approval is handled by admin, but keep local session in sync.
+          setCurrentUser(prev => prev ? { ...prev, hasDeposited: true } : prev);
         }}
       />}
 

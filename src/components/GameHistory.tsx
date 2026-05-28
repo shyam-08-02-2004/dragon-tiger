@@ -56,9 +56,10 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
   const pastRounds = useMemo(() => {
     const rounds: PastRound[] = [];
     const currentCycleStartRawId = rawRoundId - (currentRound - 1);
+    const maxHistory = 100;
+    const firstVisibleRawId = Math.max(rawRoundId - maxHistory, currentCycleStartRawId);
     
-    // Show history for the current cycle up to 2000 rounds
-    for (let pastRawId = rawRoundId - 1; pastRawId >= currentCycleStartRawId; pastRawId--) {
+    for (let pastRawId = rawRoundId - 1; pastRawId >= firstVisibleRawId; pastRawId--) {
       if (pastRawId < 0) break;
       const pastRoundId = (pastRawId % 2000) + 1;
       
@@ -90,7 +91,10 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
         <div className="gh-header">
           <div className="gh-header-left">
             <span className="gh-icon">⏱</span>
-            <span className="gh-title">HISTORY</span>
+            <div>
+              <span className="gh-title">HISTORY</span>
+              <span className="gh-subtitle">Recent 100 rounds</span>
+            </div>
           </div>
           <button className="gh-close" onClick={onClose}>✕</button>
         </div>
@@ -108,7 +112,7 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
               onClick={() => handleTabChange('bets')}
               style={{ flex: 1, padding: '12px', background: activeTab === 'bets' ? '#2c3e50' : 'transparent', color: activeTab === 'bets' ? '#f1c40f' : '#aaa', border: 'none', borderBottom: activeTab === 'bets' ? '2px solid #f1c40f' : 'none', fontWeight: 'bold', cursor: 'pointer' }}
             >
-              My Bets
+              My Bets (24h)
             </button>
           </div>
         )}
@@ -171,7 +175,7 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
             </div>
             <div className="gh-list">
               {betHistory.length === 0 ? (
-                <div className="gh-empty">Aaj koi bet nahi lagayi hai.</div>
+                <div className="gh-empty">No bets in the last 24 hours.</div>
               ) : (
                 betHistory.map(b => (
                   <div key={b._id || Math.random()} className="gh-row" style={{ borderLeftColor: b.winAmount > 0 ? '#2ecc71' : '#e74c3c' }}>
@@ -200,7 +204,7 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
         {/* Footer */}
         {activeTab === 'game' && (
           <div className="gh-footer">
-            📊 Showing last {pastRounds.length} rounds of current cycle
+            📊 Showing last {pastRounds.length} {pastRounds.length === 1 ? 'round' : 'rounds'} of the most recent 100
           </div>
         )}
       </div>

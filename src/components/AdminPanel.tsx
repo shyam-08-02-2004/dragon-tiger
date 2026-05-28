@@ -11,6 +11,35 @@ interface AdminPanelProps {
   onLogout: () => void;
 }
 
+type LiveBets = {
+  dragon: number;
+  tiger: number;
+  tie: number;
+  total: number;
+  betCount: number;
+};
+
+const defaultLiveBets: LiveBets = {
+  dragon: 0,
+  tiger: 0,
+  tie: 0,
+  total: 0,
+  betCount: 0
+};
+
+const normalizeLiveBets = (data: any): LiveBets => {
+  if (!data || typeof data !== 'object' || typeof data.totals !== 'object') return defaultLiveBets;
+
+  const totals = data.totals || {};
+  const dragon = Number(totals.dragon) || 0;
+  const tiger = Number(totals.tiger) || 0;
+  const tie = Number(totals.tie) || 0;
+  const total = Number(totals.total) || dragon + tiger + tie;
+  const betCount = Number(data.betCount) || 0;
+
+  return { dragon, tiger, tie, total, betCount };
+};
+
 const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [users, setUsers] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
@@ -27,7 +56,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [adminBetHistory, setAdminBetHistory] = useState<any[]>([]);
   const [editBalanceUser, setEditBalanceUser] = useState<string | null>(null);
   const [newBalance, setNewBalance] = useState<string>('');
-  const [liveBets, setLiveBets] = useState<{ dragon: number; tiger: number; tie: number; total: number; betCount: number }>({ dragon: 0, tiger: 0, tie: 0, total: 0, betCount: 0 });
+  const [liveBets, setLiveBets] = useState<LiveBets>(defaultLiveBets);
   const [showGameHistory, setShowGameHistory] = useState(() => sessionStorage.getItem('dt_adminShowGameHist') === 'true');
 
   // Round outcome control
@@ -105,14 +134,27 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     const pollBets = () => {
       const global = getGlobalGameState();
       const roundId = global.roundId;
+      const isBetting = global.phase === 'betting';
+
       if (liveBetsRoundRef.current !== roundId) {
         liveBetsRoundRef.current = roundId;
-        setLiveBets({ dragon: 0, tiger: 0, tie: 0, total: 0, betCount: 0 });
+        setLiveBets(defaultLiveBets);
       }
+
+      if (!isBetting) {
+        setLiveBets(defaultLiveBets);
+        return;
+      }
+
       fetch(`/api/bets/round/${roundId}?t=${Date.now()}`)
         .then(r => r.json())
-        .then(data => { if (data && data.totals) setLiveBets({ ...data.totals, betCount: data.betCount || 0 }); })
-        .catch(() => {});
+        .then(data => {
+          const normalized = normalizeLiveBets(data);
+          setLiveBets(normalized);
+        })
+        .catch(() => {
+          setLiveBets(defaultLiveBets);
+        });
     };
     pollBets();
     const betPollId = setInterval(pollBets, 2000);
@@ -258,14 +300,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
               // Apply same override logic as App.tsx
               if (forcedOutcome === 'dragon') {
-                dragonCard = { suit: 'â™ ', rank: 'K', value: 13 };
-                tigerCard  = { suit: 'â™¥', rank: '2', value: 2  };
+                dragonCard = { suit: '♠', rank: 'K', value: 13 };
+                tigerCard  = { suit: '♥', rank: '2', value: 2  };
               } else if (forcedOutcome === 'tiger') {
-                dragonCard = { suit: 'â™¥', rank: '2', value: 2  };
-                tigerCard  = { suit: 'â™ ', rank: 'K', value: 13 };
+                dragonCard = { suit: '♥', rank: '2', value: 2  };
+                tigerCard  = { suit: '♠', rank: 'K', value: 13 };
               } else if (forcedOutcome === 'tie') {
-                dragonCard = { suit: 'â™ ', rank: '8', value: 8 };
-                tigerCard  = { suit: 'â™¥', rank: '8', value: 8 };
+                dragonCard = { suit: '♠', rank: '8', value: 8 };
+                tigerCard  = { suit: '♥', rank: '8', value: 8 };
               }
 
               setSimDragonCard(dragonCard);
@@ -608,52 +650,55 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                 </div>
 
                 {/* â”€â”€ Live Bet Totals â”€â”€ */}
-                <div style={{ marginBottom: '24px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                    <h3 style={{ margin: 0 }}>ðŸ“Š Live Bets â€” Round #{simRoundId}</h3>
-                    <span style={{ fontSize: '12px', color: '#aaa', background: 'rgba(255,255,255,0.07)', padding: '4px 10px', borderRadius: '20px' }}>
-                      {liveBets.betCount} players Â· â‚¹{liveBets.total} total
+                <div className="admin-live-bets">
+                  <div className="admin-live-bets-header">
+                    <div>
+                      <h3 className="admin-live-bets-title">ðŸ“Š Live Bets — Round #{simRoundId}</h3>
+                      <div className="admin-live-bets-subtitle">
+                        {simPhase === 'betting' ? 'Betting open now' : 'Betting closed for this round'}
+                      </div>
+                    </div>
+                    <span className="admin-live-bets-badge">
+                      {liveBets.betCount} players · ₹{liveBets.total} total
                     </span>
                   </div>
+
                   {(() => {
-                    const total = liveBets.total || 1;
-                    const dragonPct = Math.round((liveBets.dragon / total) * 100);
-                    const tigerPct  = Math.round((liveBets.tiger  / total) * 100);
-                    const tiePct    = Math.round((liveBets.tie    / total) * 100);
+                    const total = liveBets.total;
+                    const divisor = total > 0 ? total : 1;
+                    const dragonPct = Math.round((liveBets.dragon / divisor) * 100);
+                    const tigerPct  = Math.round((liveBets.tiger  / divisor) * 100);
+                    const tiePct    = Math.round((liveBets.tie    / divisor) * 100);
                     return (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                        {/* Dragon */}
-                        <div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                            <span style={{ color: '#e74c3c', fontWeight: 'bold' }}>ðŸ‰ Dragon</span>
-                            <span style={{ color: '#fff', fontWeight: 'bold' }}>â‚¹{liveBets.dragon} <span style={{ color: '#aaa', fontSize: '12px' }}>({dragonPct}%)</span></span>
+                      <div className="admin-live-bets-columns">
+                        <div className="admin-live-bets-row">
+                          <div className="admin-live-bets-stat">
+                            <span>ðŸ‰ Dragon</span>
+                            <strong>₹{liveBets.dragon}</strong>
+                            <span>{dragonPct}%</span>
                           </div>
-                          <div style={{ height: '10px', background: 'rgba(255,255,255,0.08)', borderRadius: '5px', overflow: 'hidden' }}>
-                            <div style={{ height: '100%', width: `${dragonPct}%`, background: 'linear-gradient(90deg, #c0392b, #e74c3c)', borderRadius: '5px', transition: 'width 0.5s ease' }} />
+                          <div className="admin-live-bets-stat">
+                            <span>ðŸ¯ Tiger</span>
+                            <strong>₹{liveBets.tiger}</strong>
+                            <span>{tigerPct}%</span>
                           </div>
-                        </div>
-                        {/* Tiger */}
-                        <div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                            <span style={{ color: '#3498db', fontWeight: 'bold' }}>ðŸ¯ Tiger</span>
-                            <span style={{ color: '#fff', fontWeight: 'bold' }}>â‚¹{liveBets.tiger} <span style={{ color: '#aaa', fontSize: '12px' }}>({tigerPct}%)</span></span>
-                          </div>
-                          <div style={{ height: '10px', background: 'rgba(255,255,255,0.08)', borderRadius: '5px', overflow: 'hidden' }}>
-                            <div style={{ height: '100%', width: `${tigerPct}%`, background: 'linear-gradient(90deg, #2980b9, #3498db)', borderRadius: '5px', transition: 'width 0.5s ease' }} />
+                          <div className="admin-live-bets-stat">
+                            <span>ðŸ¤ Tie</span>
+                            <strong>₹{liveBets.tie}</strong>
+                            <span>{tiePct}%</span>
                           </div>
                         </div>
-                        {/* Tie */}
-                        <div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                            <span style={{ color: '#27ae60', fontWeight: 'bold' }}>ðŸ¤ Tie</span>
-                            <span style={{ color: '#fff', fontWeight: 'bold' }}>â‚¹{liveBets.tie} <span style={{ color: '#aaa', fontSize: '12px' }}>({tiePct}%)</span></span>
-                          </div>
-                          <div style={{ height: '10px', background: 'rgba(255,255,255,0.08)', borderRadius: '5px', overflow: 'hidden' }}>
-                            <div style={{ height: '100%', width: `${tiePct}%`, background: 'linear-gradient(90deg, #219a52, #27ae60)', borderRadius: '5px', transition: 'width 0.5s ease' }} />
-                          </div>
+                        <div className="admin-live-bets-graph">
+                          <div className="admin-live-bets-bar" style={{ width: `${dragonPct}%`, background: 'linear-gradient(90deg, #c0392b, #e74c3c)' }} />
+                          <div className="admin-live-bets-bar" style={{ width: `${tigerPct}%`, background: 'linear-gradient(90deg, #2980b9, #3498db)' }} />
+                          <div className="admin-live-bets-bar" style={{ width: `${tiePct}%`, background: 'linear-gradient(90deg, #219a52, #27ae60)' }} />
                         </div>
                         {liveBets.total === 0 && (
-                          <p style={{ color: '#555', textAlign: 'center', margin: '8px 0', fontSize: '13px' }}>Abhi kisi ne bet nahi lagayi is round mein.</p>
+                          <div className="admin-live-bets-note">
+                            {simPhase === 'betting'
+                              ? 'Abhi kisi ne bet nahi lagayi is round mein.'
+                              : 'Round ke baad betting band ho gayi hai. Agle round tak wait karein.'}
+                          </div>
                         )}
                       </div>
                     );

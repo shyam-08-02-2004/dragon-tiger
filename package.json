@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npx vercel --prod --yes"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
