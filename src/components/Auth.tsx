@@ -85,15 +85,6 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       return;
     }
 
-    const usersStr = localStorage.getItem('dragonTigerUsers') || '{}';
-    const users = JSON.parse(usersStr);
-    const mNum = mobileNumber.trim();
-
-    if (users[mNum]) {
-      setError('This mobile number is already registered.');
-      return;
-    }
-
     // Simulate OTP
     const randomOtp = Math.floor(100000 + Math.random() * 900000).toString();
     setGeneratedOtp(randomOtp);
@@ -162,14 +153,6 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
     if (!/^[6-9]\d{9}$/.test(mobileNumber.trim())) {
       setError('Please enter a valid 10-digit mobile number.');
-      return;
-    }
-
-    const usersStr = localStorage.getItem('dragonTigerUsers') || '{}';
-    const users = JSON.parse(usersStr);
-
-    if (!users[mobileNumber.trim()]) {
-      setError('Account not found with this Mobile Number.');
       return;
     }
 
