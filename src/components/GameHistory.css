@@ -1,4 +1,4 @@
-﻿/* ===== OVERLAY ===== */
+/* ===== OVERLAY ===== */
 .gh-overlay {
   position: fixed;
   inset: 0;
@@ -234,9 +234,6 @@
   color: #555;
 }
 .gh-row .gh-col-winner {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   font-weight: 700;
   font-size: 13px;
   text-align: right;
@@ -504,9 +501,6 @@
   }
   
   .gh-row .gh-col-winner {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
     flex: 0 0 65px;
     font-size: 9px;
   }
@@ -521,4 +515,3 @@
     padding: 6px;
   }
 }
-
