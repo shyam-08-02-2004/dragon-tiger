@@ -212,17 +212,19 @@ html, body {
   padding-bottom: 15px;
 }
 
-.table-responsive {
-  overflow-x: auto;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 196, 0, 0.1);
-  background: rgba(0, 0, 0, 0.2);
-}
+  .table-responsive {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 196, 0, 0.1);
+    background: rgba(0, 0, 0, 0.2);
+    -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
+  }
 
-.admin-table-v2 {
-  width: 100%;
-  border-collapse: collapse;
-}
+  .admin-table-v2 {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px; /* Force horizontal overflow on small screens */
+  }
 
 .admin-table-v2 th {
   text-align: left;
