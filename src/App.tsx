@@ -20,7 +20,7 @@ import {
 import './App.css';
 
 const BETTING_TIMER = 15;
-const INITIAL_BALANCE = 50;
+const INITIAL_BALANCE = 80;
 
 const DEALER_MESSAGES = {
   betting: [
@@ -44,7 +44,8 @@ const initialState: GameState = {
   tigerCard: null,
   result: null,
   bets: {},
-  balance: 0,
+  balance: INITIAL_BALANCE,
+
   selectedChip: 10,
   lastWin: 0,
   totalBet: 0,
@@ -110,7 +111,8 @@ const App: React.FC = () => {
 
   useEffect(() => { stateRef.current = state; }, [state]);
   useEffect(() => { currentUserRef.current = currentUser; }, [currentUser]);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const balanceSyncRef = useRef<number>(0);
+  
 
   useEffect(() => {
     const handleOpenHelp = () => setHelpOpen(true);
@@ -189,28 +191,32 @@ const App: React.FC = () => {
   useEffect(() => {
     if (isAuthenticated && currentUser && currentUser.id !== 'babu') {
       const fetchBalance = () => {
+        // Skip fetch if a recent local update has occurred (15s debounce)
+        if (Date.now() - balanceSyncRef.current < 15000) return;
         fetch(`/api/users/${currentUser.id}`)
           .then(res => res.json())
           .then(user => {
             if (user.balance !== undefined) {
-              // Skip updating from poll if we just updated locally within the last 4 seconds
-              if (Date.now() - lastLocalBalanceUpdate.current < 4000) return;
+              // Also respect recent UI updates
+              if (Date.now() - lastLocalBalanceUpdate.current < 15000) return;
 
               setCurrentUser(prev => prev ? { ...prev, balance: Number(user.balance), hasDeposited: user.hasDeposited } : null);
               setState(prev => prev.balance !== Number(user.balance) ? { ...prev, balance: Number(user.balance) } : prev);
-              
+
               const savedStr = sessionStorage.getItem('dragonTigerCurrentUser');
               if (savedStr) {
-                 const saved = JSON.parse(savedStr);
-                 if (saved.balance !== Number(user.balance) || saved.hasDeposited !== user.hasDeposited) {
+                try {
+                  const saved = JSON.parse(savedStr);
+                  if (saved.balance !== Number(user.balance) || saved.hasDeposited !== user.hasDeposited) {
                     sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify({ ...saved, balance: Number(user.balance), hasDeposited: user.hasDeposited }));
-                 }
+                  }
+                } catch (e) {}
               }
             }
           })
           .catch(console.error);
       };
-      
+
       fetchBalance();
       const interval = setInterval(fetchBalance, 5000);
       return () => clearInterval(interval);
@@ -323,6 +329,7 @@ const App: React.FC = () => {
         if (global.phase === 'betting' && global.roundId !== prev.roundNumber) {
           return {
             ...prev,
+            selectedChip: prev.selectedChip,
             phase: 'betting',
             timer: global.timer,
             roundNumber: global.roundId,
@@ -373,39 +380,42 @@ const App: React.FC = () => {
     };
   }, []);
 
-  
-  const syncBalanceToServer = async (newBalance: number, previousBalance?: number) => {
-    if (currentUser && currentUser.id !== 'babu') {
-      const userId = currentUser.id || currentUser.username;
-      fetch(`/api/users/${userId}/balance`, {
+const syncBalanceToServer = async (newBalance: number, previousBalance?: number) => {
+  if (currentUser && currentUser.id !== 'babu') {
+    const userId = currentUser.id || currentUser.username;
+    try {
+      await fetch(`/api/users/${userId}/balance`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ balance: newBalance, prevBalance: previousBalance })
-      }).catch(e => console.error(e));
-
-      setCurrentUser(prev => prev ? { ...prev, balance: newBalance } : prev);
-
-      // Update sessionStorage immediately so refresh doesn't show stale balance
-      const savedStr = sessionStorage.getItem('dragonTigerCurrentUser');
-      if (savedStr) {
-        try {
-          const saved = JSON.parse(savedStr);
-          sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify({ ...saved, balance: newBalance }));
-        } catch(e) {}
-      }
-
-      const usersStr = localStorage.getItem('dragonTigerUsers') || '{}';
-      try {
-        const users = JSON.parse(usersStr);
-        if (users[userId]) {
-          users[userId].balance = newBalance;
-          localStorage.setItem('dragonTigerUsers', JSON.stringify(users));
-        }
-      } catch (e) {
-        console.error('Failed to sync local user balance', e);
-      }
+      });
+      // Record timestamp of successful sync to debounce future polls
+      balanceSyncRef.current = Date.now();
+    } catch (e) {
+      console.error('Failed to sync balance to server', e);
     }
-  };
+    setCurrentUser(prev => prev ? { ...prev, balance: newBalance } : prev);
+    // Update sessionStorage immediately so refresh doesn't show stale balance
+    const savedStr = sessionStorage.getItem('dragonTigerCurrentUser');
+    if (savedStr) {
+      try {
+        const saved = JSON.parse(savedStr);
+        sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify({ ...saved, balance: newBalance }));
+      } catch (e) {}
+    }
+    const usersStr = localStorage.getItem('dragonTigerUsers') || '{}';
+    try {
+      const users = JSON.parse(usersStr);
+      if (users[userId]) {
+        users[userId].balance = newBalance;
+        localStorage.setItem('dragonTigerUsers', JSON.stringify(users));
+      }
+    } catch (e) {
+      console.error('Failed to sync local user balance', e);
+    }
+  }
+};
+
 
   const handlePlaceBet = useCallback((type: BetType) => {
     setState(prev => {
@@ -565,9 +575,12 @@ const App: React.FC = () => {
         const newBalance = Number(prev.balance) + winnings;
         if (currentUserRef.current && currentUserRef.current.id !== 'babu') {
            if (prev.totalBet > 0) {
+             // Record timestamp of recent local update (15s debounce)
              lastLocalBalanceUpdate.current = Date.now();
              syncBalanceToServer(newBalance, prev.balance);
            }
+           // Ensure local timestamp is refreshed after win to avoid immediate fetch balance overriding
+           lastLocalBalanceUpdate.current = Date.now();
            
            if (prev.totalBet > 0) {
              const betSideStr = Object.entries(prev.bets)
@@ -762,12 +775,17 @@ const App: React.FC = () => {
             } catch (e) {}
             return updated;
           });
+          // Sync balance to server and prevent immediate poll overwrite
+          syncBalanceToServer(balance - amount, balance);
+          // Update last local update timestamp
           lastLocalBalanceUpdate.current = Date.now();
         }}
         onDepositSuccess={(amount) => {
           // Deposit approval is handled by admin, but keep local session in sync.
           setCurrentUser(prev => prev ? { ...prev, hasDeposited: true } : prev);
         }}
+        syncBalance={syncBalanceToServer}
+        setLastUpdate={() => { lastLocalBalanceUpdate.current = Date.now(); }}
       />}
 
       {showHistory && (
