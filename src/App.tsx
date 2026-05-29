@@ -647,40 +647,33 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#000', color: 'gold' }}><h2>Syncing with Server...</h2></div>;
   }
 
-  if (!isAuthenticated || !currentUser) {
-    return <Auth onLogin={handleLogin} />;
-  }
+  const renderContent = () => {
+    if (!isAuthenticated || !currentUser) {
+      return <Auth onLogin={handleLogin} />;
+    }
 
-  if (currentUser.username === 'babu') {
+    // At this point, currentUser is guaranteed to be defined
+    const user = currentUser as NonNullable<typeof currentUser>;
+    if (user.username === 'babu') {
+      return (
+        <div style={{ position: 'relative', width: '100%', minHeight: '100vh', overflowX: 'hidden' }}>
+          <AdminPanel onLogout={handleLogout} />
+        </div>
+      );
+    }
+
     return (
-      <div style={{ position: 'relative', width: '100%', minHeight: '100vh', overflowX: 'hidden' }}>
-        <AdminPanel onLogout={handleLogout} />
-      </div>
-    );
-  }
-
-  return (
-    <div className="app-container" id="app-root">
-      
-      {/* Background Images */}
-      <div className="game-backgrounds">
-        <img src="/assets/dragon_realistic.png" className="bg-dragon-img" alt="Dragon" />
-        <img src="/assets/tiger_realistic.png" className="bg-tiger-img" alt="Tiger" />
-      </div>
-
-      <div className="game-main-content">
+      <>
         <Header 
-          balance={balance} 
-          lastWin={lastWin} 
-          roundNumber={roundNumber} 
-          username={currentUser?.username || ''} 
-          userId={currentUser?.id || ''}
-          password={currentUser?.password || ''}
-          hasDeposited={currentUser?.hasDeposited || false}
+          balance={balance}
+          roundNumber={roundNumber}
+          username={currentUser.username}
+          userId={currentUser.id || ''}
+          password={currentUser.password}
           onLogout={handleLogout}
-          onShowHistory={() => setHistoryOpen(true)}
+          onShowHistory={currentUser.id !== 'babu' ? () => setHistoryOpen(true) : undefined}
           onShowWallet={() => setWalletOpen(true)}
-          onShowSupport={() => setHelpOpen(true)}
+          onShowSupport={currentUser.id !== 'babu' ? () => setHelpOpen(true) : undefined}
         />
 
         <GameControls
@@ -696,22 +689,18 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
         />
 
         <div className="cards-reveal-area">
-          <div className="card-slot">
-            <CardDisplay
-              card={dragonCard}
-              side="dragon"
-              isRevealing={phase === 'dealing'}
-              isWinner={dragonWins}
-            />
-          </div>
-          <div className="card-slot">
-            <CardDisplay
-              card={tigerCard}
-              side="tiger"
-              isRevealing={phase === 'dealing'}
-              isWinner={tigerWins}
-            />
-          </div>
+          <CardDisplay
+            card={dragonCard}
+            side="dragon"
+            isRevealing={phase === 'dealing'}
+            isWinner={dragonWins}
+          />
+          <CardDisplay
+            card={tigerCard}
+            side="tiger"
+            isRevealing={phase === 'dealing'}
+            isWinner={tigerWins}
+          />
         </div>
 
         <BettingTable
@@ -734,16 +723,38 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
 
         {/* Bottom Tabs */}
         <div className="bottom-tabs">
-          <div className="tab active" onClick={() => setHistoryOpen(true)}>Game History</div>
-          <div className="tab">My Bets</div>
+          <div className="tab active" onClick={() => {
+            sessionStorage.setItem('dt_historyTab', 'game');
+            setHistoryOpen(true);
+          }}>Game History</div>
+          <div className="tab" onClick={() => {
+            sessionStorage.setItem('dt_historyTab', 'bets');
+            setHistoryOpen(true);
+          }}>My Bets</div>
         </div>
+      </>
+    );
+  };
+
+  return (
+    <div className="app-container" id="app-root">
+      
+      {/* Background Images - persistent across all views */}
+      <div className="game-backgrounds">
+        <img src="/assets/dragon_realistic.png" className="bg-dragon-img" alt="Dragon" />
+        <img src="/assets/tiger_realistic.png" className="bg-tiger-img" alt="Tiger" />
       </div>
+
+      <div className="game-main-content" style={{ overflowY: 'auto' }}>
+        {renderContent()}
+      </div>
+
 
       <WinPopup winAmount={lastWin} />
 
       {showWallet && <WalletModal 
-        username={currentUser.id || currentUser.username} 
-        hasDeposited={currentUser.hasDeposited || false} 
+        username={currentUser?.id ?? currentUser?.username ?? ''} 
+        hasDeposited={currentUser?.hasDeposited ?? false} 
         balance={balance} 
         onClose={() => setWalletOpen(false)} 
         onWithdrawSuccess={(amount) => {
@@ -785,13 +796,13 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
           rawRoundId={getGlobalGameState().rawRoundId}
           isOpen={showHistory}
           onClose={() => setHistoryOpen(false)}
-          username={currentUser.id || currentUser.username}
+          username={currentUser?.id ?? currentUser?.username ?? ''}
         />
       )}
 
       {showHelpCenter && (
         <HelpCenter 
-          userId={currentUser.id || currentUser.username}
+          userId={currentUser?.id ?? currentUser?.username ?? ''}
           isOpen={showHelpCenter}
           onClose={() => setHelpOpen(false)}
         />

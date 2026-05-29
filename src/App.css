@@ -418,19 +418,13 @@
 
 /* Central Cards Container for revealing cards */
 .cards-reveal-area {
-  position: absolute;
-  top: 160px;
-  left: 0;
-  right: 0;
   display: flex;
-  justify-content: space-between;
-  padding: 0 40px;
-  pointer-events: none;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 10px 20px;
+  position: relative;
   z-index: 5;
-}
-.card-slot {
-  width: 70px;
-  height: 100px;
 }
 
 @media (min-width: 481px) {

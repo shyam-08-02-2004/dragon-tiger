@@ -1,7 +1,7 @@
 .admin-layout {
   display: flex;
   height: 100vh;
-  background-color: var(--dark-bg);
+  background-color: transparent;
   color: var(--text-primary);
   font-family: var(--font-ui);
   position: relative;
@@ -21,24 +21,6 @@ html, body {
   height: 100%;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
-}
-
-.admin-layout::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url('/bg-fire.jpg');
-  background-size: cover;
-  background-position: center;
-  z-index: 0;
-}
-
-.admin-layout::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle at center, rgba(15, 20, 30, 0.7) 0%, rgba(5, 10, 15, 0.95) 100%);
-  z-index: 0;
 }
 
 .admin-layout > * {

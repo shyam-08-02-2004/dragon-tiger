@@ -25,22 +25,12 @@ const GameControls: React.FC<GameControlsProps> = ({
         {phase === 'betting' ? 'Start Betting' : phase === 'dealing' ? 'Dealing Cards...' : 'Round Ended'}
       </div>
       
-      <div className="top-right-icons">
-        <span style={{cursor: 'pointer'}}>?</span>
-        <span style={{cursor: 'pointer'}}>🔊</span>
-        <span style={{cursor: 'pointer'}}>⚙️</span>
-      </div>
-
       <div className="timer-container">
         <div className={`timer-circle ${phase === 'betting' && timer <= 5 ? 'active' : ''}`} style={{ borderColor: phase === 'betting' && timer <= 5 ? '#e74c3c' : '' }}>
           <span style={{ color: phase === 'betting' && timer <= 5 ? '#e74c3c' : '#fff' }}>
              {phase === 'betting' ? timer : 0}
           </span>
         </div>
-      </div>
-
-      <div className="game-history-btn-small">
-        <button>Game History 📈</button>
       </div>
     </div>
   );

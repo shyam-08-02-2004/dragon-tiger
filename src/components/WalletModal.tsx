@@ -177,8 +177,8 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
             ➕ Deposit
           </button>
           <button
-            className={`wallet-tab ${tab === 'withdraw' ? 'active' : ''}`}
-            onClick={() => handleTabChange('withdraw')}
+              className={`wallet-tab ${tab === 'withdraw' ? 'active' : ''} ${!hasDeposited ? 'disabled' : ''}`}
+              onClick={() => { if (hasDeposited) handleTabChange('withdraw'); else showMsg('Please make a deposit first to enable withdrawals.', 'error'); }}
           >
             💸 Withdraw
           </button>
@@ -254,7 +254,12 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
 
               {tab === 'withdraw' && (
                 <>
-                  {pendingMessage ? (
+                  {!hasDeposited ? (
+                    <div className="wallet-message error" style={{ textAlign: 'center', padding: '20px' }}>
+                      <strong>Withdrawals disabled</strong><br/><br/>
+                      Aapko withdrawal request karne se pehle pehla deposit karna hoga.
+                    </div>
+                  ) : pendingMessage ? (
                     <div className="premium-status-card">
                       <div className="status-icon-wrapper">
                         {pendingMessage.includes('pending') ? (

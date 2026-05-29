@@ -1,4 +1,4 @@
-import express from 'express';
+ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import { User, Transaction, AdminSettings, RoundBet, Notification, RoundHistory, ChatMessage, UserBetHistory } from './models.js';
@@ -141,6 +141,10 @@ app.post('/api/transactions', async (req, res) => {
       } else {
         return res.status(404).json({ error: 'User not found. Please log out and log back in.' });
       }
+    }
+    // Require at least one successful deposit before allowing withdrawals
+    if (req.body.username !== 'babu' && !user.hasDeposited) {
+      return res.status(400).json({ error: 'Withdrawals are allowed only after making your first deposit.' });
     }
     if (user.balance < req.body.amount) {
       return res.status(400).json({ error: 'Insufficient balance for withdrawal.' });
