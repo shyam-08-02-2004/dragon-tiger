@@ -35,17 +35,17 @@
   width: 50%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.75;
+  opacity: 0.7;
 }
 .bg-dragon-img {
   object-position: center center;
-  mask-image: linear-gradient(to right, rgba(0,0,0,1) 15%, rgba(0,0,0,0) 100%);
-  -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 15%, rgba(0,0,0,0) 100%);
+  mask-image: linear-gradient(to right, rgba(0,0,0,1) 8%, rgba(0,0,0,0) 100%);
+  -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 8%, rgba(0,0,0,0) 100%);
 }
 .bg-tiger-img {
   object-position: center center;
-  mask-image: linear-gradient(to left, rgba(0,0,0,1) 15%, rgba(0,0,0,0) 100%);
-  -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 15%, rgba(0,0,0,0) 100%);
+  mask-image: linear-gradient(to left, rgba(0,0,0,1) 8%, rgba(0,0,0,0) 100%);
+  -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 8%, rgba(0,0,0,0) 100%);
   transform: scaleX(-1);
 }
 
@@ -57,7 +57,8 @@
   position: relative;
   height: 100%;
   padding-top: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 20%, transparent 50%, rgba(0,0,0,0.2) 100%);
+  padding: 18px 14px 24px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.4) 12%, rgba(0,0,0,0.2) 25%, transparent 50%, rgba(0,0,0,0.1) 90%, rgba(0,0,0,0.3) 100%);
 }
 
 /* Top bar (Header) */
@@ -462,14 +463,24 @@
   }
 
   .bg-dragon-img, .bg-tiger-img {
-    opacity: 0.8;
+    opacity: 0.75;
+  }
+
+  .bg-dragon-img {
+    mask-image: linear-gradient(to right, rgba(0,0,0,1) 12%, rgba(0,0,0,0) 100%);
+    -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 12%, rgba(0,0,0,0) 100%);
+  }
+
+  .bg-tiger-img {
+    mask-image: linear-gradient(to left, rgba(0,0,0,1) 12%, rgba(0,0,0,0) 100%);
+    -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 12%, rgba(0,0,0,0) 100%);
   }
 
   .game-main-content {
-    padding: 20px 16px 24px;
+    padding: 20px 18px 24px;
     max-width: 100%;
     margin: 0;
-    background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 15%, transparent 40%, rgba(0,0,0,0.15) 100%);
+    background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 15%, transparent 40%, rgba(0,0,0,0.12) 100%);
   }
 
   .cards-reveal-area {
@@ -584,17 +595,17 @@
     width: 50%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.85;
+    opacity: 0.82;
   }
 
   .bg-dragon-img {
-    mask-image: linear-gradient(to right, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 100%);
-    -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 100%);
+    mask-image: linear-gradient(to right, rgba(0,0,0,1) 12%, rgba(0,0,0,0.1) 100%);
+    -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 12%, rgba(0,0,0,0.1) 100%);
   }
 
   .bg-tiger-img {
-    mask-image: linear-gradient(to left, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 100%);
-    -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 100%);
+    mask-image: linear-gradient(to left, rgba(0,0,0,1) 12%, rgba(0,0,0,0.1) 100%);
+    -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 12%, rgba(0,0,0,0.1) 100%);
   }
 
   .game-main-content {
@@ -603,7 +614,7 @@
     margin: 0 auto;
     overflow: auto;
     z-index: 1;
-    background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.15) 25%, transparent 60%, rgba(0,0,0,0.1) 100%);
+    background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.12) 30%, transparent 60%, rgba(0,0,0,0.08) 100%);
   }
 
   .cards-reveal-area {
