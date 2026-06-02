@@ -81,38 +81,56 @@ export const playSound = (variant: SoundVariant, muted: boolean) => {
 
 // Ambient background sound (soft, user-friendly)
 let __ambientNodes: any = null;
-export const startAmbient = (muted = false, volume = 0.03) => {
+export const startAmbient = (muted = false, volume = 0.02) => {
   if (muted) return;
   const ctx = getAudioContext();
   if (!ctx) return;
   try {
     if (__ambientNodes) return; // already running
-    const gain = ctx.createGain();
-    gain.gain.value = volume;
+
+    const masterGain = ctx.createGain();
+    masterGain.gain.value = Math.max(0.0001, volume);
 
     const osc1 = ctx.createOscillator();
     osc1.type = 'sine';
-    osc1.frequency.value = 60; // low warm hum
+    osc1.frequency.value = 35; // very low warm hum
 
     const osc2 = ctx.createOscillator();
     osc2.type = 'triangle';
-    osc2.frequency.value = 90; // subtle texture
+    osc2.frequency.value = 55; // subtle texture
+    osc2.detune.value = 6;
 
-    // gentle detune to avoid static tone
-    osc2.detune.value = 7;
+    // gentle low-frequency oscillator to modulate amplitude for movement
+    const lfo = ctx.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.value = 0.09; // ~0.09 Hz (slow wobble)
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.value = Math.max(0.001, volume * 0.8);
 
-    osc1.connect(gain);
-    osc2.connect(gain);
-    gain.connect(ctx.destination);
+    // small filter to smooth the tone
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 600; // gentle rolloff
 
-    // smooth fade-in
-    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(volume, ctx.currentTime + 1.2);
+    // routing
+    osc1.connect(lp);
+    osc2.connect(lp);
+    lp.connect(masterGain);
+    masterGain.connect(ctx.destination);
+
+    // LFO modulates master gain
+    lfo.connect(lfoGain);
+    lfoGain.connect(masterGain.gain);
+
+    // fade-in
+    masterGain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    masterGain.gain.exponentialRampToValueAtTime(Math.max(0.0001, volume), ctx.currentTime + 1.6);
 
     osc1.start();
     osc2.start();
+    lfo.start();
 
-    __ambientNodes = { ctx, gain, osc1, osc2 };
+    __ambientNodes = { ctx, masterGain, lp, osc1, osc2, lfo, lfoGain };
   } catch (e) {
     console.warn('Ambient start failed', e);
   }
@@ -122,24 +140,24 @@ export const stopAmbient = () => {
   const nodes = __ambientNodes;
   if (!nodes) return;
   try {
-    const { ctx, gain, osc1, osc2 } = nodes;
-    // smooth fade-out then stop
-    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.8);
+    const { ctx, masterGain, osc1, osc2, lfo } = nodes;
+    masterGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.9);
     setTimeout(() => {
-      try { osc1.stop(); } catch(e) {}
-      try { osc2.stop(); } catch(e) {}
-      try { gain.disconnect(); } catch(e) {}
+      try { osc1.stop(); } catch (e) {}
+      try { osc2.stop(); } catch (e) {}
+      try { lfo.stop(); } catch (e) {}
+      try { masterGain.disconnect(); } catch (e) {}
       __ambientNodes = null;
-    }, 900);
+    }, 1000);
   } catch (e) {
     __ambientNodes = null;
   }
 };
 
-export const setAmbientVolume = (volume = 0.03) => {
+export const setAmbientVolume = (volume = 0.02) => {
   if (!__ambientNodes) return;
   try {
-    const { ctx, gain } = __ambientNodes;
-    gain.gain.setValueAtTime(Math.max(0.0001, volume), ctx.currentTime + 0.05);
+    const { ctx, masterGain } = __ambientNodes;
+    masterGain.gain.setValueAtTime(Math.max(0.0001, volume), ctx.currentTime + 0.05);
   } catch (e) {}
 };

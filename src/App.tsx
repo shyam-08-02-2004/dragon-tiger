@@ -124,13 +124,7 @@ const App: React.FC = () => {
     localStorage.setItem(getMuteStorageKey(currentUser), String(muted));
   }, [currentUser, muted]);
 
-  const enableVoice = () => {
-    if ('speechSynthesis' in window) {
-      const utter = new SpeechSynthesisUtterance('');
-      window.speechSynthesis.speak(utter);
-    }
-    setVoiceEnabled(true);
-  };
+  // `enableVoice` removed — voice is unlocked on first user interaction
   const [isTimeSynced, setIsTimeSynced] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [state, setState] = useState<GameState>(() => {
@@ -797,11 +791,6 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
 
   return (
     <div className="app-header">
-        { !voiceEnabled && (
-          <button onClick={enableVoice} style={{ marginRight: '12px', background: '#3498db', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: '4px', cursor: 'pointer' }}>
-            Enable Voice
-          </button>
-        ) }
         <button onClick={toggleMute} style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: '18px' }}>
           {muted ? '🔇' : '🔊'}
         </button>

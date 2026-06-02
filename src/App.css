@@ -17,7 +17,7 @@
 
 /* Background images layout */
 .game-backgrounds {
-  position: absolute;
+  position: fixed;
   top: 60px; /* Just below header */
   left: 0;
   right: 0;
@@ -25,6 +25,7 @@
   display: flex;
   justify-content: space-between;
   z-index: 0;
+  pointer-events: none;
 }
 
 .bg-dragon-img, .bg-tiger-img {
