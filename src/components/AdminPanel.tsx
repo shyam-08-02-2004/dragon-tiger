@@ -359,7 +359,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
         setTargetRoundId('');
         setTimeout(() => setSaveMsg(''), 4000);
         if (!muted) {
-          speak(`Round ${roundId} result set to ${outcome}`);
+          speak(`Round ${roundId} result set to ${outcome}`, muted);
           playSound('notify', muted);
         }
       }

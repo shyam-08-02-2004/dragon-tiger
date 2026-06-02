@@ -18,7 +18,7 @@ import {
   drawCard, determineResult, calculateWinnings,
 } from './types/game';
 import './App.css';
-import { speak, playSound } from './utils/voice';
+import { speak, playSound, startAmbient, stopAmbient, setAmbientVolume } from './utils/voice';
 
 const BETTING_TIMER = 15;
 const INITIAL_BALANCE = 80;
@@ -92,6 +92,8 @@ const App: React.FC = () => {
         window.speechSynthesis.speak(utter);
         setVoiceEnabled(true);
       }
+      // start ambient sound if not muted
+      if (!muted) startAmbient(false, 0.035);
       window.removeEventListener('click', unlock);
     };
     window.addEventListener('click', unlock);
@@ -106,6 +108,16 @@ const App: React.FC = () => {
       setMuted(stored === 'true');
     }
   }, [currentUser?.id, currentUser?.username]);
+
+  // Control ambient sound when muted state changes
+  useEffect(() => {
+    if (muted) {
+      stopAmbient();
+    } else {
+      // start or increase ambient
+      startAmbient(false, 0.03);
+    }
+  }, [muted]);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -784,7 +796,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
   };
 
   return (
-    <header className="app-header">
+    <div className="app-header">
         { !voiceEnabled && (
           <button onClick={enableVoice} style={{ marginRight: '12px', background: '#3498db', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: '4px', cursor: 'pointer' }}>
             Enable Voice

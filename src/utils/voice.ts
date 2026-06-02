@@ -1,8 +1,10 @@
 // src/utils/voice.ts
+import type { BetType, GameResult } from '../types/game';
+
 const getAudioContext = (): AudioContext | null => {
   if (typeof window === 'undefined') return null;
   const Win = window as any;
-  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  const AudioCtx = Win.AudioContext || Win.webkitAudioContext;
   if (!AudioCtx) return null;
   if (!Win.__dtAudioContext) {
     Win.__dtAudioContext = new AudioCtx();
@@ -35,7 +37,7 @@ export const speak = (text: string, muted: boolean) => {
   }
 };
 
-export type SoundVariant = 'dragon' | 'tiger' | 'tie' | 'double' | 'clear' | 'notify' | 'win' | 'lose';
+export type SoundVariant = BetType | GameResult | 'double' | 'clear' | 'notify' | 'win' | 'lose';
 
 export const playSound = (variant: SoundVariant, muted: boolean) => {
   if (muted) return;
@@ -75,4 +77,69 @@ export const playSound = (variant: SoundVariant, muted: boolean) => {
     default:
       playTone(440, 0.12, 0.15, 'sine');
   }
+};
+
+// Ambient background sound (soft, user-friendly)
+let __ambientNodes: any = null;
+export const startAmbient = (muted = false, volume = 0.03) => {
+  if (muted) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  try {
+    if (__ambientNodes) return; // already running
+    const gain = ctx.createGain();
+    gain.gain.value = volume;
+
+    const osc1 = ctx.createOscillator();
+    osc1.type = 'sine';
+    osc1.frequency.value = 60; // low warm hum
+
+    const osc2 = ctx.createOscillator();
+    osc2.type = 'triangle';
+    osc2.frequency.value = 90; // subtle texture
+
+    // gentle detune to avoid static tone
+    osc2.detune.value = 7;
+
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(ctx.destination);
+
+    // smooth fade-in
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(volume, ctx.currentTime + 1.2);
+
+    osc1.start();
+    osc2.start();
+
+    __ambientNodes = { ctx, gain, osc1, osc2 };
+  } catch (e) {
+    console.warn('Ambient start failed', e);
+  }
+};
+
+export const stopAmbient = () => {
+  const nodes = __ambientNodes;
+  if (!nodes) return;
+  try {
+    const { ctx, gain, osc1, osc2 } = nodes;
+    // smooth fade-out then stop
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.8);
+    setTimeout(() => {
+      try { osc1.stop(); } catch(e) {}
+      try { osc2.stop(); } catch(e) {}
+      try { gain.disconnect(); } catch(e) {}
+      __ambientNodes = null;
+    }, 900);
+  } catch (e) {
+    __ambientNodes = null;
+  }
+};
+
+export const setAmbientVolume = (volume = 0.03) => {
+  if (!__ambientNodes) return;
+  try {
+    const { ctx, gain } = __ambientNodes;
+    gain.gain.setValueAtTime(Math.max(0.0001, volume), ctx.currentTime + 0.05);
+  } catch (e) {}
 };

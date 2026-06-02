@@ -12,6 +12,7 @@ interface HeaderProps {
   onShowWallet: () => void;
   onShowSupport?: () => void;
   muted: boolean;
+  voiceEnabled: boolean;
   onToggleMute: () => void;
 }
 
