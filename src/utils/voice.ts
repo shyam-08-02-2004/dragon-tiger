@@ -79,9 +79,9 @@ export const playSound = (variant: SoundVariant, muted: boolean) => {
   }
 };
 
-// Ambient background sound (soft, user-friendly)
+// Ambient background music (user-friendly, slow, musical)
 let __ambientNodes: any = null;
-export const startAmbient = (muted = false, volume = 0.02) => {
+export const startAmbient = (muted = false, volume = 0.06) => {
   if (muted) return;
   const ctx = getAudioContext();
   if (!ctx) return;
@@ -91,46 +91,67 @@ export const startAmbient = (muted = false, volume = 0.02) => {
     const masterGain = ctx.createGain();
     masterGain.gain.value = Math.max(0.0001, volume);
 
-    const osc1 = ctx.createOscillator();
-    osc1.type = 'sine';
-    osc1.frequency.value = 35; // very low warm hum
+    // Create harmonic pad with musical frequencies (D minor chord)
+    const frequencies = [
+      { freq: 73.42, type: 'sine' as OscillatorType },      // D2 - root
+      { freq: 110, type: 'sine' as OscillatorType },        // A2 - fifth
+      { freq: 146.83, type: 'triangle' as OscillatorType }, // D3 - octave
+      { freq: 220, type: 'sine' as OscillatorType },        // A3 - octave + fifth
+    ];
 
-    const osc2 = ctx.createOscillator();
-    osc2.type = 'triangle';
-    osc2.frequency.value = 55; // subtle texture
-    osc2.detune.value = 6;
+    const oscillators: OscillatorNode[] = [];
+    const gains: GainNode[] = [];
 
-    // gentle low-frequency oscillator to modulate amplitude for movement
+    frequencies.forEach(({ freq, type }) => {
+      const osc = ctx.createOscillator();
+      osc.type = type;
+      osc.frequency.value = freq;
+      
+      const gain = ctx.createGain();
+      gain.gain.value = volume / frequencies.length; // distribute volume across oscillators
+      
+      osc.connect(gain);
+      gain.connect(masterGain);
+      
+      oscillators.push(osc);
+      gains.push(gain);
+      osc.start();
+    });
+
+    // Gentle low-frequency oscillator for breathing movement (slow wobble)
     const lfo = ctx.createOscillator();
     lfo.type = 'sine';
-    lfo.frequency.value = 0.09; // ~0.09 Hz (slow wobble)
+    lfo.frequency.value = 0.07; // ~0.07 Hz (very slow breathing)
     const lfoGain = ctx.createGain();
-    lfoGain.gain.value = Math.max(0.001, volume * 0.8);
+    lfoGain.gain.value = Math.max(0.0008, volume * 0.6);
 
-    // small filter to smooth the tone
+    // Low-pass filter for smooth, warm tone
     const lp = ctx.createBiquadFilter();
     lp.type = 'lowpass';
-    lp.frequency.value = 600; // gentle rolloff
+    lp.frequency.value = 800; // smooth, warm cutoff
+    lp.Q.value = 0.5;
 
-    // routing
-    osc1.connect(lp);
-    osc2.connect(lp);
-    lp.connect(masterGain);
-    masterGain.connect(ctx.destination);
+    // Additional high-pass filter to reduce rumble
+    const hp = ctx.createBiquadFilter();
+    hp.type = 'highpass';
+    hp.frequency.value = 20;
 
-    // LFO modulates master gain
+    // Signal chain: oscillators → HP → LP → master gain → destination
+    masterGain.connect(hp);
+    hp.connect(lp);
+    lp.connect(ctx.destination);
+
+    // LFO modulates master gain for breathing effect
     lfo.connect(lfoGain);
     lfoGain.connect(masterGain.gain);
 
-    // fade-in
+    // Smooth fade-in (slower for musical quality)
     masterGain.gain.setValueAtTime(0.0001, ctx.currentTime);
-    masterGain.gain.exponentialRampToValueAtTime(Math.max(0.0001, volume), ctx.currentTime + 1.6);
+    masterGain.gain.exponentialRampToValueAtTime(Math.max(0.0001, volume), ctx.currentTime + 2.5);
 
-    osc1.start();
-    osc2.start();
     lfo.start();
 
-    __ambientNodes = { ctx, masterGain, lp, osc1, osc2, lfo, lfoGain };
+    __ambientNodes = { ctx, masterGain, lp, hp, oscillators, lfo, lfoGain, gains };
   } catch (e) {
     console.warn('Ambient start failed', e);
   }
@@ -140,11 +161,12 @@ export const stopAmbient = () => {
   const nodes = __ambientNodes;
   if (!nodes) return;
   try {
-    const { ctx, masterGain, osc1, osc2, lfo } = nodes;
+    const { ctx, masterGain, oscillators, lfo } = nodes;
     masterGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.9);
     setTimeout(() => {
-      try { osc1.stop(); } catch (e) {}
-      try { osc2.stop(); } catch (e) {}
+      try {
+        oscillators.forEach((osc: OscillatorNode) => osc.stop());
+      } catch (e) {}
       try { lfo.stop(); } catch (e) {}
       try { masterGain.disconnect(); } catch (e) {}
       __ambientNodes = null;
