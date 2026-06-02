@@ -11,6 +11,8 @@ interface HeaderProps {
   onShowHistory?: () => void;
   onShowWallet: () => void;
   onShowSupport?: () => void;
+  muted: boolean;
+  onToggleMute: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -23,8 +25,11 @@ const Header: React.FC<HeaderProps> = ({
   onShowHistory,
   onShowWallet,
   onShowSupport,
+  muted,
+  onToggleMute,
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <header className="header">
@@ -67,17 +72,38 @@ const Header: React.FC<HeaderProps> = ({
           <div className="wallet-add-btn">+</div>
         </div>
         <div className="user-info" onClick={() => setShowDropdown(!showDropdown)}>
-          <span className="username-badge">{username}</span>
-          <div className="logout-btn" onClick={onLogout}>⎋</div>
+          <div className="user-avatar" style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#f1c40f', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '16px' }}>
+            {username?.charAt(0).toUpperCase()}
+          </div>
+          <button className="mute-btn" onClick={(e) => { e.stopPropagation(); onToggleMute(); }} style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer' }}>
+            {muted ? '🔇' : '🔊'}
+          </button>
         </div>
         {showDropdown && (
           <div className="user-dropdown-profile">
             <div className="udp-header">
               <div className="udp-avatar">{username?.charAt(0).toUpperCase()}</div>
               <div className="udp-details">
-                <div className="udp-username">Name: {username}</div>
+
                 <div className="udp-reg">Reg No: {userId}</div>
-                <div className="udp-reg" style={{ marginTop: '2px', color: '#ffcc00' }}>Pass: {password || '******'}</div>
+              </div>
+            </div>
+            <div className="udp-body">
+              <div className="udp-row udp-password-row">
+                <span className="udp-label">Password</span>
+                <div className="udp-password-display">
+                  <span>{showPassword ? password : '••••••••'}</span>
+                  <button
+                    type="button"
+                    className="udp-password-toggle"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowPassword(prev => !prev);
+                    }}
+                  >
+                    {showPassword ? 'Hide' : 'Show'}
+                  </button>
+                </div>
               </div>
             </div>
             <button className="udp-btn udp-wallet" onClick={onShowWallet} style={{ background: 'rgba(241, 196, 15, 0.1)', color: '#f1c40f' }}>

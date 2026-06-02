@@ -13,11 +13,12 @@ import GameHistory from './components/GameHistory';
 import HelpCenter from './components/HelpCenter';
 import WinPopup from './components/WinPopup';
 import type { GameState, BetType, GameResult } from './types/game';
-import { getGlobalGameState, getDeterministicCards, setTimeOffset } from './syncEngine';
+import { getGlobalGameState, getDeterministicCards, getForcedDeterministicCards, setTimeOffset } from './syncEngine';
 import {
   drawCard, determineResult, calculateWinnings,
 } from './types/game';
 import './App.css';
+import { speak, playSound } from './utils/voice';
 
 const BETTING_TIMER = 15;
 const INITIAL_BALANCE = 80;
@@ -63,6 +64,17 @@ const App: React.FC = () => {
     const saved = sessionStorage.getItem('dragonTigerCurrentUser');
     return saved ? JSON.parse(saved) : null;
   });
+
+  const getMuteStorageKey = (user: UserAccount | null) => {
+    if (!user) return 'dt_muted_guest';
+    const id = user.id || user.username || 'guest';
+    return `dt_muted_${id}`;
+  };
+
+  const [muted, setMuted] = useState<boolean>(() => {
+    const key = getMuteStorageKey(currentUser);
+    return localStorage.getItem(key) === 'true';
+  });
   const [showWallet, setShowWallet] = useState(() => sessionStorage.getItem('dt_showWallet') === 'true');
   const [showHistory, setShowHistory] = useState(() => sessionStorage.getItem('dt_showHistory') === 'true');
   const [showHelpCenter, setShowHelpCenter] = useState(() => sessionStorage.getItem('dt_showHelp') === 'true');
@@ -70,6 +82,43 @@ const App: React.FC = () => {
   const setWalletOpen = (val: boolean) => { setShowWallet(val); sessionStorage.setItem('dt_showWallet', String(val)); };
   const setHistoryOpen = (val: boolean) => { setShowHistory(val); sessionStorage.setItem('dt_showHistory', String(val)); };
   const setHelpOpen = (val: boolean) => { setShowHelpCenter(val); sessionStorage.setItem('dt_showHelp', String(val)); };
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const toggleMute = () => setMuted(prev => !prev);
+  // Unlock speech synthesis on first user interaction
+  useEffect(() => {
+    const unlock = () => {
+      if ('speechSynthesis' in window) {
+        const utter = new SpeechSynthesisUtterance('');
+        window.speechSynthesis.speak(utter);
+        setVoiceEnabled(true);
+      }
+      window.removeEventListener('click', unlock);
+    };
+    window.addEventListener('click', unlock);
+    return () => window.removeEventListener('click', unlock);
+  }, []);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    const key = getMuteStorageKey(currentUser);
+    const stored = localStorage.getItem(key);
+    if (stored !== null) {
+      setMuted(stored === 'true');
+    }
+  }, [currentUser?.id, currentUser?.username]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    localStorage.setItem(getMuteStorageKey(currentUser), String(muted));
+  }, [currentUser, muted]);
+
+  const enableVoice = () => {
+    if ('speechSynthesis' in window) {
+      const utter = new SpeechSynthesisUtterance('');
+      window.speechSynthesis.speak(utter);
+    }
+    setVoiceEnabled(true);
+  };
   const [isTimeSynced, setIsTimeSynced] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [state, setState] = useState<GameState>(() => {
@@ -177,6 +226,8 @@ const App: React.FC = () => {
   const handleLogin = (user: UserAccount) => {
     sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify(user));
     setCurrentUser(user);
+    // Voice welcome
+    voiceEnabled && speak(`Welcome ${user.username}`, muted);
     setState(prev => ({ ...prev, balance: Number(user.balance) || 0, history: [], roundNumber: getGlobalGameState().roundId, bets: {}, totalBet: 0 }));
     setIsAuthenticated(true);
   };
@@ -279,8 +330,12 @@ const App: React.FC = () => {
   useEffect(() => {
     if (state.phase !== 'betting') return;
     const interval = setInterval(() => {
+      if (state.phase !== 'betting') return;
       msgIdx.current = (msgIdx.current + 1) % DEALER_MESSAGES.betting.length;
-      setState(prev => ({ ...prev, dealerMessage: DEALER_MESSAGES.betting[msgIdx.current] }));
+      const newMsg = DEALER_MESSAGES.betting[msgIdx.current];
+      setState(prev => ({ ...prev, dealerMessage: newMsg }));
+      // Voice announcement for dealer message
+      voiceEnabled && speak(newMsg, muted);
     }, 4000);
     return () => clearInterval(interval);
   }, [state.phase]);
@@ -434,6 +489,9 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
       lastLocalBalanceUpdate.current = Date.now();
       syncBalanceToServer(newState.balance, prev.balance);
 
+      playSound(type, muted);
+      voiceEnabled && speak(`Nice! Your ${type} bet has been placed.`, muted);
+
       // Sync bets to server for admin live view
       if (currentUser && currentUser.id !== 'babu') {
         const global = getGlobalGameState();
@@ -446,7 +504,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
 
       return newState;
     });
-  }, [currentUser]);
+  }, [currentUser, muted]);
 
   const handleSelectChip = useCallback((value: number) => {
     setState(prev => ({ ...prev, selectedChip: value }));
@@ -464,6 +522,9 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
       lastLocalBalanceUpdate.current = Date.now();
       syncBalanceToServer(newState.balance, prev.balance);
 
+      playSound('clear', muted);
+      voiceEnabled && speak('Your bets have been cleared.', muted);
+
       // Sync cleared bets to server for admin live view
       if (currentUser && currentUser.id !== 'babu') {
         const global = getGlobalGameState();
@@ -476,7 +537,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
 
       return newState;
     });
-  }, [currentUser]);
+  }, [currentUser, muted]);
 
   const handleDoubleBet = useCallback(() => {
     setState(prev => {
@@ -496,6 +557,9 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
       lastLocalBalanceUpdate.current = Date.now();
       syncBalanceToServer(newState.balance, prev.balance);
 
+      playSound('double', muted);
+      voiceEnabled && speak('Your bet amount has been doubled.', muted);
+
       // Sync doubled bets to server for admin live view
       if (currentUser && currentUser.id !== 'babu') {
         const global = getGlobalGameState();
@@ -508,13 +572,11 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
 
       return newState;
     });
-  }, [currentUser]);
+  }, [currentUser, muted]);
 
-  
   const handleDeal = async (roundId?: number, seed?: number) => {
     if (!roundId) return;
-    
-    // Fetch forced outcome from server (READ only - not deleted, so all users get same)
+
     let forcedOutcome = 'none';
     try {
       const res = await fetch('/api/admin/settings/consume', {
@@ -524,42 +586,70 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
       });
       if (res.ok) {
         const data = await res.json();
-        forcedOutcome = data.outcome;
+        if (data.outcome) forcedOutcome = data.outcome;
       }
     } catch(e) {}
 
-    setState(prev => {
-      if (prev.phase !== 'betting' && prev.phase !== 'dealing') return prev;
-      return { ...prev, phase: 'dealing', dealerMessage: DEALER_MESSAGES.dealing };
-    });
-
     setTimeout(() => {
-      let { dragonCard, tigerCard } = getDeterministicCards(roundId, seed);
+      let { dragonCard, tigerCard } = forcedOutcome !== 'none' 
+        ? getForcedDeterministicCards(roundId, seed, forcedOutcome)
+        : getDeterministicCards(roundId, seed);
       let result = determineResult(dragonCard, tigerCard);
-      
-      // Override cards to match forced outcome
-      if (forcedOutcome === 'dragon') {
-        // Dragon MUST win — give Dragon K♠ and Tiger 2♥
-        dragonCard = { suit: '♠', rank: 'K', value: 13 };
-        tigerCard  = { suit: '♥', rank: '2', value: 2  };
-        result = determineResult(dragonCard, tigerCard);
-      } else if (forcedOutcome === 'tiger') {
-        // Tiger MUST win — give Tiger K♠ and Dragon 2♥
-        dragonCard = { suit: '♥', rank: '2', value: 2  };
-        tigerCard  = { suit: '♠', rank: 'K', value: 13 };
-        result = determineResult(dragonCard, tigerCard);
-      } else if (forcedOutcome === 'tie') {
-        // Tie — both get 8
-        dragonCard = { suit: '♠', rank: '8', value: 8 };
-        tigerCard  = { suit: '♥', rank: '8', value: 8 };
-        result = determineResult(dragonCard, tigerCard);
+
+      // Voice announcement for result
+      if (voiceEnabled) {
+        speak(`Result is ${result}`, muted);
       }
+      playSound(result, muted);
+
+      // Check if already processed
+      if (stateRef.current.history.some(h => h.id === roundId)) return;
+      const currentPrev = stateRef.current;
+      const winnings = calculateWinnings(currentPrev.bets, result, dragonCard, tigerCard);
+      const newBalance = Number(currentPrev.balance) + winnings;
+
+      // ---- SIDE EFFECTS (Out of setState to avoid double execution in StrictMode) ----
+      if (currentUserRef.current && currentUserRef.current.id !== 'babu') {
+         if (currentPrev.totalBet > 0) {
+           lastLocalBalanceUpdate.current = Date.now();
+           syncBalanceToServer(newBalance, currentPrev.balance);
+           
+           const betSideStr = Object.entries(currentPrev.bets)
+             .filter(([k, v]) => v && v > 0)
+             .map(([k, v]) => `${k.charAt(0).toUpperCase() + k.slice(1)}`)
+             .join(', ');
+
+           fetch('/api/users/bet-history', {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({
+               username: currentUserRef.current.id || currentUserRef.current.username,
+               roundId: getGlobalGameState().rawRoundId,
+               roundNumber: roundId,
+               betSide: betSideStr,
+               betAmount: currentPrev.totalBet,
+               winAmount: winnings
+             })
+           }).catch(() => {});
+         }
+      }
+
+      fetch('/api/history/record', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roundId: getGlobalGameState().rawRoundId, result })
+      }).catch(() => {});
+
+      fetch('/api/admin/settings/cleanup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roundId })
+      }).catch(() => {});
+      // ---------------------------------------------------------------------------------
 
       setState(prev => {
         if (prev.history.some(h => h.id === roundId)) return prev;
         
-        const winnings = calculateWinnings(prev.bets, result, dragonCard, tigerCard);
-        const lastWin = winnings;
         let newHistory = prev.history;
         if (roundId === 1) {
           newHistory = []; // Reset history at the start of a new cycle
@@ -571,51 +661,6 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
         ];
         
         if (newHistory.length > 2000) newHistory.shift();
-        
-        const newBalance = Number(prev.balance) + winnings;
-        if (currentUserRef.current && currentUserRef.current.id !== 'babu') {
-           if (prev.totalBet > 0) {
-             // Record timestamp of recent local update (15s debounce)
-             lastLocalBalanceUpdate.current = Date.now();
-             syncBalanceToServer(newBalance, prev.balance);
-           }
-           // Ensure local timestamp is refreshed after win to avoid immediate fetch balance overriding
-           lastLocalBalanceUpdate.current = Date.now();
-           
-           if (prev.totalBet > 0) {
-             const betSideStr = Object.entries(prev.bets)
-               .filter(([k, v]) => v && v > 0)
-               .map(([k, v]) => `${k.charAt(0).toUpperCase() + k.slice(1)}`)
-               .join(', ');
-
-             fetch('/api/users/bet-history', {
-               method: 'POST',
-               headers: { 'Content-Type': 'application/json' },
-               body: JSON.stringify({
-                 username: currentUserRef.current.id,
-                 roundId: getGlobalGameState().rawRoundId,
-                 roundNumber: roundId,
-                 betSide: betSideStr,
-                 betAmount: prev.totalBet,
-                 winAmount: winnings
-               })
-             }).catch(() => {});
-           }
-        }
-
-        // Record real outcome to server (for late joiners and GameHistory)
-        fetch('/api/history/record', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ roundId: getGlobalGameState().rawRoundId, result })
-        }).catch(() => {});
-
-        // Cleanup old forced outcomes after result
-        fetch('/api/admin/settings/cleanup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ roundId })
-        }).catch(() => {});
 
         return {
           ...prev,
@@ -624,7 +669,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
           tigerCard,
           result,
           balance: newBalance,
-          lastWin,
+          lastWin: winnings,
           history: newHistory,
           dealerMessage: result === 'tie'
             ? 'It\'s a Tie!'
@@ -674,6 +719,8 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
           onShowHistory={currentUser.id !== 'babu' ? () => setHistoryOpen(true) : undefined}
           onShowWallet={() => setWalletOpen(true)}
           onShowSupport={currentUser.id !== 'babu' ? () => setHelpOpen(true) : undefined}
+          muted={muted} voiceEnabled={voiceEnabled}
+          onToggleMute={toggleMute}
         />
 
         <GameControls
@@ -737,7 +784,15 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
   };
 
   return (
-    <div className="app-container" id="app-root">
+    <header className="app-header">
+        { !voiceEnabled && (
+          <button onClick={enableVoice} style={{ marginRight: '12px', background: '#3498db', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: '4px', cursor: 'pointer' }}>
+            Enable Voice
+          </button>
+        ) }
+        <button onClick={toggleMute} style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: '18px' }}>
+          {muted ? '🔇' : '🔊'}
+        </button>
       
       {/* Background Images - persistent across all views */}
       <div className="game-backgrounds">

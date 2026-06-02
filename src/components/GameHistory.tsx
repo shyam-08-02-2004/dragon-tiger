@@ -68,28 +68,41 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
   }, [isOpen, username]);
   const pastRounds = useMemo(() => {
     const rounds: PastRound[] = [];
-    const currentCycleStartRawId = rawRoundId - (currentRound - 1);
     const maxHistory = 100;
-    const firstVisibleRawId = Math.max(rawRoundId - maxHistory, currentCycleStartRawId);
+    const firstVisibleRawId = Math.max(rawRoundId - maxHistory, 0);
+
+    // Build lookup maps for O(1) access
+    const serverMap = new Map<number, string>();
+    for (const h of serverHistory) {
+      serverMap.set(Number(h.roundId), h.result);
+    }
+    const adminMap = new Map<number, string>();
+    for (const a of adminOutcomes) {
+      adminMap.set(Number(a.roundId), a.outcome);
+    }
     
     for (let pastRawId = rawRoundId - 1; pastRawId >= firstVisibleRawId; pastRawId--) {
       if (pastRawId < 0) break;
       const pastRoundId = (pastRawId % 2000) + 1;
       
-      const forced = serverHistory.find(h => h.roundId === pastRawId);
-
-      // If no server-recorded history, fall back to admin-set outcomes (matched by cycle-local round number)
-      const adminForced = !forced ? adminOutcomes.find(a => Number(a.roundId) === pastRoundId) : undefined;
-
-      if (forced) {
-        rounds.push({ round: pastRoundId, rawRoundId: pastRawId, winner: forced.result as GameResult });
-      } else if (adminForced) {
-        rounds.push({ round: pastRoundId, rawRoundId: pastRawId, winner: adminForced.outcome as GameResult });
-      } else {
-        const { dragonCard, tigerCard } = getDeterministicCards(pastRoundId, pastRawId);
-        const winner = determineResult(dragonCard, tigerCard);
-        rounds.push({ round: pastRoundId, rawRoundId: pastRawId, winner });
+      // 1. Server history is the source of truth (has actual played result)
+      const serverResult = serverMap.get(pastRawId);
+      if (serverResult) {
+        rounds.push({ round: pastRoundId, rawRoundId: pastRawId, winner: serverResult as GameResult });
+        continue;
       }
+
+      // 2. Check admin-set outcome (matched by cycle-local round number)
+      const adminOutcome = adminMap.get(pastRoundId);
+      if (adminOutcome && adminOutcome !== 'none') {
+        rounds.push({ round: pastRoundId, rawRoundId: pastRawId, winner: adminOutcome as GameResult });
+        continue;
+      }
+
+      // 3. Fallback: deterministic cards
+      const { dragonCard, tigerCard } = getDeterministicCards(pastRoundId, pastRawId);
+      const winner = determineResult(dragonCard, tigerCard);
+      rounds.push({ round: pastRoundId, rawRoundId: pastRawId, winner });
     }
     return rounds;
   }, [currentRound, rawRoundId, serverHistory, adminOutcomes]);
@@ -205,12 +218,12 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
               </div>
             )}
 
-            <div className="gh-table-header">
-              <span style={{ flex: '0 0 60px' }}>Time</span>
-              <span style={{ flex: 1 }}>Round</span>
-              <span style={{ flex: '0 0 70px', textAlign: 'center' }}>Bet On</span>
-              <span style={{ flex: '0 0 80px', textAlign: 'center' }}>Bet / Win</span>
-              <span style={{ flex: '0 0 55px', textAlign: 'right' }}>Status</span>
+            <div className="gh-table-header gh-bets-header">
+              <span className="gh-bet-col-time">Time</span>
+              <span className="gh-bet-col-round">Round</span>
+              <span className="gh-bet-col-side">Bet On</span>
+              <span className="gh-bet-col-amount">Bet / Win</span>
+              <span className="gh-bet-col-status">Status</span>
             </div>
             <div className="gh-list">
               {betHistory.length === 0 ? (
@@ -219,22 +232,22 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
                 betHistory.map(b => {
                   const isWin = b.winAmount > 0;
                   return (
-                    <div key={b._id || Math.random()} className={`gh-row ${isWin ? 'gh-bar-tie' : 'gh-bar-dragon'}`}>
-                      <span style={{ flex: '0 0 60px', fontFamily: 'var(--font-tech)', fontSize: '11px', color: '#aaa' }}>
+                    <div key={b._id || Math.random()} className={`gh-row gh-bet-row ${isWin ? 'gh-bar-tie' : 'gh-bar-dragon'}`}>
+                      <span className="gh-bet-col-time">
                         {new Date(b.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
                       </span>
-                      <span style={{ flex: 1, fontFamily: 'var(--font-tech)', fontSize: '13px', color: '#fff', fontWeight: 700 }}>
+                      <span className="gh-bet-col-round">
                         #{b.roundNumber}
                       </span>
-                      <span style={{ flex: '0 0 70px', textAlign: 'center', fontSize: '12px', color: '#7ec8e3', fontWeight: 600 }}>
+                      <span className="gh-bet-col-side">
                         {b.betSide || '-'}
                       </span>
-                      <span style={{ flex: '0 0 80px', textAlign: 'center', fontSize: '11px' }}>
+                      <span className="gh-bet-col-amount">
                         <span style={{ color: '#aaa' }}>₹{b.betAmount}</span>
                         <span style={{ color: '#555', margin: '0 2px' }}>/</span>
                         <span style={{ color: isWin ? '#2ecc71' : '#e74c3c', fontWeight: 700 }}>₹{b.winAmount}</span>
                       </span>
-                      <span style={{ flex: '0 0 55px', textAlign: 'right', fontSize: '11px', fontWeight: 800, color: isWin ? '#2ecc71' : '#e74c3c', textShadow: isWin ? '0 0 8px rgba(46,204,113,0.5)' : '0 0 8px rgba(231,76,60,0.5)' }}>
+                      <span className={`gh-bet-col-status ${isWin ? 'gh-status-win' : 'gh-status-lost'}`}>
                         {isWin ? '✅ WIN' : '❌ LOST'}
                       </span>
                     </div>

@@ -21,20 +21,15 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ card, side, isRevealing, isWi
       <div className={`playing-card ${card ? 'revealed' : 'hidden-back'} ${isRevealing ? 'flipping' : ''} ${isWinner ? 'winner-card' : ''} ${red ? 'red-card' : 'black-card'}`}>
         {card ? (
           <>
-            {/* Rank in top-left corner */}
-            <div
-              className="card-rank"
-              style={{
-                position: 'absolute',
-                top: '8px',
-                left: '8px',
-                zIndex: 4,
-              }}
-            >
-              {card.rank}
+            <div className="card-corner top-left">
+              <div className="card-rank">{card.rank}</div>
+              <div className="card-small-suit">{card.suit}</div>
             </div>
-            {/* Central suit */}
             <div className="card-center-suit">{card.suit}</div>
+            <div className="card-corner bottom-right">
+              <div className="card-rank">{card.rank}</div>
+              <div className="card-small-suit">{card.suit}</div>
+            </div>
           </>
         ) : (
           <div className="card-back-design">
@@ -42,6 +37,11 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ card, side, isRevealing, isWi
           </div>
         )}
       </div>
+      {card && (
+        <div className={`card-value-label ${side}`}>
+          Value: {card.value}
+        </div>
+      )}
     </div>
   );
 };

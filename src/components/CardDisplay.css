@@ -120,50 +120,25 @@
   animation: cardBreath 3s ease-in-out infinite;
 }
 
-/* ── REVEALED / FACE-UP — DARK PREMIUM THEME ── */
+/* ── REVEALED / FACE-UP — REALISTIC WHITE THEME ── */
 .playing-card.revealed {
-  background:
-    linear-gradient(
-      145deg,
-      #1a1a2e 0%,
-      #0f0f1a 40%,
-      #161625 100%
-    );
-  border: 2px solid rgba(212, 160, 23, 0.6);
+  background: #fdfbf7;
+  border: 5px solid #dcd1c0;
+  border-radius: 12px;
   box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.7),
-    0 0 0 1px rgba(212, 160, 23, 0.2),
-    0 0 20px rgba(212, 160, 23, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+    0 10px 30px rgba(0, 0, 0, 0.4),
+    inset 0 0 15px rgba(0,0,0,0.06);
   animation: dealCard 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-  overflow: hidden;
+  position: relative;
 }
 
-/* subtle shimmer overlay on revealed card */
+/* subtle drop shadow inside card */
 .playing-card.revealed::before {
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: 12px;
-  background: linear-gradient(
-    135deg,
-    rgba(212, 160, 23, 0.05) 0%,
-    transparent 40%,
-    rgba(212, 160, 23, 0.03) 60%,
-    transparent 100%
-  );
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* thin inner gold border line */
-.playing-card.revealed::after {
-  content: "";
-  position: absolute;
-  inset: 5px;
-  border-radius: 9px;
-  border: 1px solid rgba(212, 160, 23, 0.2);
+  border-radius: 8px;
+  box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.1);
   pointer-events: none;
   z-index: 0;
 }
@@ -184,29 +159,54 @@
     0 0 80px rgba(212, 160, 23, 0.3) !important;
 }
 
-/* ── SUIT COLOURS — bright on dark background ── */
+/* ── SUIT COLOURS — realistic on white background ── */
 .playing-card.red-card .card-rank,
-.playing-card.red-card .card-suit,
+.playing-card.red-card .card-small-suit,
 .playing-card.red-card .card-center-suit {
-  color: #ff4757 !important;
-  text-shadow: 0 0 12px rgba(255, 71, 87, 0.5);
+  color: #d32f2f !important;
+  text-shadow: none;
 }
 
 .playing-card.black-card .card-rank,
-.playing-card.black-card .card-suit,
+.playing-card.black-card .card-small-suit,
 .playing-card.black-card .card-center-suit {
-  color: #dfe6e9 !important;
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+  color: #1c2025 !important;
+  text-shadow: none;
 }
 
 /* ───────────────────────────────────────────
-   CARD RANK (top-left)
+   CARD CORNERS (top-left, bottom-right)
 ─────────────────────────────────────────── */
+.card-corner {
+  position: absolute;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  transform: translateZ(2px);
+}
+
+.card-corner.top-left {
+  top: 6px;
+  left: 6px;
+}
+
+.card-corner.bottom-right {
+  bottom: 6px;
+  right: 6px;
+  transform: rotate(180deg) translateZ(2px);
+}
+
 .card-rank {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 900;
   font-family: var(--font-display), Georgia, serif;
-  line-height: 1;
+}
+
+.card-small-suit {
+  font-size: 16px;
+  margin-top: -2px;
 }
 
 /* ───────────────────────────────────────────
@@ -216,11 +216,11 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) translateZ(1px);
-  font-size: 56px;
+  transform: translate(-50%, -50%) translateZ(2px);
+  font-size: 50px;
   line-height: 1;
   z-index: 3;
-  filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
 }
 
 /* ───────────────────────────────────────────
@@ -267,6 +267,23 @@
   position: relative;
   z-index: 1;
   animation: backCenterPulse 3s ease-in-out infinite;
+}
+
+.card-value-label {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #f8f9fa;
+}
+
+.card-value-label.dragon {
+  color: #ff7675;
+}
+
+.card-value-label.tiger {
+  color: #74b9ff;
 }
 
 /* ───────────────────────────────────────────
@@ -345,6 +362,9 @@
   align-items: center;
   justify-content: center;
   gap: 14px;
+  width: 100%;
+  max-width: 100%;
+  flex-wrap: wrap;
 }
 
 #cards-arena .card-slot {
@@ -352,8 +372,10 @@
   align-items: center;
   gap: 12px;
   max-width: none;
+  min-width: 180px;
   padding: 6px 10px;
   border-radius: 12px;
+  width: auto;
 }
 
 #cards-arena .card-label {
@@ -368,7 +390,6 @@
   height: 160px;
 }
 
-/* Vertical VS divider between two cards */
 #vs-divider {
   display: flex;
   flex-direction: column;
@@ -376,6 +397,7 @@
   justify-content: center;
   gap: 6px;
   padding: 4px 8px;
+  flex-shrink: 0;
 }
 
 #vs-divider .vs-line {
@@ -386,11 +408,15 @@
 }
 
 #vs-divider .vs-badge {
-  background: rgba(212,160,23,0.12);
-  color: #ffd700;
-  padding: 6px 8px;
-  border-radius: 8px;
-  font-weight: 800;
+  background: rgba(43, 26, 0, 0.7);
+  color: #f1c40f;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 900;
+  font-size: 20px;
+  border: 1px solid rgba(241, 196, 15, 0.4);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
 }
 
 #vs-divider .tie-indicator {
@@ -399,4 +425,61 @@
   padding: 4px 8px;
   border-radius: 6px;
   font-weight: 800;
+}
+
+@media (max-width: 900px) {
+  #cards-arena {
+    gap: 12px;
+  }
+
+  #cards-arena .card-slot {
+    min-width: 150px;
+    padding: 5px 8px;
+  }
+
+  #cards-arena .playing-card {
+    width: 100px;
+    height: 140px;
+  }
+
+  #vs-divider {
+    gap: 4px;
+    padding: 4px 6px;
+  }
+}
+
+@media (max-width: 640px) {
+  #cards-arena {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #cards-arena .card-slot {
+    flex-direction: column;
+    min-width: 220px;
+    width: 100%;
+    padding: 10px;
+  }
+
+  #cards-arena .playing-card {
+    width: 95px;
+    height: 130px;
+  }
+
+  #vs-divider {
+    flex-direction: row;
+    width: 100%;
+    height: auto;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #vs-divider .vs-line {
+    width: 40px;
+    height: 2px;
+  }
+
+  #vs-divider .vs-badge {
+    padding: 4px 8px;
+  }
 }

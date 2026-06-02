@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { speak, playSound } from '../utils/voice';
 import './AdminPanel.css';
 import './WalletModal.css';
 import CardDisplay from './CardDisplay';
 import { determineResult } from '../types/game';
-import { getGlobalGameState, getDeterministicCards } from '../syncEngine';
+import { getGlobalGameState, getDeterministicCards, getForcedDeterministicCards } from '../syncEngine';
 import type { Card, GameResult } from '../types/game';
 import GameHistory from './GameHistory';
 
@@ -46,6 +47,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState<'users' | 'game' | 'transactions' | 'support'>(() => (sessionStorage.getItem('dt_adminTab') as any) || 'users');
   const [simPhase, setSimPhase] = useState<'betting' | 'dealing' | 'result'>('betting');
   const [simTimer, setSimTimer] = useState<number>(15);
+  const [muted, setMuted] = useState<boolean>(() => localStorage.getItem('dt_admin_muted') === 'true');
   const [simRoundId, setSimRoundId] = useState<number>(0);
   const [simDragonCard, setSimDragonCard] = useState<Card | null>(null);
   const [simTigerCard, setSimTigerCard] = useState<Card | null>(null);
@@ -58,6 +60,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [newBalance, setNewBalance] = useState<string>('');
   const [liveBets, setLiveBets] = useState<LiveBets>(defaultLiveBets);
   const [showGameHistory, setShowGameHistory] = useState(() => sessionStorage.getItem('dt_adminShowGameHist') === 'true');
+
+  useEffect(() => {
+    localStorage.setItem('dt_admin_muted', String(muted));
+  }, [muted]);
 
   // Round outcome control
   const [roundOutcomes, setRoundOutcomes] = useState<{ roundId: number; outcome: string }[]>([]);
@@ -145,7 +151,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   useEffect(() => {
     const pollBets = () => {
       const global = getGlobalGameState();
-      const roundId = global.roundId;
+      const roundId = global.rawRoundId;
       const isBetting = global.phase === 'betting';
 
       if (liveBetsRoundRef.current !== roundId) {
@@ -287,9 +293,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
       setSimPhase(prevPhase => {
         if (global.phase === 'betting' && prevPhase !== 'betting') {
           setSimTimer(global.timer);
-          setSimDragonCard(null);
-          setSimTigerCard(null);
-          setSimResult(null);
+          // Preserve last round cards until next deal so admin sees the last card fronts
           return 'betting';
         }
         if (global.phase === 'betting') {
@@ -308,19 +312,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
             .then(r => r.json())
             .then(data => {
               const forcedOutcome = data.outcome || 'none';
-              let { dragonCard, tigerCard } = getDeterministicCards(global.roundId, global.rawRoundId);
-
-              // Apply same override logic as App.tsx
-              if (forcedOutcome === 'dragon') {
-                dragonCard = { suit: '♠', rank: 'K', value: 13 };
-                tigerCard  = { suit: '♥', rank: '2', value: 2  };
-              } else if (forcedOutcome === 'tiger') {
-                dragonCard = { suit: '♥', rank: '2', value: 2  };
-                tigerCard  = { suit: '♠', rank: 'K', value: 13 };
-              } else if (forcedOutcome === 'tie') {
-                dragonCard = { suit: '♠', rank: '8', value: 8 };
-                tigerCard  = { suit: '♥', rank: '8', value: 8 };
-              }
+              let { dragonCard, tigerCard } = forcedOutcome !== 'none'
+                ? getForcedDeterministicCards(global.roundId, global.rawRoundId, forcedOutcome)
+                : getDeterministicCards(global.roundId, global.rawRoundId);
 
               setSimDragonCard(dragonCard);
               setSimTigerCard(tigerCard);
@@ -364,6 +358,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
         setSaveMsg(`✅ Round #${roundId} → ${outcome.toUpperCase()} set ho gaya!`);
         setTargetRoundId('');
         setTimeout(() => setSaveMsg(''), 4000);
+        if (!muted) {
+          speak(`Round ${roundId} result set to ${outcome}`);
+          playSound('notify', muted);
+        }
       }
     } catch(e) { console.error(e); }
   };
@@ -421,6 +419,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     try {
       await fetch(`/api/admin/users/${id}`, { method: 'DELETE' });
       setUsers(users.filter((u: any) => u.id !== id));
+      if (!muted) {
+        speak('User deleted', muted);
+        playSound('lose', muted);
+      }
     } catch (err) { console.error(err); }
   };
 
@@ -434,6 +436,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
       if (res.ok) {
         fetch('/api/admin/users').then(r => r.json()).then(data => { if (Array.isArray(data)) setUsers(data); });
         fetch('/api/admin/transactions').then(r => r.json()).then(data => { if (Array.isArray(data)) setTransactions(data); });
+        if (!muted) {
+          speak(`Transaction ${action === 'approve' ? 'approved' : 'rejected'}`, muted);
+          playSound(action === 'approve' ? 'win' : 'lose', muted);
+        }
       } else {
         const err = await res.json();
         alert(err.error || "Failed to process transaction");
@@ -447,6 +453,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
       const res = await fetch(`/api/admin/transactions/${txId}`, { method: 'DELETE' });
       if (res.ok) {
         setTransactions(prev => prev.filter((t: any) => t.id !== txId));
+        if (!muted) {
+          speak('Transaction deleted', muted);
+          playSound('lose', muted);
+        }
       } else {
         alert("Failed to delete transaction");
       }
@@ -494,6 +504,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
         <header className="admin-header">
           <h1>{activeTab === 'users' ? 'User Management' : activeTab === 'game' ? 'Game Control Room' : activeTab === 'transactions' ? 'Transactions' : 'Support Center'}</h1>
           <div className="admin-badge">Admin Privileges Active</div>
+          <button onClick={() => setMuted(!muted)} className="mute-btn" style={{ marginLeft: '12px', background: 'transparent', border: 'none', color: '#fff', fontSize: '18px', cursor: 'pointer' }}>{muted ? '🔇' : '🔊'}</button>
         </header>
 
         <div className="admin-content">

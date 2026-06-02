@@ -59,6 +59,34 @@ export function getDeterministicCards(roundId: number, seed?: number): { dragonC
   return { dragonCard, tigerCard };
 }
 
+export function getForcedDeterministicCards(roundId: number, seed: number | undefined, forcedOutcome: string): { dragonCard: Card, tigerCard: Card } {
+  let { dragonCard, tigerCard } = getDeterministicCards(roundId, seed);
+  
+  if (forcedOutcome === 'dragon' || forcedOutcome === 'tiger' || forcedOutcome === 'tie') {
+    const rng = seededRandom((seed || roundId) + 1000); // Offset seed for consistent override
+    const deck = createDeck();
+    
+    if (forcedOutcome === 'dragon') {
+      while (dragonCard.value <= tigerCard.value) {
+        dragonCard = deck[Math.floor(rng() * deck.length)];
+        tigerCard = deck[Math.floor(rng() * deck.length)];
+      }
+    } else if (forcedOutcome === 'tiger') {
+      while (tigerCard.value <= dragonCard.value) {
+        dragonCard = deck[Math.floor(rng() * deck.length)];
+        tigerCard = deck[Math.floor(rng() * deck.length)];
+      }
+    } else if (forcedOutcome === 'tie') {
+      while (dragonCard.value !== tigerCard.value || (tigerCard.rank === dragonCard.rank && tigerCard.suit === dragonCard.suit)) {
+        dragonCard = deck[Math.floor(rng() * deck.length)];
+        tigerCard = deck[Math.floor(rng() * deck.length)];
+      }
+    }
+  }
+  
+  return { dragonCard, tigerCard };
+}
+
 let timeOffset = 0;
 
 export function setTimeOffset(offset: number) {

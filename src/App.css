@@ -1,15 +1,18 @@
+.app-header,
 .app-container {
   width: 100%;
-  max-width: 480px; /* Closer to mobile width */
+  max-width: 1200px;
   margin: 0 auto;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #050505;
+  background-color: #080808;
   position: relative;
-  overflow: hidden; /* Prevent scrolling, true mobile app feel */
-  box-shadow: 0 0 50px rgba(0,0,0,0.9);
+  overflow: hidden;
+  box-shadow: 0 0 50px rgba(0,0,0,0.85);
   font-family: 'Inter', sans-serif;
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.07);
 }
 
 /* Background images layout */
@@ -39,6 +42,7 @@
   object-position: 20% center;
   mask-image: linear-gradient(to left, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
   -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
+  transform: scaleX(-1);
 }
 
 .game-main-content {
@@ -427,16 +431,103 @@
   z-index: 5;
 }
 
-@media (min-width: 481px) {
+@media (min-width: 768px) {
   body {
     background-color: #111;
     display: flex;
     justify-content: center;
     align-items: center;
   }
+
+  .app-header,
   .app-container {
-    height: 90vh;
-    border-radius: 20px;
-    border: 2px solid #333;
+    min-height: 92vh;
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .game-main-content {
+    padding: 22px 24px 28px;
+    max-width: 1160px;
+    margin: 0 auto;
+  }
+
+  .game-backgrounds {
+    top: 72px;
+    height: 460px;
+  }
+
+  .cards-reveal-area {
+    gap: 28px;
+    padding: 0 10px;
+  }
+
+  .betting-areas {
+    padding: 0 12px;
+    gap: 16px;
+  }
+
+  .chip-item {
+    width: 54px;
+    height: 54px;
+    font-size: 15px;
+  }
+
+  .chips-container {
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 0 14px 18px;
+  }
+
+  .bottom-actions {
+    padding: 0 14px 18px;
+    gap: 16px;
+  }
+
+  .action-btn {
+    min-width: 150px;
+  }
+
+  .game-info-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    padding: 16px 14px;
+  }
+
+  .timer-circle {
+    width: 90px;
+    height: 90px;
+    font-size: 36px;
+  }
+}
+
+@media (min-width: 1100px) {
+  .app-header,
+  .app-container {
+    max-width: 1180px;
+  }
+
+  .game-main-content {
+    padding: 26px 28px 32px;
+  }
+
+  .betting-areas {
+    gap: 20px;
+  }
+
+  .cards-reveal-area {
+    gap: 32px;
+  }
+
+  .chips-container {
+    padding: 0 18px 22px;
+  }
+
+  .bottom-actions {
+    padding: 0 18px 22px;
   }
 }

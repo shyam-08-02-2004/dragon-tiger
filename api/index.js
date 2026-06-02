@@ -154,16 +154,14 @@ app.post('/api/transactions', async (req, res) => {
   const tx = new Transaction(req.body);
   await tx.save();
 
-  // Notify admin of withdrawal request
-  if (req.body.type === 'withdraw') {
-    const adminNotif = new Notification({
-      id: 'admin_notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
-      username: 'babu',
-      message: `Withdrawal request from ${req.body.username} for ₹${req.body.amount}`,
-      type: 'admin'
-    });
-    await adminNotif.save();
-  }
+  // Notify admin of transaction request
+  const adminNotif = new Notification({
+    id: 'admin_notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+    username: 'babu',
+    message: `${req.body.type === 'deposit' ? 'Deposit' : 'Withdrawal'} request from ${req.body.username} for ₹${req.body.amount}`,
+    type: 'admin'
+  });
+  await adminNotif.save();
 
   res.json(tx);
 });
@@ -453,7 +451,7 @@ app.post('/api/history/record', async (req, res) => {
 
 app.get('/api/history', async (req, res) => {
   try {
-    const currentRoundId = Math.floor(Date.now() / 25000);
+    const currentRoundId = Math.floor(Date.now() / 20000);
     const epochStart = currentRoundId - (currentRoundId % 2000);
     
     const history = await RoundHistory.find({ roundId: { $gte: epochStart } })
