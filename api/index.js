@@ -111,6 +111,60 @@ app.get('/api/admin/transactions', async (req, res) => {
   res.json(transactions);
 });
 
+app.post('/api/admin/transactions', async (req, res) => {
+  try {
+    const { type, userId, amount, utr, upiId } = req.body;
+    if (!userId || !amount) return res.status(400).json({ error: 'Missing userId or amount' });
+    
+    const user = await User.findOne({ id: userId });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    if (type === 'deposit') {
+      if (!utr || !/^\d{12}$/.test(utr.trim())) {
+        return res.status(400).json({ error: 'Deposit requires exactly 12-digit UTR.' });
+      }
+    }
+    
+    const parsedAmount = parseFloat(amount);
+
+    if (type === 'deposit') {
+      user.balance += parsedAmount;
+      user.hasDeposited = true;
+    } else if (type === 'withdraw') {
+      if (user.balance < parsedAmount) {
+        return res.status(400).json({ error: 'User balance is too low for this withdrawal.' });
+      }
+      user.balance -= parsedAmount;
+    }
+    await user.save();
+
+    const tx = new Transaction({
+      id: 'tx_' + Date.now(),
+      username: user.username,
+      type,
+      amount: parsedAmount,
+      utr,
+      upiId,
+      status: 'approved'
+    });
+    
+    await tx.save();
+
+    // Notify user
+    const notif = new Notification({
+      id: 'notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+      username: user.username,
+      message: `Admin manually added a ${type} of ₹${parsedAmount}`,
+      type: 'success'
+    });
+    await notif.save();
+
+    res.json(tx);
+  } catch(e) {
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
+
 app.get('/api/transactions/:username', async (req, res) => {
   const transactions = await Transaction.find({ username: req.params.username }).sort({ timestamp: -1 });
   res.json(transactions);
@@ -128,9 +182,12 @@ app.post('/api/transactions', async (req, res) => {
     if (!upi || !/^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(upi.trim())) {
       return res.status(400).json({ error: 'Please enter a valid UPI ID.' });
     }
-    if (!req.body.amount || req.body.amount <= 0) {
-      return res.status(400).json({ error: 'Withdrawal amount must be greater than zero.' });
+    const amountStr = req.body.amount;
+    const amountNum = parseFloat(amountStr);
+    if (isNaN(amountNum) || amountNum <= 0) {
+      return res.status(400).json({ error: 'Withdrawal amount must be a valid number greater than zero.' });
     }
+    
     let user = await User.findOne({ id: req.body.username });
     if (!user) {
       user = await User.findOne({ username: req.body.username });
@@ -146,10 +203,15 @@ app.post('/api/transactions', async (req, res) => {
     if (req.body.username !== 'babu' && !user.hasDeposited) {
       return res.status(400).json({ error: 'Withdrawals are allowed only after making your first deposit.' });
     }
-    if (user.balance < req.body.amount) {
+    if (user.balance < amountNum) {
       return res.status(400).json({ error: 'Insufficient balance for withdrawal.' });
     }
-    // We do NOT deduct the balance here. We deduct it when the Admin approves it.
+    // Deduct the balance immediately upon request for withdrawals
+    if (req.body.type === 'withdraw') {
+      user.balance -= amountNum;
+      await user.save();
+    }
+    req.body.amount = amountNum; // Ensure it saves as a number in Transaction
   }
   const tx = new Transaction(req.body);
   await tx.save();
@@ -177,17 +239,19 @@ app.post('/api/admin/transactions/:txId/action', async (req, res) => {
       if (tx.type === 'deposit') {
         user.balance += tx.amount;
         user.hasDeposited = true;
-      } else if (tx.type === 'withdraw') {
-        if (user.balance >= tx.amount) {
-          user.balance -= tx.amount;
-        } else {
-          return res.status(400).json({ error: 'User does not have enough balance anymore to approve this withdrawal.' });
-        }
       }
+      // Note: We don't deduct on withdraw approval since it was deducted immediately.
       await user.save();
     }
   } else if (action === 'reject') {
-    // Rejection doesn't require refunding since we didn't deduct initially.
+    // Refund the user if the withdrawal was rejected
+    if (tx.type === 'withdraw') {
+      const user = await User.findOne({ id: tx.username });
+      if (user) {
+        user.balance += tx.amount;
+        await user.save();
+      }
+    }
   }
   
   tx.status = action === 'approve' ? 'approved' : 'rejected';
@@ -195,9 +259,9 @@ app.post('/api/admin/transactions/:txId/action', async (req, res) => {
 
   // Create a notification for the user on approval
   if (action === 'approve') {
-    let msg = `Request Successful`;
+    let msg = `Your ${tx.type} was approved!`;
     if (tx.type === 'withdraw') {
-      msg = 'Payment status pending';
+      msg = '6 working days me payment wallet ya bank me aa jayega';
     }
     const notif = new Notification({
       id: 'notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
@@ -306,7 +370,7 @@ app.post('/api/bets', async (req, res) => {
   // bets = { dragon: 200, tiger: 0, tie: 100, ... }
   if (!roundId || !username || !bets) return res.status(400).json({ error: 'Missing fields' });
   try {
-    // Delete old bets for this user in this round (replace with fresh state)
+    // Delete old bets for this user in this raw round id (replace with fresh state)
     await RoundBet.deleteMany({ roundId: Number(roundId), username });
     const docs = [];
     for (const [betType, amount] of Object.entries(bets)) {
@@ -322,7 +386,7 @@ app.post('/api/bets', async (req, res) => {
   }
 });
 
-// Admin fetches live bet totals for a round
+// Admin fetches live bet totals for a raw round id
 app.get('/api/bets/round/:roundId', async (req, res) => {
   const roundId = Number(req.params.roundId);
   try {
@@ -333,7 +397,7 @@ app.get('/api/bets/round/:roundId', async (req, res) => {
       else totals[b.betType] = b.amount;
       totals.total += b.amount;
     }
-    res.json({ roundId, totals, betCount: bets.length });
+    res.json({ roundId, totals, betCount: bets.length, bets });
   } catch(e) {
     res.status(500).json({ error: 'Server error' });
   }

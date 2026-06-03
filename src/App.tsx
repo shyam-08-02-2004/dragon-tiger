@@ -504,7 +504,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
         fetch('/api/bets', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ roundId: global.roundId, username: currentUser.id, bets: newBets })
+          body: JSON.stringify({ roundId: global.rawRoundId, username: currentUser.id, bets: newBets })
         }).catch(() => {});
       }
 
@@ -537,7 +537,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
         fetch('/api/bets', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ roundId: global.roundId, username: currentUser.id, bets: {} })
+          body: JSON.stringify({ roundId: global.rawRoundId, username: currentUser.id, bets: {} })
         }).catch(() => {});
       }
 
@@ -572,7 +572,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
         fetch('/api/bets', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ roundId: global.roundId, username: currentUser.id, bets: newBets })
+          body: JSON.stringify({ roundId: global.rawRoundId, username: currentUser.id, bets: newBets })
         }).catch(() => {});
       }
 
@@ -614,6 +614,14 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
       const winnings = calculateWinnings(currentPrev.bets, result, dragonCard, tigerCard);
       const newBalance = Number(currentPrev.balance) + winnings;
 
+      if (winnings > 0) {
+        if (voiceEnabled) {
+          setTimeout(() => speak(`Congratulations, you won ${winnings}`, muted), 1500);
+        }
+        playSound('congrats', muted);
+      } else if (currentPrev.totalBet > 0) {
+        playSound('lose', muted);
+      }
       // ---- SIDE EFFECTS (Out of setState to avoid double execution in StrictMode) ----
       if (currentUserRef.current && currentUserRef.current.id !== 'babu') {
          if (currentPrev.totalBet > 0) {
@@ -814,29 +822,10 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
         balance={balance} 
         onClose={() => setWalletOpen(false)} 
         onWithdrawSuccess={(amount) => {
-          setState(prev => ({ ...prev, balance: Number(prev.balance) - amount }));
-          setCurrentUser(prev => {
-            if (!prev) return prev;
-            const updated = { ...prev, balance: Number(prev.balance) - amount };
-            const savedStr = sessionStorage.getItem('dragonTigerCurrentUser');
-            if (savedStr) {
-              try {
-                const saved = JSON.parse(savedStr);
-                sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify({ ...saved, balance: updated.balance }));
-              } catch (e) {}
-            }
-            const userId = updated.id || updated.username;
-            const usersStr = localStorage.getItem('dragonTigerUsers') || '{}';
-            try {
-              const users = JSON.parse(usersStr);
-              if (users[userId]) {
-                users[userId].balance = updated.balance;
-                localStorage.setItem('dragonTigerUsers', JSON.stringify(users));
-              }
-            } catch (e) {}
-            return updated;
-          });
-          syncBalanceToServer(balance - amount, balance);
+          const newBalance = balance - amount;
+          setState(prev => ({ ...prev, balance: newBalance }));
+          // We don't need to call syncBalanceToServer or setCurrentUser here because 
+          // WalletModal already calls the syncBalance prop with the correct newBalance.
           lastLocalBalanceUpdate.current = Date.now();
         }}
         onDepositSuccess={(amount) => {
