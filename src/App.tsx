@@ -615,8 +615,12 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
       const newBalance = Number(currentPrev.balance) + winnings;
 
       if (winnings > 0) {
+        if (!muted) {
+          const congratsAudio = new Audio('/assets/congratulations.mp3');
+          congratsAudio.play().catch(() => {});
+        }
         if (voiceEnabled) {
-          setTimeout(() => speak(`Congratulations, you won ${winnings}`, muted), 1500);
+          setTimeout(() => speak(`You won ${winnings}`, muted), 1500);
         }
         playSound('congrats', muted);
       } else if (currentPrev.totalBet > 0) {
