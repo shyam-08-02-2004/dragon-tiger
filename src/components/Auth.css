@@ -4,9 +4,27 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  padding: 20px;
+  padding: 15px;
   overflow: hidden;
-  background-color: transparent;
+  background-color: #05070a;
+}
+
+.auth-container::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url('/bg-fire.jpg');
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+}
+
+.auth-container::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(15, 20, 30, 0.4) 0%, rgba(5, 10, 15, 0.95) 100%);
+  z-index: 1;
 }
 
 .auth-card {
@@ -209,18 +227,26 @@
 
 @media (max-width: 480px) {
   .auth-card {
-    padding: 25px;
+    padding: 20px 15px;
+    width: 100%;
+    max-width: 100%;
+  }
+  .auth-header {
+    margin-bottom: 25px;
+    gap: 10px;
   }
   .auth-title {
-    font-size: 20px;
+    font-size: 18px;
+    letter-spacing: 2px;
   }
   .input-group input {
     padding: 10px 12px;
-    font-size: 15px;
+    font-size: 14px;
   }
   .auth-submit-btn {
-    padding: 14px;
-    font-size: 16px;
+    padding: 12px;
+    font-size: 15px;
+    margin-top: 10px;
   }
 }
 
