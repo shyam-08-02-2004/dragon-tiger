@@ -7,6 +7,7 @@ export interface UserAccount {
   hasDeposited?: boolean;
   id?: string;
   password?: string;
+  avatarUrl?: string;
 }
 
 interface AuthProps {
@@ -28,7 +29,9 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const [username, setUsername] = useState('');
+  const [referralCode, setReferralCode] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
+  const [ageConfirmed, setAgeConfirmed] = useState(false);
   
   const [otpInput, setOtpInput] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -71,19 +74,24 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   };
 
 
-  const handleSignupStep1 = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+    const handleSignupStep1 = (e: React.FormEvent) => {
+      e.preventDefault();
+      setError('');
 
-    if (!username.trim() || !mobileNumber.trim()) {
-      setError('Please enter Username and Mobile Number.');
-      return;
-    }
+      if (!username.trim()) {
+        setError('Please enter a username.');
+        return;
+      }
 
-    if (!/^[6-9]\d{9}$/.test(mobileNumber.trim())) {
-      setError('Please enter a valid 10-digit mobile number.');
-      return;
-    }
+      if (!ageConfirmed) {
+        setError('You must confirm you are 18+ to sign up.');
+        return;
+      }
+
+      if (!/^[6-9]\d{9}$/.test(mobileNumber.trim())) {
+        setError('Please enter a valid 10-digit mobile number.');
+        return;
+      }
 
     // Simulate OTP
     const randomOtp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -127,7 +135,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: mNum, username: username.trim(), password })
+        body: JSON.stringify({ id: mNum, username: username.trim(), password, referralCode: referralCode.trim() })
       });
       const data = await res.json();
       
@@ -219,6 +227,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     setConfirmPassword('');
     setOtpInput('');
     setError('');
+    setAgeConfirmed(false);
   };
 
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -393,6 +402,33 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                   autoComplete="off"
                 />
               </div>
+
+              {mode === 'signup' && (
+                <div className="input-group">
+                  <label htmlFor="referralCode">Referral Code (Optional)</label>
+                  <input
+                    type="text"
+                    id="referralCode"
+                    value={referralCode}
+                    onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                    placeholder="Enter referral code"
+                    autoComplete="off"
+                  />
+                </div>
+              )}
+
+              {mode === 'signup' && (
+                <div className="checkbox-group" style={{ display: 'flex', alignItems: 'center', fontSize: '12px', marginBottom: '15px', color: '#666' }}>
+                  <input
+                    type="checkbox"
+                    id="ageConfirm"
+                    checked={ageConfirmed}
+                    onChange={(e) => setAgeConfirmed(e.target.checked)}
+                    style={{ marginRight: '8px' }}
+                  />
+                  <label htmlFor="ageConfirm">I confirm I am over 18 years old</label>
+                </div>
+              )}
             </>
           )}
 

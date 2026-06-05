@@ -132,16 +132,16 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
 
         {/* Tabs */}
         {username && (
-          <div style={{ display: 'flex', borderBottom: '1px solid rgba(212,160,23,0.2)', background: 'linear-gradient(180deg, rgba(25,25,30,0.95), rgba(15,15,20,0.95))' }}>
-            <button 
+          <div className="gh-tabs">
+            <button
+              className={`gh-tab-btn ${activeTab === 'game' ? 'active' : ''}`}
               onClick={() => handleTabChange('game')}
-              style={{ flex: 1, padding: '14px', background: activeTab === 'game' ? 'rgba(212,160,23,0.12)' : 'transparent', color: activeTab === 'game' ? '#ffd700' : '#666', border: 'none', borderBottom: activeTab === 'game' ? '3px solid #ffd700' : '3px solid transparent', fontWeight: '800', cursor: 'pointer', fontSize: '13px', letterSpacing: '1px', textTransform: 'uppercase' as const, transition: 'all 0.25s ease', textShadow: activeTab === 'game' ? '0 0 12px rgba(212,160,23,0.5)' : 'none' }}
             >
               📜 Game History
             </button>
-            <button 
+            <button
+              className={`gh-tab-btn ${activeTab === 'bets' ? 'active' : ''}`}
               onClick={() => handleTabChange('bets')}
-              style={{ flex: 1, padding: '14px', background: activeTab === 'bets' ? 'rgba(212,160,23,0.12)' : 'transparent', color: activeTab === 'bets' ? '#ffd700' : '#666', border: 'none', borderBottom: activeTab === 'bets' ? '3px solid #ffd700' : '3px solid transparent', fontWeight: '800', cursor: 'pointer', fontSize: '13px', letterSpacing: '1px', textTransform: 'uppercase' as const, transition: 'all 0.25s ease', textShadow: activeTab === 'bets' ? '0 0 12px rgba(212,160,23,0.5)' : 'none' }}
             >
               💰 My Bets
             </button>
@@ -170,7 +170,7 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
             </div>
 
             {/* Table Header */}
-            <div className="gh-table-header">
+            <div className="gh-table-header" style={{ position: 'sticky', top: 0, background: 'rgba(0,0,0,0.6)', zIndex: 2 }}>
               <span className="gh-col-round">Round</span>
               <span className="gh-col-game" style={{ textAlign: 'center' }}>Time</span>
               <span className="gh-col-winner">Winner</span>
@@ -185,8 +185,8 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
                   const { label, cls, bar } = winnerInfo(r.winner);
                   const roundTime = new Date(r.rawRoundId * 20000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
                   return (
-                    <div key={`${r.round}-${r.rawRoundId}`} className={`gh-row ${bar} ${i === 0 ? 'gh-latest' : ''}`}>
-                      <span className="gh-col-round">#{r.round}</span>
+                    <div key={`${r.round}-${r.rawRoundId}`} className={`gh-row ${bar} ${i === 0 ? 'gh-latest' : ''}`} style={{ animation: 'ghRowFadeIn 0.3s ease forwards', animationDelay: `${i * 0.05}s` }}>
+                      <span className="gh-col-round">#{String(r.round).padStart(3, '0')}</span>
                       <span className="gh-col-game" style={{ textAlign: 'center', fontSize: '11px', color: '#999' }}>{roundTime}</span>
                       <span className={`gh-col-winner ${cls}`}>{label}</span>
                     </div>

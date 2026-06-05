@@ -5,7 +5,10 @@ const userSchema = new mongoose.Schema({
   username: { type: String, required: true },
   password: { type: String, required: true },
   balance: { type: Number, default: 50 },
-  hasDeposited: { type: Boolean, default: false }
+  hasDeposited: { type: Boolean, default: false },
+  referralCode: { type: String, unique: true, sparse: true },
+  totalReferrals: { type: Number, default: 0 },
+  referralEarnings: { type: Number, default: 0 }
 });
 
 const transactionSchema = new mongoose.Schema({
@@ -52,7 +55,7 @@ const notificationSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
   username: { type: String, required: true },
   message: { type: String, required: true },
-  type: { type: String, enum: ['info', 'warning', 'error', 'success'], default: 'info' },
+  type: { type: String, enum: ['info', 'warning', 'error', 'success', 'admin'], default: 'info' },
   read: { type: Boolean, default: false },
   timestamp: { type: Date, default: Date.now }
 });
@@ -74,7 +77,8 @@ const chatMessageSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
   userId: { type: String, required: true }, // The user's mobile/id
   sender: { type: String, enum: ['user', 'admin'], required: true },
-  message: { type: String, required: true },
+  message: { type: String, default: '' },
+  imageUrl: { type: String, default: null },
   readByAdmin: { type: Boolean, default: false },
   readByUser: { type: Boolean, default: false },
   timestamp: { type: Date, default: Date.now }

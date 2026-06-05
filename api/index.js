@@ -7,9 +7,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Encode the password in the URI as requested
-// Default to the provided link if .env is missing for some reason
-const MONGO_URI = process.env.MONGODB_URI || 'mongodb+srv://shyambabudangi277_db_user:shyam%4075097@cluster1.h8jmgeq.mongodb.net/?appName=Cluster1';
+// Use the Atlas URI from Vercel environment variables.
+// Hard-coded fallback ensures connection works even if env var is missing.
+const MONGO_URI = process.env.MONGODB_URI || 'mongodb+srv://shyambabudangi277_db_user:shyam%4075097@cluster1.h8jmgeq.mongodb.net/dragonTiger?retryWrites=true&w=majority';
 
 let cachedDb = null;
 
@@ -47,14 +47,38 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 app.post('/api/auth/signup', async (req, res) => {
-  const { id, username, password } = req.body;
+  const { id, username, password, referralCode } = req.body;
   const existingUser = await User.findOne({ id });
   if (existingUser) {
     return res.status(400).json({ error: 'Mobile number already registered.' });
   }
-  
-  const newUser = new User({ id, username, password, balance: 50, hasDeposited: false });
+
+  // Generate unique referral code for this new user
+  const generatedRefCode = `DT-${id.substring(0, 6).toUpperCase()}`;
+  let startBalance = 50;
+
+  // Process incoming referral code
+  if (referralCode && referralCode.trim() !== '') {
+    const referrer = await User.findOne({ referralCode: referralCode.trim().toUpperCase() });
+    if (referrer) {
+      startBalance = 150; // 50 base + 100 bonus
+      referrer.balance += 50;
+      referrer.totalReferrals = (referrer.totalReferrals || 0) + 1;
+      referrer.referralEarnings = (referrer.referralEarnings || 0) + 50;
+      await referrer.save();
+    }
+  }
+
+  const newUser = new User({ 
+    id, 
+    username, 
+    password, 
+    balance: startBalance, 
+    hasDeposited: false,
+    referralCode: generatedRefCode
+  });
   await newUser.save();
+
   res.json(newUser);
 });
 
@@ -544,16 +568,17 @@ app.get('/api/chat/:userId', async (req, res) => {
 // Send a chat message
 app.post('/api/chat/:userId', async (req, res) => {
   try {
-    const { sender, message } = req.body;
-    if (!sender || !message) return res.status(400).json({ error: 'Missing fields' });
+    const { sender, message, imageUrl } = req.body;
+    if (!sender || (!message && !imageUrl)) return res.status(400).json({ error: 'Message or Image is required' });
     
     const newMsg = new ChatMessage({
       id: 'msg_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
       userId: req.params.userId,
       sender,
-      message,
-      readByAdmin: sender === 'admin', // Admin already read their own message
-      readByUser: sender === 'user' // User already read their own message
+      message: message || '',
+      imageUrl: imageUrl || null,
+      readByAdmin: sender === 'admin',
+      readByUser: sender === 'user'
     });
     await newMsg.save();
     res.json(newMsg);
@@ -636,4 +661,4 @@ app.get('/api/admin/chat/users', async (req, res) => {
   }
 });
 
-export default app;
+app.listen(3000, () => console.log('🚀 Server running on http://localhost:3000'));

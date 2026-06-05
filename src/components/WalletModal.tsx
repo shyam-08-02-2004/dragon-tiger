@@ -37,16 +37,16 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
         .then(data => {
           if (Array.isArray(data)) {
             const now = new Date().getTime();
-            const pendingWithdrawal = data.find(tx => tx.type === 'withdraw' && tx.status === 'pending');
-            const recentApproved = data.find(tx => 
+            const pendingWithdrawal = data.find((tx: any) => tx.type === 'withdraw' && tx.status === 'pending');
+            const recentApproved = data.find((tx: any) => 
               tx.type === 'withdraw' && 
               tx.status === 'approved' && 
-              (now - new Date(tx.timestamp).getTime() < 2 * 60 * 60 * 1000)
+              (now - new Date(tx.timestamp).getTime() < 10 * 60 * 1000)
             );
             if (pendingWithdrawal) {
-              setPendingMessage('Payment successful ho gaya');
+              setPendingMessage('pending');
             } else if (recentApproved) {
-              setPendingMessage('Payment status pending');
+              setPendingMessage('approved');
             } else {
               setPendingMessage(null);
             }
@@ -150,9 +150,11 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
     }
 
     if (tab === 'withdraw') {
+      if (syncBalance) {
+        syncBalance(balance - val, balance).catch(() => {});
+      }
       if (onWithdrawSuccess) onWithdrawSuccess(val);
-      showMsg('Payment successful ho gaya', 'success');
-      setPendingMessage('Payment successful ho gaya');
+      setPendingMessage('pending');
     } else {
       if (onDepositSuccess) onDepositSuccess(val);
       showMsg(`Your deposit request for ₹${val} has been sent for approval.`, 'success');
@@ -229,7 +231,7 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
                   <button type="button" className="wallet-back-btn" onClick={() => setDepositStep(1)}>
                     ← Change Amount
                   </button>
-                  <div className="wallet-qr-section" style={{ background: '#fff', padding: '15px', display: 'inline-block', borderRadius: '12px', margin: '15px 0' }}>
+                  <div className="wallet-qr-section" style={{ background: '#fff', padding: '15px', display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: '12px', margin: '15px auto', textAlign: 'center' }}>
                     <p style={{ color: '#000', marginBottom: '10px', fontWeight: 'bold' }}>Scan to Pay ₹{amount}</p>
                     <QRCodeSVG 
                       value={`upi://pay?pa=prashantdangi0077@okaxis&pn=DragonTiger&am=${amount || 0}&cu=INR`} 
@@ -260,29 +262,23 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
                       Aapko withdrawal request karne se pehle pehla deposit karna hoga.
                     </div>
                   ) : pendingMessage ? (
-                    <div className="premium-status-card">
-                      <div className="status-icon-wrapper">
-                        {pendingMessage.includes('pending') ? (
-                          <div className="spinner-ring"></div>
-                        ) : (
-                          <div className="success-check">✓</div>
-                        )}
+                    <div className="premium-status-card" style={{ padding: '24px', background: 'linear-gradient(145deg, rgba(46,204,113,0.1), rgba(0,0,0,0.8))', border: '1px solid rgba(46,204,113,0.3)', borderRadius: '16px', textAlign: 'center' }}>
+                      <div className="status-icon-wrapper" style={{ fontSize: '48px', marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+                        ✅
                       </div>
-                      <h3 className="status-title">
-                        {pendingMessage.includes('pending') ? 'Processing' : 'Success'}
+                      <h3 className="status-title" style={{ color: '#fff', fontSize: '22px', marginBottom: '8px' }}>
+                        {pendingMessage === 'approved' ? 'Approval Successful' : 'Payment Successful'}
                       </h3>
-                      <p className="status-desc">{pendingMessage}</p>
-                      <div className="status-timeline">
-                        <div className={`timeline-step ${pendingMessage.includes('successful') ? 'active' : 'completed'}`}>
-                          <div className="step-dot"></div>
-                          <span>Requested</span>
+                      <p className="status-desc" style={{ color: '#ccc', fontSize: '15px', lineHeight: '1.5' }}>
+                        {pendingMessage === 'approved' 
+                          ? 'Aapka withdrawal request successfully approve ho gaya hai.'
+                          : 'Aapka payment successfully submit ho gaya hai aur requested amount wallet se deduct ho gaya hai.'}
+                      </p>
+                      {pendingMessage === 'approved' && (
+                        <div style={{ marginTop: '20px', padding: '12px', background: 'rgba(241, 196, 15, 0.1)', border: '1px solid rgba(241, 196, 15, 0.3)', borderRadius: '8px', color: '#f1c40f', fontSize: '13px' }}>
+                          ⏳ <strong>Next Step:</strong> 6 working days me payment aapke wallet ya bank me aa jayega.
                         </div>
-                        <div className="timeline-line"></div>
-                        <div className={`timeline-step ${pendingMessage.includes('pending') ? 'active' : ''}`}>
-                          <div className="step-dot"></div>
-                          <span>Processing</span>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   ) : balance < 600 ? (
                     <div className="wallet-message error" style={{ textAlign: 'center', padding: '20px' }}>

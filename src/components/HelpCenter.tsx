@@ -6,6 +6,7 @@ interface Message {
   userId: string;
   sender: 'user' | 'admin';
   message: string;
+  imageUrl?: string;
   timestamp: string;
 }
 
@@ -18,7 +19,9 @@ interface HelpCenterProps {
 const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
+  const [imageFile, setImageFile] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeMenuMsgId, setActiveMenuMsgId] = useState<string | null>(null);
   const holdTimeoutRef = useRef<any>(null);
   const hideTimeoutRef = useRef<any>(null);
@@ -94,17 +97,31 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
   };
 
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setImageFile(event.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSend = async () => {
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() && !imageFile) return;
     
     try {
       const msg = newMessage;
+      const img = imageFile;
       setNewMessage('');
+      setImageFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
       
       const res = await fetch(`/api/chat/${userId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sender: 'user', message: msg })
+        body: JSON.stringify({ sender: 'user', message: msg, imageUrl: img })
       });
       const data = await res.json();
       setMessages(prev => [...prev, data]);
@@ -159,6 +176,11 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
                     </div>
                   ) : (
                     <>
+                      {msg.imageUrl && (
+                        <div style={{ marginBottom: msg.message ? '8px' : '0' }}>
+                          <img src={msg.imageUrl} alt="attachment" style={{ maxWidth: '100%', borderRadius: '8px', maxHeight: '200px', objectFit: 'contain' }} />
+                        </div>
+                      )}
                       {msg.message}
                       <div className="hc-timestamp" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
                         <span style={{ fontSize: '10px', opacity: 0.8, display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -202,6 +224,20 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
             </div>
           ) : (
             <>
+              {imageFile && (
+                <div style={{ position: 'absolute', bottom: '100%', left: '10px', background: '#333', padding: '5px', borderRadius: '8px', marginBottom: '5px', display: 'flex', alignItems: 'center', gap: '8px', zIndex: 10 }}>
+                  <img src={imageFile} alt="preview" style={{ height: '40px', borderRadius: '4px' }} />
+                  <button onClick={() => { setImageFile(null); if (fileInputRef.current) fileInputRef.current.value = ''; }} style={{ background: 'none', border: 'none', color: '#e74c3c', cursor: 'pointer', fontSize: '18px' }}>✕</button>
+                </div>
+              )}
+              <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageUpload} style={{ display: 'none' }} />
+              <button 
+                onClick={() => fileInputRef.current?.click()} 
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', padding: '0 8px', color: '#aaa' }}
+                title="Attach Photo"
+              >
+                📸
+              </button>
               <input 
                 type="text" 
                 placeholder="Type your message..." 
@@ -209,7 +245,7 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
                 onChange={e => setNewMessage(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSend()}
               />
-              <button className="hc-send-btn" onClick={handleSend} disabled={!newMessage.trim()}>
+              <button className="hc-send-btn" onClick={handleSend} disabled={!newMessage.trim() && !imageFile}>
                 Send
               </button>
             </>

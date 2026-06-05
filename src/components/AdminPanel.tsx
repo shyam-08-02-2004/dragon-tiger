@@ -18,6 +18,7 @@ type LiveBets = {
   tie: number;
   total: number;
   betCount: number;
+  bets: any[];
 };
 
 const defaultLiveBets: LiveBets = {
@@ -25,7 +26,8 @@ const defaultLiveBets: LiveBets = {
   tiger: 0,
   tie: 0,
   total: 0,
-  betCount: 0
+  betCount: 0,
+  bets: []
 };
 
 const normalizeLiveBets = (data: any): LiveBets => {
@@ -38,12 +40,13 @@ const normalizeLiveBets = (data: any): LiveBets => {
   const total = Number(totals.total) || dragon + tiger + tie;
   const betCount = Number(data.betCount) || 0;
 
-  return { dragon, tiger, tie, total, betCount };
+  return { dragon, tiger, tie, total, betCount, bets: data.bets || [] };
 };
 
 const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [users, setUsers] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
+  const [txFilter, setTxFilter] = useState<'all' | 'deposit' | 'withdraw'>('all');
   const [activeTab, setActiveTab] = useState<'users' | 'game' | 'transactions' | 'support'>(() => (sessionStorage.getItem('dt_adminTab') as any) || 'users');
   const [simPhase, setSimPhase] = useState<'betting' | 'dealing' | 'result'>('betting');
   const [simTimer, setSimTimer] = useState<number>(15);
@@ -74,6 +77,43 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [supportUsers, setSupportUsers] = useState<any[]>([]);
   const [selectedSupportUser, setSelectedSupportUser] = useState<string | null>(() => sessionStorage.getItem('dt_adminSupportUser') || null);
   const [supportMessages, setSupportMessages] = useState<any[]>([]);
+
+  const [showAddForm, setShowAddForm] = useState<boolean>(false);
+  const [newTxType, setNewTxType] = useState<'deposit' | 'withdraw'>('deposit');
+  const [newTxUserId, setNewTxUserId] = useState<string>('');
+  const [newAmount, setNewAmount] = useState<string>('');
+  const [newUtr, setNewUtr] = useState<string>('');
+  
+  const handleAddTransaction = async () => {
+    if (!newTxUserId || !newAmount) { alert('Select user and amount'); return; }
+    if (newTxType === 'deposit' && (!newUtr || !/^\d{12}$/.test(newUtr))) {
+      alert('Deposit transactions require a valid 12-digit UTR.');
+      return;
+    }
+    const payload = {
+      type: newTxType,
+      userId: newTxUserId,
+      amount: parseFloat(newAmount),
+      utr: newUtr || undefined,
+    };
+    try {
+      const res = await fetch('/api/admin/transactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        // Refresh transactions list
+        fetch(`/api/admin/transactions`).then(r => r.json()).then(data => { if (Array.isArray(data)) setTransactions(data); });
+        setShowAddForm(false);
+        setNewTxUserId(''); setNewAmount(''); setNewUtr('');
+        if (!muted) { speak('Transaction added', muted); }
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Failed to add transaction');
+      }
+    } catch (e) { console.error(e); }
+  };
 
   // State Setters with sessionStorage wrappers
   const handleTabChange = (tab: 'users' | 'game' | 'transactions' | 'support') => {
@@ -147,7 +187,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     }
   }, [selectedUserHistory, userHistoryTab]);
 
-  // â”€â”€ Live bet polling every 2 seconds â”€â”€
+  // ── Live bet polling every second ──
   useEffect(() => {
     const pollBets = () => {
       const global = getGlobalGameState();
@@ -175,11 +215,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
         });
     };
     pollBets();
-    const betPollId = setInterval(pollBets, 2000);
+    const betPollId = setInterval(pollBets, 1000);
     return () => clearInterval(betPollId);
   }, []);
 
-  // â”€â”€ Support Chat Polling â”€â”€
+  // ── Support Chat Polling ──
   useEffect(() => {
     if (activeTab !== 'support' || !selectedSupportUser) return;
     
@@ -284,7 +324,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     setEditingChatText('');
   };
 
-  // â”€â”€ Continuous game loop for admin (always running) â”€â”€
+  // ── Continuous game loop for admin (always running) ──
   useEffect(() => {
     simTimerRef.current = setInterval(() => {
       const global = getGlobalGameState();
@@ -344,7 +384,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     return () => { if (simTimerRef.current) clearInterval(simTimerRef.current); };
   }, []);
 
-  // â”€â”€ Set outcome for ANY round â”€â”€
+  // ── Set outcome for ANY round ──
   const setRoundOutcome = async (roundId: number, outcome: string) => {
     try {
       const res = await fetch('/api/admin/round-outcomes', {
@@ -366,7 +406,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     } catch(e) { console.error(e); }
   };
 
-  // â”€â”€ Remove outcome for a round â”€â”€
+  // ── Remove outcome for a round ──
   const removeRoundOutcome = async (roundId: number) => {
     try {
       const res = await fetch(`/api/admin/round-outcomes/${roundId}`, { method: 'DELETE' });
@@ -474,7 +514,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
           <h2>CASINO ADMIN</h2>
         </div>
 
-        {/* â”€â”€ Live Round Badge in sidebar â”€â”€ */}
+        {/* ── Live Round Badge in sidebar ── */}
         <div style={{
           margin: '10px 16px',
           padding: '12px',
@@ -508,7 +548,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
         </header>
 
         <div className="admin-content">
-          {/* â”€â”€ USERS TAB â”€â”€ */}
+          {/* ── USERS TAB ── */}
           {activeTab === 'users' && (
             <div className="admin-card">
               <h3>Registered Players</h3>
@@ -568,7 +608,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
             </div>
           )}
 
-          {/* â”€â”€ GAME TAB â”€â”€ */}
+          {/* ── GAME TAB ── */}
           {activeTab === 'game' && (
             <div className="admin-grid">
               <div className="admin-card">
@@ -583,7 +623,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   </button>
                 </div>
 
-                {/* â”€â”€ Current Round Info â”€â”€ */}
+                {/* ── Current Round Info ── */}
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: '20px', padding: '20px',
                   background: 'linear-gradient(135deg, rgba(241,196,15,0.15), rgba(0,0,0,0))',
@@ -614,14 +654,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   </div>
                 </div>
 
-                {/* â”€â”€ ANY ROUND WIN CONTROL â”€â”€ */}
+                {/* ── ANY ROUND WIN CONTROL ── */}
                 <div style={{
                   padding: '20px', background: 'rgba(155,89,182,0.08)', border: '2px solid rgba(155,89,182,0.5)',
                   borderRadius: '14px', marginBottom: '24px'
                 }}>
                   <h3 style={{ color: '#9b59b6', margin: '0 0 6px 0' }}>🎯 Kisi Bhi Round Ka Result Set Karein</h3>
                   <p className="text-muted" style={{ margin: '0 0 16px 0', fontSize: '13px' }}>
-                    Round number daalo (1â€“2000) aur choose karo Dragon / Tiger / Tie â€” agle us round mein wahi result aayega.
+                    Round number daalo (1–2000) aur choose karo Dragon / Tiger / Tie — agle us round mein wahi result aayega.
                   </p>
 
                   {saveMsg && (
@@ -692,7 +732,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   )}
                 </div>
 
-                {/* â”€â”€ Live Bet Totals â”€â”€ */}
+                {/* ── Live Bet Totals ── */}
                 <div className="admin-live-bets">
                   <div className="admin-live-bets-header">
                     <div>
@@ -743,12 +783,39 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                               : 'Round ke baad betting band ho gayi hai. Agle round tak wait karein.'}
                           </div>
                         )}
+                        {liveBets.bets.length > 0 && (
+                          <div className="admin-live-bets-feed" style={{ marginTop: '16px', maxHeight: '200px', overflowY: 'auto', background: 'rgba(0,0,0,0.3)', borderRadius: '8px', padding: '10px' }}>
+                            <h4 style={{ margin: '0 0 10px 0', fontSize: '13px', color: '#aaa', textTransform: 'uppercase' }}>Live Bet Feed</h4>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                              {liveBets.bets.map((b: any, idx: number) => {
+                                const sideColor = b.betType === 'dragon' ? '#e74c3c' : b.betType === 'tiger' ? '#3498db' : '#2ecc71';
+                                const sideLabel = b.betType === 'dragon' ? '🐲 Dragon' : b.betType === 'tiger' ? '🐯 Tiger' : '🤝 Tie';
+                                return (
+                                  <div key={idx} style={{
+                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                    background: 'rgba(255,255,255,0.05)', padding: '8px 12px', borderRadius: '6px',
+                                    borderLeft: `4px solid ${sideColor}`
+                                  }}>
+                                    <div>
+                                      <span style={{ color: '#aaa', marginRight: '4px' }}>User:</span><span style={{ fontWeight: 'bold', color: '#fff', fontSize: '13px' }}>{b.username}</span>
+                                      <span style={{ color: '#888', fontSize: '11px', marginLeft: '8px' }}>bet on</span>
+                                      <span style={{ color: sideColor, fontWeight: 'bold', fontSize: '13px', marginLeft: '6px' }}>{sideLabel}</span>
+                                    </div>
+                                    <div style={{ fontWeight: 'bold', color: '#f1c40f', fontSize: '14px' }}>
+                                      ₹{b.amount}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     );
                   })()}
                 </div>
 
-                {/* â”€â”€ Live Game Preview â”€â”€ */}
+                {/* ── Live Game Preview ── */}
                 <h3 style={{ marginBottom: '8px' }}>🃏 Live Game Preview</h3>
                 <div style={{ transform: 'scale(0.85)', transformOrigin: 'top center', minHeight: '200px' }}>
                   <div className="table-area" style={{ pointerEvents: 'none' }}>
@@ -776,10 +843,44 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
             </div>
           )}
 
-          {/* â”€â”€ TRANSACTIONS TAB â”€â”€ */}
+          {/* ── TRANSACTIONS TAB ── */}
           {activeTab === 'transactions' && (
             <div className="admin-card">
               <h3>Pending Transactions</h3>
+              {/* Filter Buttons */}
+              <div className="tx-filter-buttons" style={{ marginBottom: '12px', display: 'flex', gap: '8px' }}>
+                <button className={`filter-btn ${txFilter === 'all' ? 'active' : ''}`} onClick={() => setTxFilter('all')}>All</button>
+                <button className={`filter-btn ${txFilter === 'deposit' ? 'active' : ''}`} onClick={() => setTxFilter('deposit')}>Deposits</button>
+                <button className={`filter-btn ${txFilter === 'withdraw' ? 'active' : ''}`} onClick={() => setTxFilter('withdraw')}>Withdrawals</button>
+              </div>
+              {/* Add Transaction Button */}
+              <div style={{ marginBottom: '12px' }}>
+                <button className="action-btn edit" onClick={() => setShowAddForm(true)}>➕ Add Transaction</button>
+              </div>
+              {/* Add Transaction Form */}
+              {showAddForm && (
+                <div className="add-tx-form" style={{ marginBottom: '16px', padding: '16px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}>
+                  <h4 style={{ margin: '0 0 12px 0', color: '#f1c40f' }}>➕ Add New Transaction</h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px' }}>
+                    <select value={newTxType} onChange={e => setNewTxType(e.target.value as any)} style={{ padding: '10px', borderRadius: '8px', background: 'rgba(0,0,0,0.5)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}>
+                      <option value="deposit">Deposit</option>
+                      <option value="withdraw">Withdrawal</option>
+                    </select>
+                    <select value={newTxUserId} onChange={e => setNewTxUserId(e.target.value)} style={{ padding: '10px', borderRadius: '8px', background: 'rgba(0,0,0,0.5)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}>
+                      <option value="">Select User</option>
+                      {users.map(u => (<option key={u.id} value={u.id}>{u.username} ({u.id})</option>))}
+                    </select>
+                    <input type="number" placeholder="Amount (₹)" value={newAmount} onChange={e => setNewAmount(e.target.value)} style={{ padding: '10px', borderRadius: '8px', background: 'rgba(0,0,0,0.5)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }} />
+                    {newTxType === 'deposit' && (
+                      <input type="text" maxLength={12} placeholder="12-Digit UTR" value={newUtr} onChange={e => setNewUtr(e.target.value.replace(/\D/g, '').slice(0, 12))} style={{ padding: '10px', borderRadius: '8px', background: 'rgba(0,0,0,0.5)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }} />
+                    )}
+                  </div>
+                  <div style={{ marginTop: '16px', display: 'flex', gap: '10px' }}>
+                    <button type="button" onClick={handleAddTransaction} style={{ flex: 1, padding: '12px', background: '#2ecc71', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '15px' }}>✅ Submit</button>
+                    <button type="button" onClick={() => { setShowAddForm(false); setNewUtr(''); setNewAmount(''); setNewTxUserId(''); }} style={{ flex: 1, padding: '12px', background: '#e74c3c', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '15px' }}>❌ Cancel</button>
+                  </div>
+                </div>
+              )}
               <div className="table-responsive">
                 <table className="admin-table-v2">
                   <thead>
@@ -788,33 +889,35 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {transactions.slice().reverse().map((tx) => (
-                      <tr key={tx.id}>
-                        <td data-label="Time">{new Date(tx.timestamp).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}</td>
-                        <td data-label="User" className="fw-bold">{tx.username}</td>
-                        <td data-label="Type" className={tx.type === 'deposit' ? 'green' : 'gold'}>{tx.type.toUpperCase()}</td>
-                        <td data-label="Amount" className="gold">₹{tx.amount}</td>
-                        <td data-label="UTR/UPI" style={{ fontSize: '12px', maxWidth: '120px', wordBreak: 'break-all' }}>
-                          {tx.utr && <span style={{ color: '#aaa' }}>UTR: {tx.utr}</span>}
-                          {tx.upiId && <span style={{ color: '#7ec8e3' }}>UPI: {tx.upiId}</span>}
-                          {!tx.utr && !tx.upiId && '-'}
-                        </td>
-                        <td data-label="Status"><span className={`status-badge ${tx.status}`}>{tx.status.toUpperCase()}</span></td>
-                        <td data-label="Actions">
-                          {tx.status === 'pending' ? (
-                            <div className="action-buttons">
-                              <button className="action-btn edit" title="Approve" onClick={() => handleTransactionAction(tx.id, 'approve')}>✅</button>
-                              <button className="action-btn delete" title="Reject" onClick={() => handleTransactionAction(tx.id, 'reject')}>❌</button>
-                              <button className="action-btn delete" title="Delete" onClick={() => handleDeleteTransaction(tx.id)} style={{ background: '#e74c3c', color: 'white' }}>🗑️</button>
-                            </div>
-                          ) : (
-                            <div className="action-buttons">
-                              <button className="action-btn delete" title="Delete" onClick={() => handleDeleteTransaction(tx.id)} style={{ background: '#e74c3c', color: 'white' }}>🗑️</button>
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                    {transactions
+                      .filter(tx => txFilter === 'all' || tx.type === txFilter)
+                      .slice().reverse().map((tx) => (
+                        <tr key={tx.id}>
+                          <td data-label="Time">{new Date(tx.timestamp).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}</td>
+                          <td data-label="User" className="fw-bold">{tx.username}</td>
+                          <td data-label="Type" className={tx.type === 'deposit' ? 'green' : 'gold'}>{tx.type.toUpperCase()}</td>
+                          <td data-label="Amount" className="gold">₹{tx.amount}</td>
+                          <td data-label="UTR/UPI" style={{ fontSize: '12px', maxWidth: '120px', wordBreak: 'break-all' }}>
+                            {tx.utr && <span style={{ color: '#aaa' }}>UTR: {tx.utr}</span>}
+                            {tx.upiId && <span style={{ color: '#7ec8e3' }}>UPI: {tx.upiId}</span>}
+                            {!tx.utr && !tx.upiId && '-'}
+                          </td>
+                          <td data-label="Status"><span className={`status-badge ${tx.status}`}>{tx.status.toUpperCase()}</span></td>
+                          <td data-label="Actions">
+                            {tx.status === 'pending' ? (
+                              <div className="action-buttons">
+                                <button className="action-btn edit" title="Approve" onClick={() => handleTransactionAction(tx.id, 'approve')}>✅</button>
+                                <button className="action-btn delete" title="Reject" onClick={() => handleTransactionAction(tx.id, 'reject')}>❌</button>
+                                <button className="action-btn delete" title="Delete" onClick={() => handleDeleteTransaction(tx.id)} style={{ background: '#e74c3c', color: 'white' }}>🗑️</button>
+                              </div>
+                            ) : (
+                              <div className="action-buttons">
+                                <button className="action-btn delete" title="Delete" onClick={() => handleDeleteTransaction(tx.id)} style={{ background: '#e74c3c', color: 'white' }}>🗑️</button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
                     {transactions.length === 0 && (
                       <tr><td colSpan={7} className="text-center text-muted">No transactions found.</td></tr>
                     )}

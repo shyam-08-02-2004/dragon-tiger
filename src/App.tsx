@@ -12,6 +12,7 @@ import WalletModal from './components/WalletModal';
 import GameHistory from './components/GameHistory';
 import HelpCenter from './components/HelpCenter';
 import WinPopup from './components/WinPopup';
+import ReferAndEarn from './components/ReferAndEarn';
 import type { GameState, BetType, GameResult } from './types/game';
 import { getGlobalGameState, getDeterministicCards, getForcedDeterministicCards, setTimeOffset } from './syncEngine';
 import {
@@ -78,10 +79,12 @@ const App: React.FC = () => {
   const [showWallet, setShowWallet] = useState(() => sessionStorage.getItem('dt_showWallet') === 'true');
   const [showHistory, setShowHistory] = useState(() => sessionStorage.getItem('dt_showHistory') === 'true');
   const [showHelpCenter, setShowHelpCenter] = useState(() => sessionStorage.getItem('dt_showHelp') === 'true');
+  const [showRefer, setShowRefer] = useState(false);
 
   const setWalletOpen = (val: boolean) => { setShowWallet(val); sessionStorage.setItem('dt_showWallet', String(val)); };
   const setHistoryOpen = (val: boolean) => { setShowHistory(val); sessionStorage.setItem('dt_showHistory', String(val)); };
   const setHelpOpen = (val: boolean) => { setShowHelpCenter(val); sessionStorage.setItem('dt_showHelp', String(val)); };
+  const setReferOpen = (val: boolean) => setShowRefer(val);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const toggleMute = () => setMuted(prev => !prev);
   // Unlock speech synthesis on first user interaction
@@ -737,6 +740,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
           onShowHistory={currentUser.id !== 'babu' ? () => setHistoryOpen(true) : undefined}
           onShowWallet={() => setWalletOpen(true)}
           onShowSupport={currentUser.id !== 'babu' ? () => setHelpOpen(true) : undefined}
+          onShowRefer={currentUser.id !== 'babu' ? () => setReferOpen(true) : undefined}
           muted={muted} voiceEnabled={voiceEnabled}
           onToggleMute={toggleMute}
         />
@@ -854,6 +858,13 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
           userId={currentUser?.id ?? currentUser?.username ?? ''}
           isOpen={showHelpCenter}
           onClose={() => setHelpOpen(false)}
+        />
+      )}
+
+      {showRefer && (
+        <ReferAndEarn 
+          userId={currentUser?.id ?? currentUser?.username ?? ''}
+          onClose={() => setReferOpen(false)}
         />
       )}
 

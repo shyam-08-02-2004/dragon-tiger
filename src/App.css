@@ -29,25 +29,33 @@
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
+  background-color: #000;
+}
+
+.game-backgrounds::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to bottom, transparent 35%, #000 65%);
+  z-index: 1;
 }
 
 .bg-dragon-img, .bg-tiger-img {
-  width: 50%;
-  height: 100%;
+  width: 55%;
+  height: 70%;
   object-fit: cover;
-  opacity: 0.65;
-  filter: brightness(1.1) contrast(1.15);
+  opacity: 0.88;
+  filter: brightness(1.12) contrast(1.18) saturate(1.1);
 }
 .bg-dragon-img {
-  object-position: 35% center;
-  mask-image: linear-gradient(to right, rgba(0,0,0,1) 5%, rgba(0,0,0,0.8) 25%, rgba(0,0,0,0) 100%);
-  -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 5%, rgba(0,0,0,0.8) 25%, rgba(0,0,0,0) 100%);
+  object-position: center top;
+  mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 50%, rgba(0,0,0,0) 100%);
+  -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 50%, rgba(0,0,0,0) 100%);
 }
 .bg-tiger-img {
-  object-position: 65% center;
-  mask-image: linear-gradient(to left, rgba(0,0,0,1) 5%, rgba(0,0,0,0.8) 25%, rgba(0,0,0,0) 100%);
-  -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 5%, rgba(0,0,0,0.8) 25%, rgba(0,0,0,0) 100%);
-  transform: scaleX(-1);
+  object-position: center top;
+  mask-image: linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 50%, rgba(0,0,0,0) 100%);
+  -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 50%, rgba(0,0,0,0) 100%);
 }
 
 .game-main-content {
@@ -60,13 +68,10 @@
   padding-top: 0;
   padding: 18px 14px 24px;
   background: linear-gradient(180deg, 
-    rgba(0,0,0,0.65) 0%, 
-    rgba(0,0,0,0.45) 10%, 
-    rgba(0,0,0,0.25) 20%, 
-    rgba(0,0,0,0.08) 40%, 
+    rgba(0,0,0,0.28) 0%, 
+    rgba(0,0,0,0.18) 25%, 
     transparent 50%, 
-    rgba(0,0,0,0.05) 75%, 
-    rgba(0,0,0,0.25) 100%);
+    rgba(0,0,0,0.12) 100%);
 }
 
 /* Top bar (Header) */
@@ -425,6 +430,7 @@
   font-weight: 600;
   cursor: pointer;
   border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
 }
 .tab.active {
   color: var(--gold);
@@ -433,6 +439,20 @@
 }
 .tab:not(.active) {
   color: #888;
+}
+
+@media (max-width: 600px) {
+  .bottom-tabs {
+    height: auto;
+    flex-wrap: wrap;
+    padding: 6px;
+    gap: 6px;
+  }
+  .tab {
+    min-width: 48%;
+    padding: 10px 0;
+    font-size: 13px;
+  }
 }
 
 /* Central Cards Container for revealing cards */
@@ -470,34 +490,17 @@
     height: 100vh;
   }
 
-  .bg-dragon-img, .bg-tiger-img {
-    opacity: 0.72;
-    filter: brightness(1.08) contrast(1.12);
-  }
 
-  .bg-dragon-img {
-    object-position: 40% center;
-    mask-image: linear-gradient(to right, rgba(0,0,0,1) 10%, rgba(0,0,0,0.7) 28%, rgba(0,0,0,0) 100%);
-    -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 10%, rgba(0,0,0,0.7) 28%, rgba(0,0,0,0) 100%);
-  }
-
-  .bg-tiger-img {
-    object-position: 60% center;
-    mask-image: linear-gradient(to left, rgba(0,0,0,1) 10%, rgba(0,0,0,0.7) 28%, rgba(0,0,0,0) 100%);
-    -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 10%, rgba(0,0,0,0.7) 28%, rgba(0,0,0,0) 100%);
-  }
 
   .game-main-content {
     padding: 20px 18px 24px;
     max-width: 100%;
     margin: 0;
     background: linear-gradient(180deg, 
-      rgba(0,0,0,0.55) 0%, 
-      rgba(0,0,0,0.35) 12%, 
-      rgba(0,0,0,0.15) 25%, 
-      transparent 45%, 
-      rgba(0,0,0,0.08) 85%, 
-      rgba(0,0,0,0.2) 100%);
+      rgba(0,0,0,0.28) 0%, 
+      rgba(0,0,0,0.18) 25%, 
+      transparent 50%, 
+      rgba(0,0,0,0.12) 100%);
   }
 
   .cards-reveal-area {
@@ -608,25 +611,7 @@
     z-index: 0;
   }
 
-  .bg-dragon-img, .bg-tiger-img {
-    width: 50%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.80;
-    filter: brightness(1.05) contrast(1.1);
-  }
 
-  .bg-dragon-img {
-    object-position: 40% center;
-    mask-image: linear-gradient(to right, rgba(0,0,0,1) 12%, rgba(0,0,0,0.2) 100%);
-    -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 12%, rgba(0,0,0,0.2) 100%);
-  }
-
-  .bg-tiger-img {
-    object-position: 60% center;
-    mask-image: linear-gradient(to left, rgba(0,0,0,1) 12%, rgba(0,0,0,0.2) 100%);
-    -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 12%, rgba(0,0,0,0.2) 100%);
-  }
 
   .game-main-content {
     padding: 32px 40px 40px;
