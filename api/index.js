@@ -661,4 +661,10 @@ app.get('/api/admin/chat/users', async (req, res) => {
   }
 });
 
-app.listen(3000, () => console.log('🚀 Server running on http://localhost:3000'));
+// Export for Vercel Serverless Functions
+export default app;
+
+// Also start local server when running directly (not on Vercel)
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(3000, () => console.log('🚀 Server running on http://localhost:3000'));
+}
