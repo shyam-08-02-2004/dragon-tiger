@@ -44,7 +44,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
           <div className="up-avatar-wrapper">
             <div className="up-avatar-ring">
               <img 
-                src="https://images.unsplash.com/photo-1583864697784-a0efc8379f70?w=400&q=80" 
+                src="/vip-avatar.png" 
                 alt="VIP Player" 
                 className="up-avatar-img"
               />
