@@ -1,5 +1,6 @@
 import React from 'react';
 import './ProfileModal.css';
+import vipAvatar from '../assets/vip-avatar.png';
 
 interface ProfileModalProps {
   user: any;
@@ -44,7 +45,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
           <div className="up-avatar-wrapper">
             <div className="up-avatar-ring">
               <img 
-                src="/vip-avatar.png" 
+                src={vipAvatar} 
                 alt="VIP Player" 
                 className="up-avatar-img"
               />

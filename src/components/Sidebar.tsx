@@ -2,6 +2,7 @@ import React from 'react';
 import './Sidebar.css';
 import { FaWallet, FaGift, FaHeadset, FaSignOutAlt } from 'react-icons/fa';
 import type { UserAccount } from './Auth';
+import vipAvatar from '../assets/vip-avatar.png';
 
 interface SidebarProps {
   user: UserAccount | null;
@@ -19,7 +20,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onClose, onLogout, onOpenWallet
         <div className="profile-section">
           <div className="avatar">
             {/* Placeholder avatar, could be replaced with user.avatarUrl */}
-            <img src={user?.avatarUrl || '/default-avatar.png'} alt="avatar" />
+            <img src={user?.avatarUrl || vipAvatar} alt="avatar" />
           </div>
           <div className="username">{user?.username || 'Guest'}</div>
         </div>
