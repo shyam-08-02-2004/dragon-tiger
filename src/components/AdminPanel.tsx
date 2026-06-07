@@ -44,7 +44,7 @@ const normalizeLiveBets = (data: any): LiveBets => {
 const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [users, setUsers] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'users' | 'game' | 'transactions' | 'support'>(() => (sessionStorage.getItem('dt_adminTab') as any) || 'users');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'game' | 'transactions' | 'support'>(() => (sessionStorage.getItem('dt_adminTab') as any) || 'dashboard');
   const [simPhase, setSimPhase] = useState<'betting' | 'dealing' | 'result'>('betting');
   const [simTimer, setSimTimer] = useState<number>(15);
   const [muted, setMuted] = useState<boolean>(() => localStorage.getItem('dt_admin_muted') === 'true');
@@ -509,10 +509,82 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
         </header>
 
         <div className="admin-content">
-          {/* â”€â”€ USERS TAB â”€â”€ */}
+          {/* ── DASHBOARD TAB ── */}
+          {activeTab === 'dashboard' && (
+            <div className="admin-dashboard-container">
+              <div className="dashboard-card full-width" style={{
+                  background: 'linear-gradient(135deg, rgba(212,160,23,0.15), rgba(212,160,23,0.05))',
+                  border: '1px solid rgba(212,160,23,0.5)',
+                  textAlign: 'center',
+                  padding: '25px',
+                  borderRadius: '16px',
+                  marginBottom: '15px'
+              }}>
+                <div style={{ fontSize: '14px', color: '#aaa', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '8px' }}>Live Round</div>
+                <div style={{ fontSize: '48px', fontWeight: '900', color: '#f1c40f', lineHeight: 1, textShadow: '0 0 20px rgba(241,196,15,0.4)', marginBottom: '10px' }}>#{simRoundId}</div>
+                <div style={{ fontSize: '16px', color: phaseColor, fontWeight: 'bold' }}>{phaseLabel}</div>
+              </div>
+
+              <div className="admin-dashboard-grid">
+                <button className="dashboard-card nav-card" onClick={() => handleTabChange('users')}>
+                  <span className="nav-icon" style={{ color: '#3498db' }}>👥</span>
+                  <span className="nav-title">Users</span>
+                </button>
+                <button className="dashboard-card nav-card" onClick={() => handleTabChange('game')}>
+                  <span className="nav-icon" style={{ color: '#f1c40f' }}>🎲</span>
+                  <span className="nav-title">Game Control</span>
+                </button>
+                <button className="dashboard-card nav-card" onClick={() => handleTabChange('transactions')}>
+                  <span className="nav-icon" style={{ color: '#2ecc71' }}>💳</span>
+                  <span className="nav-title">Transactions</span>
+                </button>
+                <button className="dashboard-card nav-card" onClick={() => handleTabChange('support')}>
+                  <span className="nav-icon" style={{ color: '#e74c3c' }}>💬</span>
+                  <span className="nav-title">Support</span>
+                </button>
+              </div>
+              <button 
+                onClick={() => {
+                  if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(err => console.log(err));
+                  } else {
+                    document.exitFullscreen();
+                  }
+                }}
+                style={{
+                  marginTop: '15px',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: '#aaa',
+                  padding: '12px',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+                Toggle Fullscreen (Hide Browser UI)
+              </button>
+            </div>
+          )}
+
+          {/* ── USERS TAB ── */}
           {activeTab === 'users' && (
-            <div className="admin-user-grid">
-              {users.map((user: any) => {
+            <div className="admin-user-layout active">
+              <div className="admin-chat-header-premium" style={{ position: 'sticky', top: 0, zIndex: 100 }}>
+                <button className="premium-back-btn" onClick={() => handleTabChange('dashboard')}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                  <span>Back</span>
+                </button>
+                <div className="chat-username" style={{ fontSize: '18px', color: '#D4AF37' }}>Users Management</div>
+                <div style={{ width: '80px' }}></div>
+              </div>
+              <div className="admin-user-grid" style={{ padding: '15px', overflowY: 'auto', flex: 1 }}>
+                {users.map((user: any) => {
                 if (user.id === 'babu') return null;
                 return (
                   <div key={user.id} className={`admin-user-card ${user.hasDeposited ? 'vip-user' : ''}`}>
@@ -556,16 +628,26 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
               {users.filter((u: any) => u.id !== 'babu').length === 0 && (
                 <div style={{ padding: '40px', textAlign: 'center', color: '#888', gridColumn: '1 / -1' }}>No registered players yet.</div>
               )}
+              </div>
             </div>
           )}
 
-          {/* â”€â”€ GAME TAB â”€â”€ */}
+          {/* ── GAME TAB ── */}
           {activeTab === 'game' && (
-            <div className="admin-grid">
-              <div className="admin-card">
+            <div className="admin-game-layout active">
+              <div className="admin-chat-header-premium" style={{ position: 'sticky', top: 0, zIndex: 100 }}>
+                <button className="premium-back-btn" onClick={() => handleTabChange('dashboard')}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                  <span>Back</span>
+                </button>
+                <div className="chat-username" style={{ fontSize: '18px', color: '#D4AF37' }}>Game Control Room</div>
+                <div style={{ width: '80px' }}></div>
+              </div>
+              <div className="admin-grid" style={{ padding: '15px', overflowY: 'auto', flex: 1 }}>
+                <div className="admin-card">
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                  <h2 style={{ margin: 0 }}>🎮 Game Control</h2>
+                  <h2 style={{ margin: 0, display: 'none' }}>🎮 Game Control</h2>
                   <button 
                     onClick={() => handleShowGameHist(true)}
                     style={{ background: '#3498db', color: '#fff', border: 'none', padding: '10px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}
@@ -771,7 +853,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
           {activeTab === 'transactions' && (
             <div className="admin-tx-layout active">
               <div className="admin-chat-header-premium" style={{ position: 'sticky', top: 0, zIndex: 100 }}>
-                <button className="premium-back-btn" onClick={() => handleTabChange('game')}>
+                <button className="premium-back-btn" onClick={() => handleTabChange('dashboard')}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                   <span>Back</span>
                 </button>
@@ -823,11 +905,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
             </div>
           )}
 
-          {/* â”€â”€ SUPPORT TAB â”€â”€ */}
+          {/* ── SUPPORT TAB ── */}
           {activeTab === 'support' && (
             <div className={`admin-card admin-chat-layout ${selectedSupportUser ? 'chat-active' : ''}`}>
               <div className="admin-chat-sidebar">
-                <h3 style={{ padding: '20px', margin: 0, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Chats</h3>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', padding: '15px 20px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                  <button className="premium-back-btn" onClick={() => handleTabChange('dashboard')} style={{ padding: '4px 8px' }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                  </button>
+                  <h3 style={{ margin: 0, color: '#D4AF37' }}>Chats</h3>
+                </div>
                 <div style={{ flex: 1, overflowY: 'auto' }}>
                   {supportUsers.map(u => (
                     <div 
