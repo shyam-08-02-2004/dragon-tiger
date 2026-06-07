@@ -755,6 +755,39 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
             isRevealing={phase === 'dealing'}
             isWinner={dragonWins}
           />
+
+          {/* Center Timer Between Cards */}
+          <div className={`center-timer-wrapper ${phase}`}>
+            <div className="center-timer-ring">
+              <svg className="center-timer-svg" viewBox="0 0 80 80">
+                <circle className="center-timer-bg-circle" cx="40" cy="40" r="34" />
+                <circle 
+                  className="center-timer-progress" 
+                  cx="40" cy="40" r="34"
+                  style={{
+                    strokeDasharray: `${2 * Math.PI * 34}`,
+                    strokeDashoffset: phase === 'betting' 
+                      ? `${2 * Math.PI * 34 * (1 - timer / 15)}` 
+                      : '0'
+                  }}
+                />
+              </svg>
+              <div className="center-timer-content">
+                {phase === 'betting' ? (
+                  <>
+                    <span className={`center-timer-number ${timer <= 5 ? 'urgent' : ''}`}>{timer}</span>
+                    <span className="center-timer-label">SEC</span>
+                  </>
+                ) : phase === 'dealing' ? (
+                  <span className="center-timer-status dealing">⚡</span>
+                ) : (
+                  <span className="center-timer-status result">✨</span>
+                )}
+              </div>
+            </div>
+            <div className="center-vs-text">VS</div>
+          </div>
+
           <CardDisplay
             card={tigerCard}
             side="tiger"
@@ -762,6 +795,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
             isWinner={tigerWins}
           />
         </div>
+
 
         <BettingTable
           bets={bets}

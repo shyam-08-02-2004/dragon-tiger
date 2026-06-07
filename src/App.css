@@ -37,13 +37,177 @@ body {
 .cards-reveal-area {
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  gap: 20px;
-  padding: 10px 20px;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
   position: relative;
   z-index: 5;
   margin-top: 10px;
 }
+
+/* ─── CENTER TIMER BETWEEN CARDS ─── */
+.center-timer-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.center-timer-ring {
+  position: relative;
+  width: 68px;
+  height: 68px;
+}
+
+.center-timer-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.center-timer-bg-circle {
+  fill: rgba(0, 0, 0, 0.6);
+  stroke: rgba(255, 215, 0, 0.15);
+  stroke-width: 3;
+}
+
+.center-timer-progress {
+  fill: none;
+  stroke: #FFD700;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.95s linear;
+  filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.6));
+}
+
+.center-timer-wrapper.dealing .center-timer-progress {
+  stroke: #e74c3c;
+  animation: timerPulseStroke 0.8s ease-in-out infinite;
+}
+
+.center-timer-wrapper.result .center-timer-progress {
+  stroke: #2ecc71;
+  filter: drop-shadow(0 0 8px rgba(46, 204, 113, 0.7));
+}
+
+.center-timer-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.center-timer-number {
+  font-family: var(--font-tech), 'Orbitron', monospace;
+  font-size: 22px;
+  font-weight: 900;
+  color: #FFD700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+  line-height: 1;
+  animation: timerBounce 1s ease-in-out infinite;
+}
+
+.center-timer-number.urgent {
+  color: #ff4444;
+  text-shadow: 0 0 14px rgba(255, 68, 68, 0.9);
+  animation: timerUrgent 0.5s ease-in-out infinite;
+}
+
+.center-timer-label {
+  font-size: 8px;
+  font-weight: 700;
+  color: rgba(255, 215, 0, 0.6);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 1px;
+}
+
+.center-timer-status {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.center-timer-status.dealing {
+  animation: dealingFlash 0.6s ease-in-out infinite;
+}
+
+.center-timer-status.result {
+  animation: resultSparkle 1.2s ease-in-out infinite;
+}
+
+.center-vs-text {
+  font-family: var(--font-display), 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 900;
+  color: #FFD700;
+  letter-spacing: 3px;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+  opacity: 0.8;
+}
+
+/* Timer Animations */
+@keyframes timerBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+@keyframes timerUrgent {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: 0.7; }
+}
+
+@keyframes timerPulseStroke {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes dealingFlash {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.6; }
+}
+
+@keyframes resultSparkle {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.2) rotate(15deg); }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .center-timer-ring {
+    width: 56px;
+    height: 56px;
+  }
+  .center-timer-number {
+    font-size: 18px;
+  }
+  .center-vs-text {
+    font-size: 9px;
+  }
+  .cards-reveal-area {
+    gap: 6px;
+    padding: 8px 8px;
+  }
+}
+
+@media (max-width: 360px) {
+  .center-timer-ring {
+    width: 48px;
+    height: 48px;
+  }
+  .center-timer-number {
+    font-size: 16px;
+  }
+  .center-vs-text {
+    font-size: 8px;
+  }
+}
+
 
 /* Premium Bottom Navigation */
 .premium-bottom-nav {
