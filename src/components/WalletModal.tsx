@@ -231,11 +231,11 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
                   <button type="button" className="wallet-back-btn" onClick={() => setDepositStep(1)}>
                     ← Change Amount
                   </button>
-                  <div className="wallet-qr-section" style={{ background: '#fff', padding: '15px', display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: '12px', margin: '15px auto', textAlign: 'center' }}>
+                  <div className="wallet-qr-section">
                     <p style={{ color: '#000', marginBottom: '10px', fontWeight: 'bold' }}>Scan to Pay ₹{amount}</p>
                     <QRCodeSVG 
                       value={`upi://pay?pa=prashantdangi0077@okaxis&pn=DragonTiger&am=${amount || 0}&cu=INR`} 
-                      size={180} 
+                      size={140} 
                     />
                   </div>
                   <div className="wallet-input-group">
