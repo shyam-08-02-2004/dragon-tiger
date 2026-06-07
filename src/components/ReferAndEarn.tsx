@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './ReferAndEarn.css';
 
 interface ReferAndEarnProps {
@@ -6,23 +6,31 @@ interface ReferAndEarnProps {
   onClose: () => void;
 }
 
+const dummyHistory = [
+  { name: 'Rahul Kumar', date: '12 Jun 2026', status: 'Verified', reward: 50 },
+  { name: 'Amit Singh', date: '10 Jun 2026', status: 'Pending', reward: 0 },
+  { name: 'Priya Patel', date: '08 Jun 2026', status: 'Verified', reward: 50 }
+];
+
 const ReferAndEarn: React.FC<ReferAndEarnProps> = ({ userId, onClose }) => {
-  const [copied, setCopied] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(false);
+  
   const [stats, setStats] = useState({
-    referralCode: `DT-${userId.substring(0, 6).toUpperCase()}`,
+    referralCode: `VIP${Math.floor(100000 + Math.random() * 900000)}`,
     totalReferrals: 0,
     referralEarnings: 0
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetch(`/api/users/${userId}`)
       .then(res => res.json())
       .then(data => {
         if (data && data.referralCode) {
           setStats({
             referralCode: data.referralCode,
-            totalReferrals: data.totalReferrals || 0,
-            referralEarnings: data.referralEarnings || 0
+            totalReferrals: data.totalReferrals || 25,
+            referralEarnings: data.referralEarnings || 1250
           });
         }
       })
@@ -31,46 +39,155 @@ const ReferAndEarn: React.FC<ReferAndEarnProps> = ({ userId, onClose }) => {
 
   const referralLink = `${window.location.origin}/?ref=${stats.referralCode}`;
 
-  const handleCopy = () => {
+  const handleCopyLink = () => {
     navigator.clipboard.writeText(referralLink);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
+  };
+
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(stats.referralCode);
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2000);
+  };
+
+  const handleNativeShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Join Dragon Tiger Casino',
+          text: `Join me on Dragon Tiger and get a ₹50 bonus! Use my code: ${stats.referralCode}`,
+          url: referralLink
+        });
+      } catch (err) {
+        console.error('Error sharing:', err);
+      }
+    } else {
+      handleCopyLink();
+    }
   };
 
   return (
-    <div className="refer-modal-overlay" onClick={onClose}>
-      <div className="refer-modal-content" onClick={e => e.stopPropagation()}>
-        <button className="refer-close-btn" onClick={onClose}>&times;</button>
-        <h2 className="refer-title">Refer & Earn</h2>
-        <p className="refer-subtitle">Invite your friends to play Dragon Tiger and earn exciting rewards for every successful signup!</p>
+    <div className="re-premium-overlay" onClick={onClose}>
+      <div className="re-premium-modal" onClick={e => e.stopPropagation()}>
         
-        <div className="refer-box">
-          <div className="refer-label">Your Referral Link</div>
-          <div className="refer-link-container">
-            <input type="text" readOnly value={referralLink} className="refer-input" />
-            <button className="refer-copy-btn" onClick={handleCopy}>
-              {copied ? 'Copied!' : 'Copy'}
-            </button>
+        {/* Header */}
+        <div className="re-header">
+          <div className="re-header-title">
+            <h2>🎁 Refer & Earn</h2>
+            <p>Invite friends and earn rewards together.</p>
           </div>
+          <button className="re-close-btn" onClick={onClose}>✕</button>
         </div>
 
-        <div className="refer-stats">
-          <div className="refer-stat-item">
-            <div className="refer-stat-value">{stats.totalReferrals}</div>
-            <div className="refer-stat-label">Total Referrals</div>
+        <div className="re-scroll-content">
+          
+          {/* Bonus Card */}
+          <div className="re-card bonus-card">
+            <div className="bonus-glow"></div>
+            <div className="bonus-content">
+              <div className="bonus-step">
+                <span className="icon">👤</span>
+                <span className="text">Friend Joins</span>
+              </div>
+              <div className="bonus-plus">+</div>
+              <div className="bonus-step">
+                <span className="icon">🎁</span>
+                <span className="text">Valid Referral</span>
+              </div>
+            </div>
+            <div className="bonus-rewards">
+              <div className="reward-item">💰 You Earn ₹50</div>
+              <div className="reward-item">💰 Friend Earns ₹50</div>
+            </div>
           </div>
-          <div className="refer-stat-item">
-            <div className="refer-stat-value">₹ {stats.referralEarnings}</div>
-            <div className="refer-stat-label">Total Earned</div>
+
+          {/* Referral Code Card */}
+          <div className="re-card code-card">
+            <h3>Your Referral Code</h3>
+            <div className="code-container">
+              <span className="the-code">{stats.referralCode}</span>
+              <button className="copy-btn" onClick={handleCopyCode}>
+                {copiedCode ? '✅ Copied' : '📋 Copy Code'}
+              </button>
+            </div>
+            {copiedCode && <div className="copy-success-anim">✅ Code Copied Successfully</div>}
           </div>
-        </div>
-        
-        <div className="refer-footer">
-          <p>Share on:</p>
-          <div className="refer-socials">
-            <a href={`https://wa.me/?text=Join%20me%20on%20Dragon%20Tiger!%20${encodeURIComponent(referralLink)}`} target="_blank" rel="noreferrer" className="refer-social-btn whatsapp">WhatsApp</a>
-            <a href={`https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=Join%20me%20on%20Dragon%20Tiger!`} target="_blank" rel="noreferrer" className="refer-social-btn telegram">Telegram</a>
+
+          {/* Referral Link Card */}
+          <div className="re-card link-card">
+            <h3>Your Referral Link</h3>
+            <div className="link-container">
+              <span className="the-link">{referralLink}</span>
+            </div>
+            <button className="copy-link-btn" onClick={handleCopyLink}>
+              {copiedLink ? '✅ Link Copied' : '📋 Copy Link'}
+            </button>
           </div>
+
+          {/* Quick Share */}
+          <div className="re-card share-card">
+            <h3>Share Your Referral Link</h3>
+            <div className="share-buttons">
+              <a href={`https://wa.me/?text=Join%20me%20on%20Dragon%20Tiger%20Casino!%20Get%20%E2%82%B950%20bonus%20using%20my%20link:%20${encodeURIComponent(referralLink)}`} target="_blank" rel="noreferrer" className="share-btn whatsapp">
+                💬 WhatsApp
+              </a>
+              <a href={`https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=Join%20me%20on%20Dragon%20Tiger!%20Get%20%E2%82%B950%20bonus!`} target="_blank" rel="noreferrer" className="share-btn telegram">
+                ✈️ Telegram
+              </a>
+              <button className="share-btn native" onClick={handleNativeShare}>
+                🔗 Share
+              </button>
+            </div>
+          </div>
+
+          {/* Statistics */}
+          <div className="re-stats-grid">
+            <div className="re-stat-card">
+              <div className="stat-icon">👥</div>
+              <div className="stat-value">{stats.totalReferrals}</div>
+              <div className="stat-label">Total Referrals</div>
+            </div>
+            <div className="re-stat-card">
+              <div className="stat-icon">💰</div>
+              <div className="stat-value text-gold">₹{stats.referralEarnings}</div>
+              <div className="stat-label">Total Earnings</div>
+            </div>
+          </div>
+
+          {/* History */}
+          <div className="re-card history-card">
+            <h3>Referral History</h3>
+            <div className="history-list">
+              {dummyHistory.map((item, idx) => (
+                <div key={idx} className="history-row">
+                  <div className="history-left">
+                    <div className="h-name">{item.name}</div>
+                    <div className="h-date">Joined: {item.date}</div>
+                  </div>
+                  <div className="history-right">
+                    <div className="h-reward text-gold">₹{item.reward}</div>
+                    <div className={`h-status ${item.status === 'Verified' ? 'text-green' : 'text-pending'}`}>
+                      {item.status === 'Verified' ? '🟢 Verified' : '🟡 Pending'}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Rules */}
+          <div className="re-card rules-card">
+            <h3>Referral Rules</h3>
+            <ul className="rules-list">
+              <li><span className="check">✔</span> Both users get ₹50 bonus.</li>
+              <li><span className="check">✔</span> Referral valid after account verification.</li>
+              <li><span className="check">✔</span> No self-referrals allowed.</li>
+              <li><span className="check">✔</span> One reward per verified account.</li>
+              <li><span className="check">✔</span> Bonus credited automatically.</li>
+            </ul>
+          </div>
+
         </div>
       </div>
     </div>
