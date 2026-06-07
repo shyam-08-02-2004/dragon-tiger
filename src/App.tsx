@@ -868,6 +868,11 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
         <ProfileModal 
           user={currentUser} 
           onClose={() => setShowProfile(false)} 
+          onLogout={() => { setShowProfile(false); handleLogout(); }}
+          onShowWallet={() => { setShowProfile(false); setWalletOpen(true); }}
+          onShowRefer={currentUser?.id !== 'babu' ? () => { setShowProfile(false); setReferOpen(true); } : undefined}
+          onShowSupport={currentUser?.id !== 'babu' ? () => { setShowProfile(false); setHelpOpen(true); } : undefined}
+          onShowHistory={() => { setShowProfile(false); setHistoryOpen(true); }}
         />
       )}
 
