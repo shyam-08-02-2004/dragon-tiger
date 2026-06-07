@@ -2,6 +2,9 @@ import React from 'react';
 import type { BetType, GamePhase } from '../types/game';
 import './BettingTable.css';
 
+import dragonOutline from '../assets/dragon_outline.png';
+import tigerOutline from '../assets/tiger_outline.png';
+
 interface BettingTableProps {
   bets: Partial<Record<BetType, number>>;
   onBet: (type: BetType) => void;
@@ -11,19 +14,17 @@ interface BettingTableProps {
 
 const BettingTable: React.FC<BettingTableProps> = ({ bets, onBet, phase }) => {
   const canBet = phase === 'betting';
-
-  // Prevent double-taps on mobile
   const lastBetTime = React.useRef(0);
 
   const handleBetClick = (type: BetType) => {
     if (!canBet) return;
     const now = Date.now();
-    if (now - lastBetTime.current < 200) return; // 200ms debounce
+    if (now - lastBetTime.current < 200) return; 
     lastBetTime.current = now;
     onBet(type);
   };
 
-  const renderBetBox = (type: BetType, label: string, payout: string, className: string, icon: string) => {
+  const renderBetBox = (type: BetType, label: string, payout: string, className: string, imgSrc?: string, textOnly?: boolean) => {
     const amount = bets[type] || 0;
     
     return (
@@ -31,9 +32,15 @@ const BettingTable: React.FC<BettingTableProps> = ({ bets, onBet, phase }) => {
         className={`premium-bet-box ${className} ${!canBet ? 'disabled' : ''} ${amount > 0 ? 'has-bet' : ''}`}
         onClick={() => handleBetClick(type)}
       >
-        <div className="pbb-icon">{icon}</div>
-        <div className="pbb-title">{label}</div>
-        <div className="pbb-payout">{payout}</div>
+        {imgSrc && (
+          <div className="pbb-img-wrapper">
+            <img src={imgSrc} alt={label} className="pbb-img" />
+          </div>
+        )}
+        <div className="pbb-content">
+          <div className="pbb-title">{label}</div>
+          <div className="pbb-payout">{payout}</div>
+        </div>
         {amount > 0 && (
           <div className="pbb-chips">
             <div className="pbb-chips-inner">
@@ -53,12 +60,15 @@ const BettingTable: React.FC<BettingTableProps> = ({ bets, onBet, phase }) => {
           <span className="pt-text-diamond">❖</span>
           <span className="pt-text-tiger">TIGER</span>
         </div>
-        <div className="pt-top-tie">TIE</div>
         
-        <div className="pt-betting-areas">
-          {renderBetBox('dragon', 'DRAGON', '1:1', 'pt-dragon', '🐉')}
-          {renderBetBox('tie', 'TIE', '8:1', 'pt-tie', '⚔️')}
-          {renderBetBox('tiger', 'TIGER', '1:1', 'pt-tiger', '🐯')}
+        <div className="pt-betting-layout">
+          {renderBetBox('dragon', 'DRAGON', '1:1', 'pt-dragon', dragonOutline)}
+          
+          <div className="pt-center-column">
+            {renderBetBox('tie', 'TIE', '8:1', 'pt-tie', undefined, true)}
+          </div>
+          
+          {renderBetBox('tiger', 'TIGER', '1:1', 'pt-tiger', tigerOutline)}
         </div>
       </div>
     </div>

@@ -21,7 +21,7 @@ import {
 } from './types/game';
 import './App.css';
 import { speak, playSound, startAmbient, stopAmbient, setAmbientVolume } from './utils/voice';
-import dealerBgImage from './assets/luxury_bg.png';
+import dealerBgImage from './assets/royal_bg.png';
 
 const BETTING_TIMER = 15;
 const INITIAL_BALANCE = 80;
@@ -799,11 +799,11 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
             <span className="pbn-label">Promotions</span>
           </div>
           <div className="pbn-item">
-            <span className="pbn-icon">🎮</span>
+            <span className="pbn-icon">🎰</span>
             <span className="pbn-label">Games</span>
           </div>
           <div className="pbn-item active">
-            <span className="pbn-icon">🎰</span>
+            <span className="pbn-icon">🃏</span>
             <span className="pbn-label">Live Casino</span>
           </div>
           <div className="pbn-item" onClick={() => setShowProfile(true)}>
