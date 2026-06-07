@@ -78,7 +78,11 @@ const chatMessageSchema = new mongoose.Schema({
   userId: { type: String, required: true }, // The user's mobile/id
   sender: { type: String, enum: ['user', 'admin'], required: true },
   message: { type: String, default: '' },
-  imageUrl: { type: String, default: null },
+  imageUrl: { type: String, default: null }, // Base64 data for image/video/pdf
+  mediaType: { type: String, default: 'text' }, // 'text', 'image', 'video', 'pdf'
+  isDeleted: { type: Boolean, default: false },
+  isEdited: { type: Boolean, default: false },
+  replyTo: { type: String, default: null }, // ID of the message being replied to
   readByAdmin: { type: Boolean, default: false },
   readByUser: { type: Boolean, default: false },
   timestamp: { type: Date, default: Date.now }

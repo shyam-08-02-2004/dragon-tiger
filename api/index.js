@@ -568,8 +568,8 @@ app.get('/api/chat/:userId', async (req, res) => {
 // Send a chat message
 app.post('/api/chat/:userId', async (req, res) => {
   try {
-    const { sender, message, imageUrl } = req.body;
-    if (!sender || (!message && !imageUrl)) return res.status(400).json({ error: 'Message or Image is required' });
+    const { sender, message, imageUrl, mediaType, replyTo } = req.body;
+    if (!sender || (!message && !imageUrl)) return res.status(400).json({ error: 'Message or Media is required' });
     
     const newMsg = new ChatMessage({
       id: 'msg_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
@@ -577,6 +577,8 @@ app.post('/api/chat/:userId', async (req, res) => {
       sender,
       message: message || '',
       imageUrl: imageUrl || null,
+      mediaType: mediaType || (imageUrl ? 'image' : 'text'),
+      replyTo: replyTo || null,
       readByAdmin: sender === 'admin',
       readByUser: sender === 'user'
     });
@@ -591,7 +593,7 @@ app.post('/api/chat/:userId', async (req, res) => {
 app.put('/api/chat/message/:id', async (req, res) => {
   try {
     const { message } = req.body;
-    const msg = await ChatMessage.findOneAndUpdate({ id: req.params.id }, { message }, { new: true });
+    const msg = await ChatMessage.findOneAndUpdate({ id: req.params.id }, { message, isEdited: true }, { new: true });
     if (!msg) return res.status(404).json({ error: 'Message not found' });
     res.json(msg);
   } catch (e) {
@@ -599,12 +601,12 @@ app.put('/api/chat/message/:id', async (req, res) => {
   }
 });
 
-// Delete a chat message
+// Delete a chat message (soft delete)
 app.delete('/api/chat/message/:id', async (req, res) => {
   try {
-    const msg = await ChatMessage.findOneAndDelete({ id: req.params.id });
+    const msg = await ChatMessage.findOneAndUpdate({ id: req.params.id }, { isDeleted: true, message: '', imageUrl: null }, { new: true });
     if (!msg) return res.status(404).json({ error: 'Message not found' });
-    res.json({ success: true, deletedId: req.params.id });
+    res.json(msg);
   } catch (e) {
     res.status(500).json({ error: 'Server error' });
   }
