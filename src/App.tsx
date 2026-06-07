@@ -747,18 +747,6 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
           onToggleMute={toggleMute}
         />
 
-        <GameControls
-          phase={phase}
-          result={result}
-          timer={timer}
-          totalBet={totalBet}
-          lastWin={lastWin}
-          dealerMessage={dealerMessage}
-          onDeal={handleDeal}
-          onNextRound={() => {}}
-          roundNumber={roundNumber}
-        />
-
         <div className="cards-reveal-area">
           <CardDisplay
             card={dragonCard}
@@ -781,27 +769,40 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
           selectedChip={selectedChip}
         />
 
-        <RoadMap history={history} />
-
         <ChipSelector
           selectedChip={selectedChip}
           onSelectChip={handleSelectChip}
-          onClearBets={handleClearBets}
-          onDoubleBet={handleDoubleBet}
           totalBet={totalBet}
           phase={phase}
         />
 
-        {/* Bottom Tabs */}
-        <div className="bottom-tabs">
-          <div className="tab active" onClick={() => {
-            sessionStorage.setItem('dt_historyTab', 'game');
-            setHistoryOpen(true);
-          }}>Game History</div>
-          <div className="tab" onClick={() => {
-            sessionStorage.setItem('dt_historyTab', 'bets');
-            setHistoryOpen(true);
-          }}>My Bets</div>
+        <GameControls
+          phase={phase}
+          timer={timer}
+          onUndo={handleClearBets}
+          onRepeat={handleDoubleBet}
+        />
+
+        <RoadMap history={history} />
+
+        {/* Premium Bottom Navigation */}
+        <div className="premium-bottom-nav">
+          <div className="pbn-item">
+            <span className="pbn-icon">🏠</span>
+            <span className="pbn-label">Home</span>
+          </div>
+          <div className="pbn-item">
+            <span className="pbn-icon">🎮</span>
+            <span className="pbn-label">Games</span>
+          </div>
+          <div className="pbn-item active">
+            <span className="pbn-icon">🎰</span>
+            <span className="pbn-label">Live Casino</span>
+          </div>
+          <div className="pbn-item" onClick={() => setShowProfile(true)}>
+            <span className="pbn-icon">👤</span>
+            <span className="pbn-label">Profile</span>
+          </div>
         </div>
       </>
     );

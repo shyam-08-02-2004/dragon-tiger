@@ -1,276 +1,79 @@
-.chip-selector {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
-  background: linear-gradient(
-    135deg,
-    rgba(0, 0, 0, 0.4) 0%,
-    rgba(17, 17, 24, 0.6) 100%
-  );
-  border-top: 1px solid rgba(212, 160, 23, 0.2);
+.premium-chips-wrapper {
+  width: 100%;
+  padding: 10px 16px;
+  margin-top: 10px;
 }
 
-.chip-row {
+.premium-chips-container {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.chip {
-  width: 58px;
-  height: 58px;
+.premium-chip {
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  border: 4px solid var(--chip-border);
-  background: radial-gradient(
-    circle at 35% 35%,
-    color-mix(in srgb, var(--chip-color) 80%, white 20%),
-    var(--chip-color)
-  );
-  color: var(--chip-text);
+  background: var(--chip-color);
+  padding: 4px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -2px 4px rgba(0,0,0,0.5);
   cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
-  transition: var(--transition);
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.5),
-    inset 0 2px 4px rgba(255, 255, 255, 0.1),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.chip:hover:not(.chip-disabled) {
-  transform: translateY(-4px) scale(1.05);
-  box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.6),
-    0 0 15px var(--chip-border),
-    inset 0 2px 4px rgba(255, 255, 255, 0.15);
+/* Selected state adds a golden glow and scales up */
+.premium-chip.selected {
+  transform: scale(1.15) translateY(-5px);
+  box-shadow: 0 8px 16px rgba(255,215,0,0.5), inset 0 2px 4px rgba(255,255,255,0.5);
+  border: 2px solid #FFD700;
 }
 
-.chip.selected {
-  transform: translateY(-6px) scale(1.1);
-  box-shadow:
-    0 10px 25px rgba(0, 0, 0, 0.7),
-    0 0 25px var(--chip-border),
-    inset 0 2px 4px rgba(255, 255, 255, 0.2);
-  animation: pulse-gold 1.5s ease-in-out infinite;
-}
-
-.chip.chip-disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.chip-value {
-  font-family: var(--font-tech);
-  font-size: 13px;
-  font-weight: 700;
-  z-index: 2;
-  position: relative;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-.chip-lines {
+/* White dashed ring around chip edge */
+.pc-dashes {
   position: absolute;
-  inset: 0;
+  top: 2px; left: 2px; right: 2px; bottom: 2px;
   border-radius: 50%;
-  overflow: hidden;
+  border: 3px dashed rgba(255,255,255,0.8);
   pointer-events: none;
 }
 
-.chip-line {
-  position: absolute;
-  top: 50%;
-  left: 50%;
+.pc-inner {
   width: 100%;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.08);
-  transform-origin: left center;
-  margin-top: -1px;
-}
-
-/* ---- Bet Actions ---- */
-.bet-actions {
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.4) 100%);
   display: flex;
-  align-items: center;
-  gap: 6px;
-  width: 100%;
-  max-width: 600px;
-  justify-content: center;
-}
-
-.total-bet-display {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(212, 160, 23, 0.2);
-  border-radius: 10px;
-  padding: 4px 8px;
-  min-width: 130px;
-}
-
-.total-bet-label {
-  font-family: var(--font-tech);
-  font-size: 10px;
-  color: var(--text-muted);
-  letter-spacing: 2px;
-}
-
-.total-bet-amount {
-  font-family: var(--font-tech);
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--gold);
-  text-shadow: 0 0 8px rgba(212, 160, 23, 0.4);
-}
-
-.action-buttons {
-  display: flex;
-  gap: 6px;
-}
-
-.action-btn {
-  display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  padding: 4px 8px;
-  border-radius: 12px;
-  border: 2px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.07);
-  backdrop-filter: blur(5px);
-  cursor: pointer;
-  transition: all 0.25s ease;
-  font-family: var(--font-tech);
-  min-width: 150px;
-  overflow: hidden;
+  position: relative;
 }
 
-.double-btn {
-  background: rgba(212, 160, 23, 0.22);
-  border-color: rgba(212, 160, 23, 0.6);
-  color: var(--gold);
-  box-shadow: inset 0 0 12px rgba(212, 160, 23, 0.3), 0 4px 12px rgba(0,0,0,0.4);
-  animation: pulseGold 2s infinite ease-in-out;
+.pc-center {
+  background: #FFF;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+  z-index: 2;
 }
 
-.double-btn:hover:not(.btn-disabled) {
-  background: rgba(212, 160, 23, 0.35);
-  border-color: var(--gold);
-  box-shadow: 0 0 20px rgba(212, 160, 23, 0.5), inset 0 0 12px rgba(212, 160, 23, 0.4);
-  transform: translateY(-3px);
-}
-
-@keyframes pulseGold {
-  0% { box-shadow: inset 0 0 8px rgba(212,160,23,0.2); }
-  50% { box-shadow: inset 0 0 16px rgba(212,160,23,0.4); }
-  100% { box-shadow: inset 0 0 8px rgba(212,160,23,0.2); }
-}
-
-.clear-btn {
-  background: rgba(192, 57, 43, 0.22);
-  border-color: rgba(192, 57, 43, 0.6);
-  color: #e74c3c;
-  box-shadow: inset 0 0 12px rgba(192,57,43,0.3), 0 4px 12px rgba(0,0,0,0.4);
-  animation: pulseRed 2s infinite ease-in-out;
-}
-
-.clear-btn:hover:not(.btn-disabled) {
-  background: rgba(192, 57, 43, 0.35);
-  border-color: #e74c3c;
-  box-shadow: 0 0 20px rgba(192,57,43,0.5), inset 0 0 12px rgba(192,57,43,0.4);
-  transform: translateY(-3px);
-}
-
-@keyframes pulseRed {
-  0% { box-shadow: inset 0 0 8px rgba(192,57,43,0.2); }
-  50% { box-shadow: inset 0 0 16px rgba(192,57,43,0.4); }
-  100% { box-shadow: inset 0 0 8px rgba(192,57,43,0.2); }
-}
-
-.action-btn.btn-disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-.btn-icon {
-  font-size: 14px;
+.pc-label {
+  color: #000;
   font-weight: 900;
-}
-
-.btn-text {
   font-size: 10px;
-  letter-spacing: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-family: sans-serif;
 }
 
-@media (max-width: 600px) {
-  .chip {
-    width: 46px;
-    height: 46px;
-  }
-  .chip-value {
-    font-size: 11px;
-  }
-  .chip-row {
-    gap: 4px;
-  }
-}
-
-@media (max-width: 480px) {
-  .chip-selector {
-    padding: 2px 4px;
-    gap: 4px;
-  }
-  .bet-actions {
-    flex-direction: row;
-    gap: 4px;
-    justify-content: space-between;
-  }
-  .total-bet-display {
-    min-width: 80px;
-    padding: 2px 4px;
-  }
-  .total-bet-label {
-    font-size: 9px;
-  }
-  .total-bet-amount {
-    font-size: 14px;
-  }
-  .action-buttons {
-    width: auto;
-    flex: 1;
-    justify-content: flex-end;
-    gap: 4px;
-  }
-  .action-btn {
-    flex: 1;
-    padding: 4px 6px;
-    font-size: 11px;
-    min-width: 80px;
-    flex-direction: row;
-    justify-content: center;
-  }
-  .btn-icon {
-    font-size: 14px;
-  }
-  .btn-text {
-    font-size: 11px;
-    letter-spacing: 1px;
-  }
-  .chip {
-    width: 38px;
-    height: 38px;
-    border-width: 3px;
-  }
+.premium-chip.disabled {
+  opacity: 0.5;
+  filter: grayscale(0.5);
+  pointer-events: none;
 }

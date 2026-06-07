@@ -1,5 +1,6 @@
 import React from 'react';
 import type { ChipValue } from '../types/game';
+import './ChipSelector.css';
 
 interface ChipSelectorProps {
   selectedChip: number;
@@ -11,59 +12,41 @@ interface ChipSelectorProps {
 }
 
 const CHIP_LIST = [
-  { value: 10, label: '10', classStr: 'chip-10' },
-  { value: 50, label: '50', classStr: 'chip-50' },
-  { value: 100, label: '100', classStr: 'chip-100' },
-  { value: 500, label: '500', classStr: 'chip-500' },
-  { value: 1000, label: '1000', classStr: 'chip-1000' },
-  { value: 2000, label: '2K', classStr: 'chip-2k' },
+  { value: 10, label: '10', color: '#1B5E20' },    // Green
+  { value: 50, label: '50', color: '#0D47A1' },    // Blue
+  { value: 100, label: '100', color: '#4A148C' },  // Purple
+  { value: 500, label: '500', color: '#E65100' },  // Orange/Gold
+  { value: 1000, label: '1000', color: '#B71C1C' },// Red
+  { value: 5000, label: '5000', color: '#212121' },// Black
 ];
 
 const ChipSelector: React.FC<ChipSelectorProps> = ({
   selectedChip,
   onSelectChip,
-  onClearBets,
-  totalBet,
   phase,
 }) => {
   const canBet = phase === 'betting';
 
   return (
-    <>
-      <div className="chips-container">
+    <div className="premium-chips-wrapper">
+      <div className="premium-chips-container">
         {CHIP_LIST.map(chip => (
           <div
             key={chip.value}
-            className={`chip-item ${chip.classStr} ${selectedChip === chip.value ? 'selected' : ''} ${!canBet ? 'disabled' : ''}`}
+            className={`premium-chip ${selectedChip === chip.value ? 'selected' : ''} ${!canBet ? 'disabled' : ''}`}
+            style={{ '--chip-color': chip.color } as React.CSSProperties}
             onClick={() => canBet && onSelectChip(chip.value)}
           >
-            {chip.label}
+            <div className="pc-inner">
+              <div className="pc-center">
+                <span className="pc-label">{chip.label}</span>
+              </div>
+              <div className="pc-dashes"></div>
+            </div>
           </div>
         ))}
       </div>
-
-      <div className="bottom-actions">
-        <button 
-          className={`action-btn btn-clear ${(!canBet || totalBet === 0) ? 'btn-disabled' : ''}`}
-          onClick={onClearBets}
-          disabled={!canBet || totalBet === 0}
-        >
-          Clear
-        </button>
-        
-        <div className="total-bet-display">
-          <span className="tb-label">Total Bet</span>
-          <span className="tb-amount">₹ {totalBet}</span>
-        </div>
-
-        <button 
-          className={`action-btn btn-confirm ${(!canBet || totalBet === 0) ? 'btn-disabled' : ''}`}
-          disabled={!canBet || totalBet === 0}
-        >
-          Confirm Bet
-        </button>
-      </div>
-    </>
+    </div>
   );
 };
 

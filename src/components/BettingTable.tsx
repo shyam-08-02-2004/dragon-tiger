@@ -1,5 +1,6 @@
 import React from 'react';
 import type { BetType, GamePhase } from '../types/game';
+import './BettingTable.css';
 
 interface BettingTableProps {
   bets: Partial<Record<BetType, number>>;
@@ -22,19 +23,22 @@ const BettingTable: React.FC<BettingTableProps> = ({ bets, onBet, phase }) => {
     onBet(type);
   };
 
-  const renderBetBox = (type: BetType, label: string, payout: string, className: string) => {
+  const renderBetBox = (type: BetType, label: string, payout: string, className: string, icon: string) => {
     const amount = bets[type] || 0;
     
     return (
       <div 
-        className={`bet-box ${className} ${!canBet ? 'disabled' : ''} ${amount > 0 ? 'has-bet' : ''}`}
+        className={`premium-bet-box ${className} ${!canBet ? 'disabled' : ''} ${amount > 0 ? 'has-bet' : ''}`}
         onClick={() => handleBetClick(type)}
       >
-        <div className="bet-title">{label}</div>
-        <div className="bet-payout">{payout}</div>
+        <div className="pbb-icon">{icon}</div>
+        <div className="pbb-title">{label}</div>
+        <div className="pbb-payout">{payout}</div>
         {amount > 0 && (
-          <div className="placed-chips">
-            <span className="placed-chips-val">₹{amount}</span>
+          <div className="pbb-chips">
+            <div className="pbb-chips-inner">
+              <span className="pbb-chips-val">{amount >= 1000 ? (amount/1000).toFixed(1) + 'K' : amount}</span>
+            </div>
           </div>
         )}
       </div>
@@ -42,10 +46,21 @@ const BettingTable: React.FC<BettingTableProps> = ({ bets, onBet, phase }) => {
   };
 
   return (
-    <div className="betting-areas">
-      {renderBetBox('dragon', 'DRAGON', '1:1', 'dragon')}
-      {renderBetBox('tie', 'TIE', '1:8', 'tie')}
-      {renderBetBox('tiger', 'TIGER', '1:1', 'tiger')}
+    <div className="premium-table-wrapper">
+      <div className="premium-table-surface">
+        <div className="pt-top-text">
+          <span className="pt-text-dragon">DRAGON</span>
+          <span className="pt-text-diamond">❖</span>
+          <span className="pt-text-tiger">TIGER</span>
+        </div>
+        <div className="pt-top-tie">TIE</div>
+        
+        <div className="pt-betting-areas">
+          {renderBetBox('dragon', 'DRAGON', '1:1', 'pt-dragon', '🐉')}
+          {renderBetBox('tie', 'TIE', '8:1', 'pt-tie', '⚔️')}
+          {renderBetBox('tiger', 'TIGER', '1:1', 'pt-tiger', '🐯')}
+        </div>
+      </div>
     </div>
   );
 };

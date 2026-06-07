@@ -1,37 +1,48 @@
 import React from 'react';
-import type { GamePhase, GameResult } from '../types/game';
+import type { GamePhase } from '../types/game';
+import './GameControls.css';
 
 interface GameControlsProps {
   phase: GamePhase;
-  result: GameResult | null;
   timer: number;
-  totalBet: number;
-  lastWin: number;
-  dealerMessage: string;
-  onDeal: () => void;
-  onNextRound: () => void;
-  roundNumber?: number;
+  onUndo?: () => void;
+  onRepeat?: () => void;
 }
 
 const GameControls: React.FC<GameControlsProps> = ({
   phase,
   timer,
-  roundNumber,
+  onUndo,
+  onRepeat,
 }) => {
+  const canBet = phase === 'betting';
+
   return (
-    <div className="game-info-row">
-      <div className="round-id-text">Round ID: <span>#{roundNumber || '000000'}</span></div>
-      <div className="start-betting-text">
-        {phase === 'betting' ? 'Start Betting' : phase === 'dealing' ? 'Dealing Cards...' : 'Round Ended'}
-      </div>
-      
-      <div className="timer-container">
-        <div className={`timer-circle ${phase === 'betting' && timer <= 5 ? 'active' : ''}`} style={{ borderColor: phase === 'betting' && timer <= 5 ? '#e74c3c' : '' }}>
-          <span style={{ color: phase === 'betting' && timer <= 5 ? '#e74c3c' : '#fff' }}>
-             {phase === 'betting' ? timer : 0}
-          </span>
+    <div className="premium-controls-wrapper">
+      <button className="pc-side-btn" onClick={onUndo} disabled={!canBet}>
+        <span className="pc-side-icon">↩</span>
+        <span>UNDO</span>
+      </button>
+
+      <div className="pc-center-btn">
+        <div className={`pc-center-inner ${!canBet ? 'disabled' : ''}`}>
+          {phase === 'betting' ? (
+            <>
+              <span>PLACE YOUR BET</span>
+              <div className="pc-timer-badge">{timer}</div>
+            </>
+          ) : phase === 'dealing' ? (
+            <span>DEALING...</span>
+          ) : (
+            <span>ROUND ENDED</span>
+          )}
         </div>
       </div>
+
+      <button className="pc-side-btn" onClick={onRepeat} disabled={!canBet}>
+        <span className="pc-side-icon">↻</span>
+        <span>REPEAT</span>
+      </button>
     </div>
   );
 };
