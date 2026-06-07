@@ -78,7 +78,7 @@ const Header: React.FC<HeaderProps> = ({
         </div>
         <div className="user-info" onClick={onShowProfile} style={{ cursor: 'pointer', padding: '2px', border: '2px solid rgba(212, 160, 23, 0.5)', borderRadius: '50%', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center' }}>
           <img 
-            src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${username || 'casino'}`} 
+            src="https://images.unsplash.com/photo-1583864697784-a0efc8379f70?w=400&q=80" 
             alt="Profile" 
             style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} 
           />
