@@ -74,6 +74,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [supportUsers, setSupportUsers] = useState<any[]>([]);
   const [selectedSupportUser, setSelectedSupportUser] = useState<string | null>(() => sessionStorage.getItem('dt_adminSupportUser') || null);
   const [supportMessages, setSupportMessages] = useState<any[]>([]);
+  const [fullScreenMedia, setFullScreenMedia] = useState<{ url: string; type: string } | null>(null);
 
   // State Setters with sessionStorage wrappers
   const handleTabChange = (tab: 'users' | 'game' | 'transactions' | 'support') => {
@@ -859,13 +860,19 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
               <div className="admin-chat-main">
                 {selectedSupportUser ? (
                   <>
-                    <div className="admin-chat-header">
-                      <button className="admin-chat-back" onClick={() => handleSupportUser(null)}>
-                        ← Back
+                    <div className="admin-chat-header-premium">
+                      <button className="premium-back-btn" onClick={() => handleSupportUser(null)}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                        <span>Back</span>
                       </button>
-                      <span style={{ fontWeight: 'bold', fontSize: '16px' }}>{selectedSupportUser}</span>
-                      <button className="admin-chat-delete" onClick={handleDeleteChat} title="Delete Chat">
-                        🗑️
+                      <div className="admin-chat-user-info">
+                        <div className="chat-avatar">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        </div>
+                        <span className="chat-username">{selectedSupportUser}</span>
+                      </div>
+                      <button className="premium-delete-chat-btn" onClick={handleDeleteChat} title="Delete Chat">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                       </button>
                     </div>
                     <div className="admin-chat-messages">
@@ -897,33 +904,39 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                                 </div>
                               </div>
                             ) : (
-                              <div
-                                onTouchStart={() => startAdminHold(msg.id)}
-                                onTouchEnd={() => endAdminHold(msg.id)}
-                                onMouseDown={() => startAdminHold(msg.id)}
-                                onMouseUp={() => endAdminHold(msg.id)}
-                                onMouseLeave={() => endAdminHold(msg.id)}
-                              >
-                                {msg.message}
-                                <div style={{ fontSize: '10px', opacity: 0.7, marginTop: '5px', display: 'flex', alignItems: 'center', justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start', gap: '4px' }}>
+                              <div>
+                                {msg.imageUrl && (
+                                  <div className="admin-chat-media-container">
+                                    {msg.mediaType === 'video' ? (
+                                      <video src={msg.imageUrl} controls className="admin-chat-video" />
+                                    ) : msg.mediaType === 'pdf' ? (
+                                      <embed src={msg.imageUrl} type="application/pdf" className="admin-chat-pdf" />
+                                    ) : (
+                                      <img 
+                                        src={msg.imageUrl} 
+                                        alt="attachment" 
+                                        className="admin-chat-image" 
+                                        onClick={() => setFullScreenMedia({ url: msg.imageUrl, type: 'image' })} 
+                                      />
+                                    )}
+                                  </div>
+                                )}
+                                {msg.message && <div className="admin-chat-text">{msg.message}</div>}
+                                <div className="admin-chat-meta">
                                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                                  {new Date(msg.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })} â€¢ {new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                                  {new Date(msg.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })} • {new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
                                 </div>
-                                {activeAdminMenuMsgId === msg.id && (
-                                  <div style={{ display: 'flex', gap: '8px', marginTop: '6px', justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start', animation: 'hcFadeIn 0.3s ease' }}>
+                                {msg.sender === 'admin' && (
+                                  <div className="admin-chat-actions">
                                     {Date.now() - new Date(msg.timestamp).getTime() <= 10 * 60 * 1000 && (
-                                      <button 
-                                        onClick={() => { setEditingChatId(msg.id); setEditingChatText(msg.message); setActiveAdminMenuMsgId(null); }}
-                                        style={{ background: 'none', border: 'none', color: '#f1c40f', fontSize: '12px', cursor: 'pointer', padding: 0 }}
-                                      >
-                                        ✏️ Edit
+                                      <button onClick={() => { setEditingChatId(msg.id); setEditingChatText(msg.message); }}>
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                        Edit
                                       </button>
                                     )}
-                                    <button 
-                                      onClick={() => handleAdminDeleteMessage(msg.id)}
-                                      style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: '12px', cursor: 'pointer', padding: 0 }}
-                                    >
-                                      🗑️ Delete
+                                    <button className="delete-action" onClick={() => handleAdminDeleteMessage(msg.id)}>
+                                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                      Delete
                                     </button>
                                   </div>
                                 )}
@@ -1035,6 +1048,26 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
           isOpen={showGameHistory}
           onClose={() => handleShowGameHist(false)}
         />
+      )}
+
+      {/* Full Screen Media Viewer */}
+      {fullScreenMedia && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.95)', zIndex: 10000,
+          display: 'flex', justifyContent: 'center', alignItems: 'center',
+          backdropFilter: 'blur(10px)'
+        }} onClick={() => setFullScreenMedia(null)}>
+          <button style={{
+            position: 'absolute', top: '20px', right: '20px',
+            background: 'rgba(212,175,55,0.2)', border: '1px solid var(--gold)',
+            color: 'var(--gold)', borderRadius: '50%', width: '40px', height: '40px',
+            fontSize: '20px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center'
+          }}>✕</button>
+          {fullScreenMedia.type === 'image' ? (
+            <img src={fullScreenMedia.url} alt="Full screen" style={{ maxWidth: '90%', maxHeight: '90%', objectFit: 'contain', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }} />
+          ) : null}
+        </div>
       )}
     </div>
   );
