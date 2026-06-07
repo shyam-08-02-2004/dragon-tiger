@@ -1,11 +1,12 @@
 .auth-container {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  padding: 15px;
-  overflow: hidden;
+  padding: 20px 15px;
+  overflow-y: auto;
   background-color: transparent;
 }
 
