@@ -38,21 +38,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-image: url('/assets/dealer_bg.png');
-  background-size: cover;
-  background-position: center top;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
   position: relative;
-}
-
-#root::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 70%, rgba(10,10,10,0.85) 100%);
-  pointer-events: none;
-  z-index: 0;
 }
 
 ::-webkit-scrollbar {
