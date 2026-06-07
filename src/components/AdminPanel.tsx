@@ -543,32 +543,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   <span className="nav-title">Support</span>
                 </button>
               </div>
-              <button 
-                onClick={() => {
-                  if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(err => console.log(err));
-                  } else {
-                    document.exitFullscreen();
-                  }
-                }}
-                style={{
-                  marginTop: '15px',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  color: '#aaa',
-                  padding: '12px',
-                  borderRadius: '12px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px'
-                }}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
-                Toggle Fullscreen (Hide Browser UI)
-              </button>
             </div>
           )}
 
