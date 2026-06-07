@@ -503,7 +503,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
       <main className="admin-main">
         <header className="admin-header">
           <h1>{activeTab === 'users' ? 'User Management' : activeTab === 'game' ? 'Game Control Room' : activeTab === 'transactions' ? 'Transactions' : 'Support Center'}</h1>
-          <div className="admin-badge">Admin Privileges Active</div>
+          <div className="admin-badge">Admin Privileges Active (v1.1)</div>
           <button onClick={() => setMuted(!muted)} className="mute-btn" style={{ marginLeft: '12px', background: 'transparent', border: 'none', color: '#fff', fontSize: '18px', cursor: 'pointer' }}>{muted ? '🔇' : '🔊'}</button>
         </header>
 

@@ -75,3 +75,51 @@ body {
   width: 90%;
   max-width: 380px;
 }
+
+/* ==========================================================================
+   UNIFIED VIP CASINO AVATAR
+   ========================================================================== */
+.vip-unified-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.vip-unified-ring {
+  border-radius: 50%;
+  padding: 4px;
+  background: linear-gradient(135deg, #FFD700, #8B6508, #FFD700, #FDF5A9);
+  background-size: 300% 300%;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+  animation: unifiedGlowRotate 4s ease infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes unifiedGlowRotate {
+  0% { background-position: 0% 50%; box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
+  50% { background-position: 100% 50%; box-shadow: 0 0 30px rgba(255, 215, 0, 0.7); }
+  100% { background-position: 0% 50%; box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
+}
+
+.vip-unified-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #0A0A0A;
+}
+
+/* Specific Sizes */
+.vip-unified-wrapper.size-lg .vip-unified-ring {
+  width: 90px;
+  height: 90px;
+}
+.vip-unified-wrapper.size-md .vip-unified-ring {
+  width: 50px;
+  height: 50px;
+}
+.vip-unified-wrapper.size-sm .vip-unified-ring {
+  width: 36px;
+  height: 36px;
+}

@@ -98,7 +98,7 @@ const ReferAndEarn: React.FC<ReferAndEarnProps> = ({ userId, onClose }) => {
             </div>
             <div className="bonus-rewards">
               <div className="reward-item">💰 You Earn ₹50</div>
-              <div className="reward-item">💰 Friend Earns ₹50</div>
+              <div className="reward-item">💰 Friend Earns ₹100</div>
             </div>
           </div>
 
@@ -119,10 +119,11 @@ const ReferAndEarn: React.FC<ReferAndEarnProps> = ({ userId, onClose }) => {
             <h3>Your Referral Link</h3>
             <div className="link-container">
               <span className="the-link">{referralLink}</span>
+              <button className="copy-link-btn" onClick={handleCopyLink}>
+                {copiedLink ? '✅ Copied' : '📋 Copy Link'}
+              </button>
             </div>
-            <button className="copy-link-btn" onClick={handleCopyLink}>
-              {copiedLink ? '✅ Link Copied' : '📋 Copy Link'}
-            </button>
+            {copiedLink && <div className="copy-success-anim">✅ Link Copied Successfully</div>}
           </div>
 
           {/* Quick Share */}
@@ -141,26 +142,35 @@ const ReferAndEarn: React.FC<ReferAndEarnProps> = ({ userId, onClose }) => {
             </div>
           </div>
 
-          {/* Statistics */}
-          <div className="re-stats-grid">
-            <div className="re-stat-card">
-              <div className="stat-icon">👥</div>
-              <div className="stat-value">{stats.totalReferrals}</div>
-              <div className="stat-label">Total Referrals</div>
+          {/* History & Statistics */}
+          <div className="re-card history-card premium-history">
+            <h3>Referral History & Stats</h3>
+            
+            {/* Inline Stats */}
+            <div className="re-stats-grid-inline">
+              <div className="re-stat-card-inline">
+                <div className="stat-icon-wrapper">
+                  <div className="stat-icon pulse-icon">👥</div>
+                </div>
+                <div className="stat-info">
+                  <div className="stat-value">{stats.totalReferrals}</div>
+                  <div className="stat-label">Total Referrals</div>
+                </div>
+              </div>
+              <div className="re-stat-card-inline">
+                <div className="stat-icon-wrapper">
+                  <div className="stat-icon pulse-icon">💰</div>
+                </div>
+                <div className="stat-info">
+                  <div className="stat-value text-gold">₹{stats.referralEarnings}</div>
+                  <div className="stat-label">Total Earnings</div>
+                </div>
+              </div>
             </div>
-            <div className="re-stat-card">
-              <div className="stat-icon">💰</div>
-              <div className="stat-value text-gold">₹{stats.referralEarnings}</div>
-              <div className="stat-label">Total Earnings</div>
-            </div>
-          </div>
 
-          {/* History */}
-          <div className="re-card history-card">
-            <h3>Referral History</h3>
             <div className="history-list">
               {dummyHistory.map((item, idx) => (
-                <div key={idx} className="history-row">
+                <div key={idx} className="history-row animated-row" style={{ animationDelay: `${idx * 0.1}s` }}>
                   <div className="history-left">
                     <div className="h-name">{item.name}</div>
                     <div className="h-date">Joined: {item.date}</div>
@@ -180,11 +190,11 @@ const ReferAndEarn: React.FC<ReferAndEarnProps> = ({ userId, onClose }) => {
           <div className="re-card rules-card">
             <h3>Referral Rules</h3>
             <ul className="rules-list">
-              <li><span className="check">✔</span> Both users get ₹50 bonus.</li>
-              <li><span className="check">✔</span> Referral valid after account verification.</li>
-              <li><span className="check">✔</span> No self-referrals allowed.</li>
-              <li><span className="check">✔</span> One reward per verified account.</li>
-              <li><span className="check">✔</span> Bonus credited automatically.</li>
+              <li><span className="check">✔</span> Share karne par aapko ₹50 bonus aur friend ko ₹100 milega.</li>
+              <li><span className="check">✔</span> Referral tabhi valid hoga jab account verified ho.</li>
+              <li><span className="check">✔</span> Self-referrals strictly allowed nahi hain.</li>
+              <li><span className="check">✔</span> Ek verified device par ek hi baar bonus milega.</li>
+              <li><span className="check">✔</span> Bonus automatically aapke wallet me add ho jayega.</li>
             </ul>
           </div>
 

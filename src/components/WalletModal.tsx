@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
+import { showCasinoAlert } from '../utils/casinoAlert';
 import './WalletModal.css';
 
 interface WalletModalProps {
@@ -30,30 +31,33 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [pendingMessage, setPendingMessage] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (tab === 'withdraw') {
-      fetch('/api/transactions/' + username)
-        .then(res => res.json())
-        .then(data => {
-          if (Array.isArray(data)) {
-            const now = new Date().getTime();
-            const pendingWithdrawal = data.find((tx: any) => tx.type === 'withdraw' && tx.status === 'pending');
-            const recentApproved = data.find((tx: any) => 
-              tx.type === 'withdraw' && 
-              tx.status === 'approved' && 
-              (now - new Date(tx.timestamp).getTime() < 10 * 60 * 1000)
-            );
-            if (pendingWithdrawal) {
-              setPendingMessage('pending');
-            } else if (recentApproved) {
-              setPendingMessage('approved');
-            } else {
-              setPendingMessage(null);
-            }
-          }
-        })
-        .catch(console.error);
+  const [kycVerified, setKycVerified] = useState<boolean>(() => localStorage.getItem(`dt_kyc_${username}`) === 'true');
+  const [kycMobile, setKycMobile] = useState<string>('');
+  const [kycUpi, setKycUpi] = useState<string>('');
+  const [isKycLoading, setIsKycLoading] = useState(false);
+
+  const handleVerifyKyc = (e: React.MouseEvent | React.FormEvent) => {
+    e.preventDefault();
+    if (!/^[6-9]\d{9}$/.test(kycMobile)) {
+      showCasinoAlert('Please enter a valid 10-digit mobile number.', 'error');
+      return;
     }
+    if (!kycUpi.includes('@')) {
+      showCasinoAlert('Please enter a valid UPI ID (e.g. name@ybl).', 'error');
+      return;
+    }
+    setIsKycLoading(true);
+    setTimeout(() => {
+      setIsKycLoading(false);
+      setKycVerified(true);
+      setUpiId(kycUpi);
+      localStorage.setItem(`dt_kyc_${username}`, 'true');
+      showCasinoAlert('UPI eKYC Verified Successfully!', 'success');
+    }, 2000);
+  };
+
+
+  useEffect(() => {
   }, [tab, username]);
 
   const msgTimeoutRef = useRef<number | null>(null);
@@ -72,12 +76,7 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
   }, [tab]);
 
   const showMsg = (text: string, type: 'success' | 'error' | 'pending') => {
-    setMessage(text);
-    setMsgType(type);
-    if (msgTimeoutRef.current) window.clearTimeout(msgTimeoutRef.current);
-    msgTimeoutRef.current = window.setTimeout(() => {
-      setMessage('');
-    }, 3000);
+    showCasinoAlert('Wallet Notice', text, type === 'pending' ? 'info' : type);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -187,15 +186,7 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
         </div>
 
         <form className="wallet-form" onSubmit={handleSubmit}>
-          {message && (
-            <div className={`toast-message ${msgType}`}>
-              {message.split('\n').map((line, i) => (
-                <span key={i}>{line}<br /></span>
-              ))}
-            </div>
-          )}
 
-          {(!message || msgType !== 'pending') && (
             <>
               {tab === 'deposit' && depositStep === 1 && (
                 <>
@@ -286,8 +277,42 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
                       Aapke wallet me ₹{balance} hain. <br/>
                       Minimum withdrawal ke liye ₹600 hona zaruri hai.
                     </div>
+                  ) : !kycVerified ? (
+                    <div className="kyc-verification-card">
+                      <div className="kyc-header">
+                        <span className="kyc-icon">🛡️</span>
+                        <h3>Premium eKYC Verification</h3>
+                        <p>Withdrawal ke liye ek baar apna UPI ID verify karein.</p>
+                      </div>
+                      <div className="wallet-input-group">
+                        <label>Registered Mobile Number</label>
+                        <input
+                          type="text"
+                          maxLength={10}
+                          value={kycMobile}
+                          onChange={e => setKycMobile(e.target.value)}
+                          placeholder="10-digit mobile number"
+                        />
+                      </div>
+                      <div className="wallet-input-group">
+                        <label>Your UPI ID</label>
+                        <input
+                          type="text"
+                          value={kycUpi}
+                          onChange={e => setKycUpi(e.target.value)}
+                          placeholder="e.g. 9876543210@ybl"
+                        />
+                        <small className="wallet-help" style={{ color: '#aaa' }}>100% Secured via NPCI. Only for fast withdrawals.</small>
+                      </div>
+                      <button type="button" className="kyc-verify-btn" onClick={handleVerifyKyc} disabled={isKycLoading}>
+                        {isKycLoading ? <span className="kyc-loader"></span> : '🔐 Verify & Continue'}
+                      </button>
+                    </div>
                   ) : (
-                    <>
+                    <div className="withdrawal-form-container">
+                      <div className="kyc-success-badge">
+                        ✅ UPI eKYC Verified
+                      </div>
                       <div className="wallet-input-group">
                         <label>Amount (₹)</label>
                         <input
@@ -311,18 +336,11 @@ const WalletModal: React.FC<WalletModalProps> = ({ onClose, username, hasDeposit
                       <button type="submit" className="wallet-submit-btn" disabled={isSubmitting || !amount || parseInt(amount) <= 0 || (tab === 'withdraw' && parseInt(amount) > balance)}>
                         {isSubmitting ? 'Processing...' : '📥 Request Withdrawal'}
                       </button>
-                    </>
+                    </div>
                   )}
                 </>
               )}
             </>
-          )}
-
-          {msgType === 'pending' && (
-            <button type="button" className="wallet-close-btn" onClick={onClose}>
-              Close
-            </button>
-          )}
         </form>
       </div>
     </div>

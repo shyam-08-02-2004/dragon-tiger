@@ -5,7 +5,8 @@ import { User, Transaction, AdminSettings, RoundBet, Notification, RoundHistory,
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Use the Atlas URI from Vercel environment variables.
 // Hard-coded fallback ensures connection works even if env var is missing.
@@ -121,7 +122,7 @@ app.put('/api/users/:id/balance', async (req, res) => {
 
 // ADMIN ROUTES
 app.get('/api/admin/users', async (req, res) => {
-  const users = await User.find({});
+  const users = await User.find({}).sort({ _id: -1 });
   res.json(users);
 });
 

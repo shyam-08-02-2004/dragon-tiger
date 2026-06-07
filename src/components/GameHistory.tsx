@@ -37,10 +37,14 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
 
   useEffect(() => {
     if (isOpen) {
-      const stored = sessionStorage.getItem('dt_historyTab') as 'game' | 'bets';
-      if (stored) setActiveTab(stored);
+      if (!username) {
+        setActiveTab('game');
+      } else {
+        const stored = sessionStorage.getItem('dt_historyTab') as 'game' | 'bets';
+        if (stored) setActiveTab(stored);
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, username]);
 
   const handleTabChange = (tab: 'game' | 'bets') => {
     setActiveTab(tab);

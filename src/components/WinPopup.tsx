@@ -23,8 +23,8 @@ const WinPopup: React.FC<WinPopupProps> = ({ winAmount, onClose }) => {
         removeTimer = window.setTimeout(() => {
           setShow(false);
           if (onClose) onClose();
-        }, 300); // matches CSS animation duration
-      }, 3000); // 3 seconds visible
+        }, 500); // matches CSS animation duration
+      }, 4000); // 4 seconds visible
     }
     
     return () => {
@@ -36,35 +36,29 @@ const WinPopup: React.FC<WinPopupProps> = ({ winAmount, onClose }) => {
   if (!show || winAmount <= 0) return null;
 
   return (
-    <div className={`win-popup-overlay ${isClosing ? 'closing' : ''}`} style={{ zIndex: 9999 }}>
-      <div className={`win-popup-container ${isClosing ? 'closing' : ''}`}>
+    <div className={`win-popup-overlay ${isClosing ? 'closing' : ''}`}>
+      <div className="win-light-rays"></div>
+      
+      <div className={`win-vip-container ${isClosing ? 'closing' : ''}`}>
         
-        {/* Top Decorative Ribbon/Badge */}
-        <div className="win-badge">
-          <div className="win-badge-icon">🚀</div>
-          <div className="win-ribbon left-ribbon"></div>
-          <div className="win-ribbon right-ribbon"></div>
-        </div>
-
-        {/* Main Card */}
-        <div className="win-card">
-          <h2 className="win-title">Congratulations on your<br/>winning</h2>
+        <div className="win-vip-card">
+          <div className="win-glow-sweep"></div>
           
-          <div className="win-subtitle">lottery result</div>
+          <div className="win-crown">👑</div>
+          <h2 className="win-vip-title">BIG WIN</h2>
+          <div className="win-vip-subtitle">CONGRATULATIONS</div>
           
-          {/* Slot for receipt */}
-          <div className="ticket-slot-container">
-            <div className="ticket-slot"></div>
-            
-            {/* The animated receipt/ticket */}
-            <div className="receipt-paper">
-              <div className="receipt-content">
-                <div className="receipt-amount">+₹{winAmount}</div>
-                <div className="receipt-text">SUCCESS</div>
-              </div>
-              {/* Folded bottom edge illusion */}
-              <div className="receipt-bottom"></div>
-            </div>
+          <div className="win-amount-box">
+            <span className="win-currency">+₹</span>
+            <span className="win-amount-value">{winAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+          </div>
+          
+          <div className="win-coins-container">
+            <div className="win-coin coin-1">🪙</div>
+            <div className="win-coin coin-2">🪙</div>
+            <div className="win-coin coin-3">🪙</div>
+            <div className="win-coin coin-4">🪙</div>
+            <div className="win-coin coin-5">🪙</div>
           </div>
         </div>
 

@@ -81,13 +81,14 @@ const App: React.FC = () => {
   const [showWallet, setShowWallet] = useState(() => sessionStorage.getItem('dt_showWallet') === 'true');
   const [showHistory, setShowHistory] = useState(() => sessionStorage.getItem('dt_showHistory') === 'true');
   const [showHelpCenter, setShowHelpCenter] = useState(() => sessionStorage.getItem('dt_showHelp') === 'true');
-  const [showRefer, setShowRefer] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
+  const [showRefer, setShowRefer] = useState(() => sessionStorage.getItem('dt_showRefer') === 'true');
+  const [showProfile, setShowProfile] = useState(() => sessionStorage.getItem('dt_showProfile') === 'true');
 
   const setWalletOpen = (val: boolean) => { setShowWallet(val); sessionStorage.setItem('dt_showWallet', String(val)); };
   const setHistoryOpen = (val: boolean) => { setShowHistory(val); sessionStorage.setItem('dt_showHistory', String(val)); };
   const setHelpOpen = (val: boolean) => { setShowHelpCenter(val); sessionStorage.setItem('dt_showHelp', String(val)); };
-  const setReferOpen = (val: boolean) => setShowRefer(val);
+  const setReferOpen = (val: boolean) => { setShowRefer(val); sessionStorage.setItem('dt_showRefer', String(val)); };
+  const setProfileOpen = (val: boolean) => { setShowProfile(val); sessionStorage.setItem('dt_showProfile', String(val)); };
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const toggleMute = () => setMuted(prev => !prev);
   // Unlock speech synthesis on first user interaction
@@ -647,12 +648,12 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
              method: 'POST',
              headers: { 'Content-Type': 'application/json' },
              body: JSON.stringify({
-               username: currentUserRef.current.id || currentUserRef.current.username,
-               roundId: getGlobalGameState().rawRoundId,
-               roundNumber: roundId,
-               betSide: betSideStr,
-               betAmount: currentPrev.totalBet,
-               winAmount: winnings
+              username: currentUserRef.current.id || currentUserRef.current.username,
+              roundId: seed,
+              roundNumber: roundId,
+              betSide: betSideStr,
+              betAmount: currentPrev.totalBet,
+              winAmount: winnings
              })
            }).catch(() => {});
          }
@@ -661,7 +662,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
       fetch('/api/history/record', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ roundId: getGlobalGameState().rawRoundId, result })
+        body: JSON.stringify({ roundId: seed, result })
       }).catch(() => {});
 
       fetch('/api/admin/settings/cleanup', {
@@ -742,7 +743,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
           onLogout={handleLogout}
           onShowWallet={() => setWalletOpen(true)}
           onShowSupport={currentUser.id !== 'babu' ? () => setHelpOpen(true) : undefined}
-          onShowProfile={currentUser.id !== 'babu' ? () => setShowProfile(true) : undefined}
+          onShowProfile={currentUser.id !== 'babu' ? () => setProfileOpen(true) : undefined}
           muted={muted} voiceEnabled={voiceEnabled}
           onToggleMute={toggleMute}
         />
@@ -839,7 +840,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
             <span className="pbn-icon">📜</span>
             <span className="pbn-label">History</span>
           </div>
-          <div className="pbn-item" onClick={() => setShowProfile(true)}>
+          <div className="pbn-item" onClick={() => setProfileOpen(true)}>
             <span className="pbn-icon">👤</span>
             <span className="pbn-label">Profile</span>
           </div>
@@ -911,12 +912,12 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
       {showProfile && (
         <ProfileModal 
           user={currentUser} 
-          onClose={() => setShowProfile(false)} 
-          onLogout={() => { setShowProfile(false); handleLogout(); }}
-          onShowWallet={() => { setShowProfile(false); setWalletOpen(true); }}
-          onShowRefer={currentUser?.id !== 'babu' ? () => { setShowProfile(false); setReferOpen(true); } : undefined}
-          onShowSupport={currentUser?.id !== 'babu' ? () => { setShowProfile(false); setHelpOpen(true); } : undefined}
-          onShowHistory={() => { setShowProfile(false); setHistoryOpen(true); }}
+          onClose={() => setProfileOpen(false)} 
+          onLogout={() => { setProfileOpen(false); handleLogout(); }}
+          onShowWallet={() => { setProfileOpen(false); setWalletOpen(true); }}
+          onShowRefer={currentUser?.id !== 'babu' ? () => { setProfileOpen(false); setReferOpen(true); } : undefined}
+          onShowSupport={currentUser?.id !== 'babu' ? () => { setProfileOpen(false); setHelpOpen(true); } : undefined}
+          onShowHistory={() => { setProfileOpen(false); setHistoryOpen(true); }}
         />
       )}
 

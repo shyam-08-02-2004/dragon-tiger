@@ -1,235 +1,264 @@
+/* ==========================================================================
+   PREMIUM VIP WIN POPUP - HIGH HD LUXURY UI
+   ========================================================================== */
+
 .win-popup-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.85);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  backdrop-filter: blur(4px);
-  animation: fadeIn 0.3s ease-out forwards;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: winFadeIn 0.5s ease-out forwards;
+  overflow: hidden;
 }
 
-@keyframes fadeIn {
+@keyframes winFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-.win-popup-container {
-  position: relative;
-  width: 90%;
-  max-width: 350px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-}
-
-@keyframes popIn {
-  from { transform: scale(0.8) translateY(20px); opacity: 0; }
-  to { transform: scale(1) translateY(0); opacity: 1; }
-}
-
 .win-popup-overlay.closing {
-  animation: fadeOut 0.3s ease-in forwards;
+  animation: winFadeOut 0.5s ease-in forwards;
 }
 
-@keyframes fadeOut {
+@keyframes winFadeOut {
   from { opacity: 1; }
   to { opacity: 0; }
 }
 
-.win-popup-container.closing {
-  animation: popOut 0.3s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards;
-}
-
-@keyframes popOut {
-  from { transform: scale(1) translateY(0); opacity: 1; }
-  to { transform: scale(0.8) translateY(20px); opacity: 0; }
-}
-
-/* Badge at the top */
-.win-badge {
-  position: relative;
-  z-index: 10;
-  margin-bottom: -30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.win-badge-icon {
-  background: linear-gradient(135deg, #ffd700, #ffaa00);
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 30px;
-  box-shadow: 0 4px 15px rgba(255, 170, 0, 0.5), inset 0 2px 5px rgba(255, 255, 255, 0.5);
-  border: 3px solid #fff;
-  position: relative;
-  z-index: 2;
-}
-
-.win-ribbon {
+/* ── SPINNING LIGHT RAYS ── */
+.win-light-rays {
   position: absolute;
-  top: 15px;
-  width: 80px;
-  height: 30px;
-  background: #ffb700;
-  z-index: 1;
-}
-
-.win-ribbon.left-ribbon {
-  left: -60px;
-  transform: rotate(-15deg);
-  border-radius: 5px 0 0 5px;
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 15px 50%);
-}
-
-.win-ribbon.right-ribbon {
-  right: -60px;
-  transform: rotate(15deg);
-  border-radius: 0 5px 5px 0;
-  clip-path: polygon(0 0, 100% 0, 85% 50%, 100% 100%, 0 100%);
-}
-
-/* Main Orange Card */
-.win-card {
-  background: linear-gradient(180deg, #ff8c52 0%, #ff5c33 100%);
-  width: 100%;
-  border-radius: 20px;
-  padding: 45px 20px 30px;
-  box-shadow: 0 10px 30px rgba(255, 92, 51, 0.4), inset 0 2px 10px rgba(255, 255, 255, 0.3);
-  text-align: center;
-  position: relative;
-  z-index: 1;
-}
-
-.win-title {
-  color: #ffffff;
-  font-family: var(--font-display, sans-serif);
-  font-size: 22px;
-  font-weight: 800;
-  line-height: 1.3;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  margin-bottom: 10px;
-  margin-top: 0;
-}
-
-.win-subtitle {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 25px;
-  text-align: left;
-  padding-left: 10px;
-}
-
-/* Ticket Slot */
-.ticket-slot-container {
-  position: relative;
-  width: 100%;
-  height: 140px;
-}
-
-.ticket-slot {
-  width: 90%;
-  height: 12px;
-  background: #aa2712;
-  margin: 0 auto;
-  border-radius: 10px;
-  box-shadow: inset 0 5px 10px rgba(0,0,0,0.6), 0 2px 2px rgba(255,255,255,0.2);
-  position: relative;
-  z-index: 3; /* Slot front lip is above ticket */
-}
-
-/* Animated Ticket */
-.receipt-paper {
-  position: absolute;
-  top: 6px;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  width: 80%;
-  height: 0; /* Starts hidden inside */
-  background: #ffffff;
-  border-radius: 0 0 8px 8px;
-  box-shadow: 0 8px 15px rgba(0,0,0,0.2);
-  overflow: hidden;
-  z-index: 2; /* Ticket is behind slot front lip */
-  animation: slideOutTicket 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s forwards;
-}
-
-@keyframes slideOutTicket {
-  0% { height: 0; padding-bottom: 0; }
-  100% { height: 120px; padding-bottom: 10px; }
-}
-
-.receipt-content {
-  padding: 20px 10px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
+  width: 200vw;
+  height: 200vw;
+  transform: translate(-50%, -50%);
+  background: repeating-conic-gradient(
+    from 0deg,
+    transparent 0deg 15deg,
+    rgba(212, 175, 55, 0.15) 15deg 30deg
+  );
+  animation: spinRays 20s linear infinite;
+  pointer-events: none;
+  z-index: 1;
   opacity: 0;
-  animation: fadeInText 0.3s ease-out 0.6s forwards;
+  animation: spinRays 20s linear infinite, rayFadeIn 1s ease-out forwards;
 }
 
-@keyframes fadeInText {
+@keyframes spinRays {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes rayFadeIn {
+  from { opacity: 0; }
   to { opacity: 1; }
 }
 
-.receipt-amount {
-  color: #e74c3c;
-  font-size: 28px;
-  font-weight: 900;
-  font-family: var(--font-tech, monospace);
-  margin-bottom: 5px;
+/* ── MAIN CONTAINER ── */
+.win-vip-container {
+  position: relative;
+  z-index: 10;
+  width: 90%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: vipPopIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-.receipt-text {
-  color: #333;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 2px;
+@keyframes vipPopIn {
+  0% { transform: scale(0.5) translateY(100px); opacity: 0; filter: blur(10px); }
+  70% { transform: scale(1.05) translateY(-10px); opacity: 1; filter: blur(0); }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
 }
 
-.receipt-bottom {
-  position: absolute;
-  bottom: 0;
-  left: 0;
+.win-vip-container.closing {
+  animation: vipPopOut 0.5s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards;
+}
+
+@keyframes vipPopOut {
+  0% { transform: scale(1) translateY(0); opacity: 1; filter: blur(0); }
+  100% { transform: scale(0.5) translateY(100px); opacity: 0; filter: blur(10px); }
+}
+
+/* ── LUXURY CARD ── */
+.win-vip-card {
+  background: linear-gradient(135deg, rgba(30, 25, 10, 0.95), rgba(15, 10, 0, 0.95));
   width: 100%;
-  height: 10px;
-  background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.05) 100%);
+  border-radius: 24px;
+  padding: 40px 20px 50px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 
+              0 0 30px rgba(212, 175, 55, 0.3),
+              inset 0 2px 10px rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(212, 175, 55, 0.5);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Mobile Responsiveness */
+/* Glowing Border Animation */
+.win-vip-card::before {
+  content: '';
+  position: absolute;
+  top: -2px; left: -2px; right: -2px; bottom: -2px;
+  border-radius: 26px;
+  background: linear-gradient(45deg, #D4AF37, transparent, #FFDF00, transparent, #D4AF37);
+  z-index: -1;
+  background-size: 400% 400%;
+  animation: glowingBorder 3s ease infinite;
+  opacity: 0.8;
+}
+
+@keyframes glowingBorder {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ── GLOW SWEEP (LIGHT REFLECTION) ── */
+.win-glow-sweep {
+  position: absolute;
+  top: 0; left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transform: skewX(-20deg);
+  animation: sweep 2.5s infinite;
+  pointer-events: none;
+}
+
+@keyframes sweep {
+  0% { left: -100%; }
+  50% { left: 200%; }
+  100% { left: 200%; }
+}
+
+/* ── CROWN & TEXT ── */
+.win-crown {
+  font-size: 50px;
+  margin-top: -70px;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 5px 15px rgba(212, 175, 55, 0.8));
+  animation: bounceCrown 2s ease-in-out infinite;
+}
+
+@keyframes bounceCrown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px) scale(1.1); }
+}
+
+.win-vip-title {
+  color: #FFD700;
+  font-family: 'Cinzel', serif;
+  font-size: 42px;
+  font-weight: 900;
+  line-height: 1.1;
+  text-shadow: 0 4px 20px rgba(255, 215, 0, 0.6), 0 1px 3px rgba(0,0,0,0.8);
+  margin: 0 0 5px 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  background: linear-gradient(to bottom, #FFF 0%, #FFDF00 50%, #B8860B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.win-vip-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 6px;
+  margin-bottom: 30px;
+  font-weight: 600;
+}
+
+/* ── AMOUNT DISPLAY ── */
+.win-amount-box {
+  background: linear-gradient(180deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  padding: 20px 10px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 5px 20px rgba(0,0,0,0.3);
+  animation: pulseAmount 1.5s infinite alternate;
+}
+
+@keyframes pulseAmount {
+  from { transform: scale(1); box-shadow: 0 5px 20px rgba(212, 175, 55, 0.2); }
+  to { transform: scale(1.05); box-shadow: 0 10px 30px rgba(212, 175, 55, 0.5); }
+}
+
+.win-currency {
+  font-size: 24px;
+  color: #4CAF50;
+  font-weight: bold;
+}
+
+.win-amount-value {
+  color: #4CAF50;
+  font-size: 46px;
+  font-weight: 900;
+  font-family: 'Inter', sans-serif;
+  text-shadow: 0 2px 10px rgba(76, 175, 80, 0.4);
+  letter-spacing: -1px;
+}
+
+/* ── FLYING COINS ── */
+.win-coins-container {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.win-coin {
+  position: absolute;
+  font-size: 30px;
+  opacity: 0;
+  filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+}
+
+.coin-1 { left: 10%; animation: flyCoin 2s ease-out 0.1s forwards; }
+.coin-2 { left: 30%; animation: flyCoin 2.2s ease-out 0.3s forwards; }
+.coin-3 { left: 50%; animation: flyCoin 1.8s ease-out 0.2s forwards; }
+.coin-4 { left: 70%; animation: flyCoin 2.1s ease-out 0.4s forwards; }
+.coin-5 { left: 90%; animation: flyCoin 1.9s ease-out 0.1s forwards; }
+
+@keyframes flyCoin {
+  0% { transform: translateY(150px) scale(0) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateY(-200px) scale(1.5) rotate(720deg); opacity: 0; }
+}
+
+/* ── RESPONSIVENESS ── */
 @media (max-width: 480px) {
-  .win-popup-container {
-    max-width: 300px;
+  .win-vip-container {
+    max-width: 320px;
   }
-  .win-card {
-    padding: 35px 15px 25px;
+  .win-vip-card {
+    padding: 30px 15px 40px;
   }
-  .win-title {
-    font-size: 18px;
+  .win-vip-title {
+    font-size: 36px;
   }
-  .receipt-amount {
-    font-size: 24px;
+  .win-vip-subtitle {
+    font-size: 12px;
+    letter-spacing: 4px;
   }
-  .win-badge-icon {
-    width: 50px;
-    height: 50px;
-    font-size: 24px;
+  .win-amount-value {
+    font-size: 38px;
   }
-  .win-ribbon.left-ribbon {
-    left: -50px;
-  }
-  .win-ribbon.right-ribbon {
-    right: -50px;
+  .win-crown {
+    font-size: 40px;
+    margin-top: -60px;
   }
 }

@@ -12,20 +12,21 @@ const getAudioContext = (): AudioContext | null => {
   return Win.__dtAudioContext;
 };
 
-const playTone = (frequency: number, duration = 0.12, volume = 0.16, type: OscillatorType = 'sine') => {
+const playTone = (frequency: number, duration = 0.12, volume = 0.16, type: OscillatorType = 'sine', detune = 0) => {
   const ctx = getAudioContext();
   if (!ctx) return;
   const oscillator = ctx.createOscillator();
   const gain = ctx.createGain();
   oscillator.type = type;
   oscillator.frequency.value = frequency;
+  oscillator.detune.value = detune;
   gain.gain.value = volume;
   oscillator.connect(gain);
   gain.connect(ctx.destination);
   oscillator.start();
   gain.gain.setValueAtTime(volume, ctx.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-  oscillator.stop(ctx.currentTime + duration + 0.02);
+  oscillator.stop(ctx.currentTime + duration + 0.05);
 };
 
 const playNoiseBurst = (duration = 0.08, volume = 0.16, highpass = 1200) => {
@@ -47,6 +48,10 @@ const playNoiseBurst = (duration = 0.08, volume = 0.16, highpass = 1200) => {
   source.connect(filter);
   filter.connect(gain);
   gain.connect(ctx.destination);
+  
+  gain.gain.setValueAtTime(volume, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+
   source.start();
 };
 
@@ -55,12 +60,15 @@ export const speak = (text: string, muted: boolean) => {
   if ('speechSynthesis' in window) {
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'en-US';
+    utter.pitch = 1.1;
+    utter.rate = 1.05;
     window.speechSynthesis.speak(utter);
   }
 };
 
 export type SoundVariant = BetType | GameResult | 'double' | 'clear' | 'notify' | 'win' | 'lose' | 'shuffle' | 'deal' | 'chip' | 'button' | 'countdown' | 'coin' | 'jackpot' | 'congrats';
 
+/* PREMIUM LUXURY CASINO SOUND EFFECTS */
 export const playSound = (variant: SoundVariant, muted: boolean) => {
   if (muted) return;
   const ctx = getAudioContext();
@@ -69,74 +77,97 @@ export const playSound = (variant: SoundVariant, muted: boolean) => {
 
   switch (variant) {
     case 'dragon':
-      playTone(420, 0.12, 0.18, 'triangle');
-      setTimeout(() => playTone(620, 0.1, 0.14, 'triangle'), 80);
+      // Deep majestic gong-like
+      playTone(220, 0.4, 0.2, 'sine');
+      playTone(330, 0.4, 0.1, 'triangle', 5);
       break;
     case 'tiger':
-      playTone(520, 0.12, 0.18, 'square');
-      setTimeout(() => playTone(720, 0.1, 0.14, 'square'), 80);
+      // Bright sharp bell-like
+      playTone(440, 0.4, 0.15, 'sine');
+      playTone(660, 0.4, 0.1, 'triangle', -5);
       break;
     case 'tie':
-      playTone(460, 0.12, 0.16, 'sine');
-      setTimeout(() => playTone(580, 0.1, 0.16, 'sine'), 80);
+      // Harmonious chord
+      playTone(261.63, 0.5, 0.15, 'sine'); // C4
+      playTone(329.63, 0.5, 0.15, 'sine'); // E4
+      playTone(392.00, 0.5, 0.15, 'triangle'); // G4
       break;
     case 'double':
-      playTone(560, 0.14, 0.18, 'triangle');
+      playTone(523.25, 0.2, 0.15, 'sine');
+      setTimeout(() => playTone(659.25, 0.3, 0.15, 'sine'), 100);
       break;
     case 'clear':
-      playTone(280, 0.12, 0.16, 'sine');
+      playNoiseBurst(0.1, 0.15, 3000);
+      playTone(300, 0.1, 0.1, 'triangle');
       break;
     case 'notify':
-      playTone(740, 0.1, 0.16, 'triangle');
-      setTimeout(() => playTone(880, 0.08, 0.14, 'triangle'), 90);
+      playTone(880, 0.1, 0.1, 'sine');
+      setTimeout(() => playTone(1760, 0.2, 0.1, 'sine'), 100);
       break;
     case 'win':
-      playTone(880, 0.18, 0.24, 'triangle');
-      setTimeout(() => playTone(1020, 0.15, 0.18, 'triangle'), 120);
-      setTimeout(() => playTone(1180, 0.1, 0.16, 'triangle'), 240);
+      // Premium ascending arpeggio
+      playTone(523.25, 0.15, 0.2, 'triangle'); // C5
+      setTimeout(() => playTone(659.25, 0.15, 0.2, 'triangle'), 80); // E5
+      setTimeout(() => playTone(783.99, 0.15, 0.2, 'triangle'), 160); // G5
+      setTimeout(() => playTone(1046.50, 0.4, 0.2, 'sine'), 240); // C6
       break;
     case 'congrats':
-      playTone(960, 0.16, 0.22, 'triangle');
-      setTimeout(() => playTone(1120, 0.12, 0.18, 'triangle'), 110);
-      setTimeout(() => playTone(1280, 0.1, 0.16, 'triangle'), 220);
-      setTimeout(() => playNoiseBurst(0.12, 0.14, 2400), 100);
+      // Grand VIP casino win flourish
+      playTone(440, 0.2, 0.2, 'sine');
+      setTimeout(() => playTone(554.37, 0.2, 0.2, 'sine'), 100);
+      setTimeout(() => playTone(659.25, 0.2, 0.2, 'sine'), 200);
+      setTimeout(() => {
+        playTone(880, 0.6, 0.25, 'triangle');
+        playTone(1108.73, 0.6, 0.2, 'sine');
+        playNoiseBurst(0.4, 0.05, 4000); // Shimmer
+      }, 300);
       break;
     case 'lose':
-      playTone(240, 0.16, 0.2, 'sine');
-      setTimeout(() => playTone(180, 0.08, 0.14, 'sine'), 100);
+      playTone(349.23, 0.3, 0.2, 'sine');
+      setTimeout(() => playTone(329.63, 0.3, 0.2, 'sine'), 200);
+      setTimeout(() => playTone(293.66, 0.5, 0.2, 'triangle'), 400);
       break;
     case 'shuffle':
-      playNoiseBurst(0.06, 0.14, 1800);
-      setTimeout(() => playNoiseBurst(0.05, 0.08, 2200), 50);
+      // Smooth card shuffle
+      for(let i=0; i<6; i++) {
+        setTimeout(() => playNoiseBurst(0.04, 0.1, 2000), i * 40);
+      }
       break;
     case 'deal':
-      playTone(1040, 0.08, 0.14, 'triangle');
-      setTimeout(() => playTone(760, 0.06, 0.12, 'triangle'), 70);
+      // Crisp card slide on felt
+      playNoiseBurst(0.06, 0.15, 1000);
+      playTone(1200, 0.02, 0.05, 'sine');
       break;
     case 'chip':
-      playTone(980, 0.04, 0.18, 'square');
-      setTimeout(() => playTone(660, 0.08, 0.12, 'triangle'), 35);
+      // High-end ceramic casino chip clink
+      playTone(3500, 0.05, 0.1, 'sine');
+      playTone(4800, 0.08, 0.08, 'sine');
       break;
     case 'button':
-      playTone(1120, 0.04, 0.18, 'square');
+      // Soft modern UI click
+      playTone(600, 0.03, 0.1, 'triangle');
+      playNoiseBurst(0.02, 0.05, 3000);
       break;
     case 'countdown':
-      playTone(720, 0.08, 0.16, 'square');
-      setTimeout(() => playTone(660, 0.08, 0.14, 'square'), 150);
-      setTimeout(() => playTone(600, 0.08, 0.12, 'square'), 300);
+      // Tension tick
+      playTone(800, 0.05, 0.1, 'sine');
       break;
     case 'coin':
-      playNoiseBurst(0.1, 0.12, 2800);
-      playTone(1280, 0.1, 0.12, 'triangle');
+      // Gold coin jingle
+      playTone(2500, 0.15, 0.15, 'sine');
+      setTimeout(() => playTone(3000, 0.2, 0.15, 'sine'), 40);
       break;
     case 'jackpot':
-      playTone(1040, 0.12, 0.2, 'triangle');
-      setTimeout(() => playTone(1240, 0.1, 0.18, 'triangle'), 90);
-      setTimeout(() => playTone(1440, 0.08, 0.16, 'triangle'), 180);
-      setTimeout(() => playNoiseBurst(0.18, 0.18, 2400), 120);
+      // Massive explosion of coins
+      for(let i=0; i<15; i++) {
+        setTimeout(() => {
+          playTone(2000 + Math.random()*1000, 0.1, 0.1, 'sine');
+          playNoiseBurst(0.05, 0.05, 3000);
+        }, i * 60);
+      }
       break;
     default:
-      playTone(440, 0.12, 0.15, 'sine');
+      playTone(440, 0.1, 0.1, 'sine');
   }
 };
 

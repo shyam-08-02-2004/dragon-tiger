@@ -1,6 +1,6 @@
 import React from 'react';
 import './ProfileModal.css';
-import vipAvatar from '../assets/vip-avatar.png';
+import vipAvatar from '../assets/vip-girl.png';
 
 interface ProfileModalProps {
   user: any;
@@ -42,12 +42,12 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
         
         {/* Profile Section */}
         <div className="up-profile-section">
-          <div className="up-avatar-wrapper">
-            <div className="up-avatar-ring">
+          <div className="vip-unified-wrapper size-lg">
+            <div className="vip-unified-ring">
               <img 
                 src={vipAvatar} 
                 alt="VIP Player" 
-                className="up-avatar-img"
+                className="vip-unified-img"
               />
             </div>
             <div className="up-camera-icon">✏️</div>
@@ -102,13 +102,8 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
             <div className="up-card-arrow">›</div>
           </div>
 
-          {/* Logout Card */}
           {onLogout && (
-            <div className="up-card logout" onClick={() => {
-              if (window.confirm("Are you sure you want to securely logout?")) {
-                onLogout();
-              }
-            }}>
+            <div className="up-card logout" onClick={() => onLogout()}>
               <div className="up-card-icon">🚪</div>
               <div className="up-card-content">
                 <h3 className="up-card-title" style={{color: '#EF4444'}}>Secure Logout</h3>

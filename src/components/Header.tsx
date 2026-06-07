@@ -1,6 +1,6 @@
 import React from 'react';
 import './Header.css';
-import vipAvatar from '../assets/vip-avatar.png';
+import vipAvatar from '../assets/vip-girl.png';
 
 interface HeaderProps {
   balance: number;
@@ -33,8 +33,10 @@ const Header: React.FC<HeaderProps> = ({
     <header className="premium-header">
       {/* Left: Profile & Wallet */}
       <div className="ph-left" onClick={onShowProfile} style={{ cursor: 'pointer' }}>
-        <div className="ph-avatar-wrapper">
-          <img src={vipAvatar} alt="Profile" className="ph-avatar" />
+        <div className="vip-unified-wrapper size-md">
+          <div className="vip-unified-ring">
+            <img src={vipAvatar} alt="Profile" className="vip-unified-img" />
+          </div>
         </div>
         <div className="ph-user-info">
           <div className="ph-name-row">

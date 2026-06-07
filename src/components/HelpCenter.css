@@ -214,37 +214,90 @@
   color: #D4AF37;
 }
 
-.hc-msg-menu {
-  position: absolute;
-  top: -30px;
-  right: 0;
-  background: rgba(0,0,0,0.9);
-  border: 1px solid #333;
-  border-radius: 8px;
+.hc-premium-actions {
   display: flex;
-  gap: 4px;
-  padding: 4px 8px;
-  z-index: 10;
-  animation: hcPop 0.2s ease;
+  gap: 8px;
+  margin-top: 8px;
+  justify-content: flex-end;
+  animation: hcPop 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 @keyframes hcPop {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
-.hc-msg-menu button {
-  background: none;
-  border: none;
+.premium-btn-edit, .premium-btn-delete {
+  background: rgba(15, 15, 20, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: #FFF;
-  font-size: 12px;
-  padding: 4px 8px;
+  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: 8px;
   cursor: pointer;
-  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  backdrop-filter: blur(5px);
 }
 
-.hc-msg-menu button:hover {
-  background: rgba(255,255,255,0.1);
+.premium-btn-edit {
+  border-color: rgba(241, 196, 15, 0.4);
+  color: #f1c40f;
+}
+
+.premium-btn-edit:hover {
+  background: rgba(241, 196, 15, 0.15);
+  box-shadow: 0 4px 15px rgba(241, 196, 15, 0.3);
+  transform: translateY(-2px);
+}
+
+.premium-btn-delete {
+  border-color: rgba(231, 76, 60, 0.4);
+  color: #e74c3c;
+}
+
+.premium-btn-delete:hover {
+  background: rgba(231, 76, 60, 0.15);
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+  transform: translateY(-2px);
+}
+
+.hc-quick-messages {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 0 10px 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.hc-quick-messages::-webkit-scrollbar {
+  display: none;
+}
+
+.hc-quick-btn {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.05));
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  color: #E0E0E0;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.hc-quick-btn:hover, .hc-quick-btn:active {
+  background: rgba(212, 175, 55, 0.25);
+  border-color: #D4AF37;
+  color: #FFF;
+  transform: scale(1.05);
 }
 
 .hc-edit-box {

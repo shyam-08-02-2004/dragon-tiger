@@ -27,6 +27,7 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeMenuMsgId, setActiveMenuMsgId] = useState<string | null>(null);
+  const [fullScreenMedia, setFullScreenMedia] = useState<{url: string, type: string} | null>(null);
 
   const [editingChatId, setEditingChatId] = useState<string | null>(null);
   const [editingChatText, setEditingChatText] = useState('');
@@ -94,10 +95,11 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
     reader.readAsDataURL(file);
   };
 
-  const handleSend = async () => {
-    if (!newMessage.trim() && !mediaFile) return;
+  const handleSend = async (quickMsg?: string) => {
+    const textToSend = quickMsg || newMessage;
+    if (!textToSend.trim() && !mediaFile) return;
     try {
-      const msg = newMessage;
+      const msg = textToSend;
       const mediaUrl = mediaFile?.url || null;
       const type = mediaFile?.type || 'text';
       setNewMessage('');
@@ -113,6 +115,14 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
       setMessages(prev => [...prev, data]);
     } catch (e) { console.error(e); }
   };
+
+  const quickMessages = [
+    "Withdrawal Issue 💸",
+    "Deposit Issue 💳",
+    "Amount Missing ⚠️",
+    "Game Error 🎮",
+    "Need Help 🆘"
+  ];
 
   if (!isOpen) return null;
 
@@ -168,7 +178,7 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
                           ) : msg.mediaType === 'pdf' ? (
                             <embed src={msg.imageUrl} type="application/pdf" className="hc-pdf" />
                           ) : (
-                            <img src={msg.imageUrl} alt="attachment" className="hc-image" />
+                            <img src={msg.imageUrl} alt="attachment" className="hc-image" style={{ cursor: 'pointer', border: '1px solid rgba(255,255,255,0.2)' }} onClick={() => setFullScreenMedia({ url: msg.imageUrl || '', type: 'image' })} />
                           )}
                         </div>
                       )}
@@ -180,12 +190,14 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
                         {new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                       </div>
 
-                      {msg.sender === 'user' && activeMenuMsgId === msg.id && (
-                        <div className="hc-msg-menu">
-                          {Date.now() - new Date(msg.timestamp).getTime() <= 5 * 60 * 1000 && (
-                            <button onClick={(e) => { e.stopPropagation(); setEditingChatId(msg.id); setEditingChatText(msg.message); setActiveMenuMsgId(null); }}>✏️ Edit</button>
-                          )}
-                          <button onClick={(e) => { e.stopPropagation(); handleDeleteMessage(msg.id); }}>🗑️ Delete</button>
+                      {msg.sender === 'user' && activeMenuMsgId === msg.id && Date.now() - new Date(msg.timestamp).getTime() <= 5 * 60 * 1000 && (
+                        <div className="hc-premium-actions">
+                          <button className="premium-btn-edit" onClick={(e) => { e.stopPropagation(); setEditingChatId(msg.id); setEditingChatText(msg.message); setActiveMenuMsgId(null); }}>
+                            <span>✏️</span> Edit
+                          </button>
+                          <button className="premium-btn-delete" onClick={(e) => { e.stopPropagation(); handleDeleteMessage(msg.id); }}>
+                            <span>🗑️</span> Delete
+                          </button>
                         </div>
                       )}
                     </>
@@ -198,28 +210,65 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
         </div>
 
         <div className="hc-input-area glass-footer">
-          {mediaFile && (
-            <div className="hc-media-preview">
-              <span className="preview-label">{mediaFile.type.toUpperCase()} Attached</span>
-              <button onClick={() => { setMediaFile(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}>✕</button>
-            </div>
-          )}
-          <div className="hc-input-row">
-            <input type="file" accept="image/*,video/*,application/pdf" ref={fileInputRef} onChange={handleFileUpload} style={{ display: 'none' }} />
-            <button className="hc-attach-btn" onClick={() => fileInputRef.current?.click()}>📎</button>
-            <input 
-              type="text" 
-              placeholder="Message Live Support..." 
-              value={newMessage}
-              onChange={e => setNewMessage(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSend()}
-              className="hc-text-input"
-            />
-            <button className="hc-send-btn" onClick={handleSend} disabled={!newMessage.trim() && !mediaFile}>
-              ➤
-            </button>
-          </div>
+          {(() => {
+            const isWaitingForAdmin = messages.length > 0 && messages[messages.length - 1].sender === 'user';
+
+            if (isWaitingForAdmin) {
+              return (
+                <div style={{ textAlign: 'center', padding: '15px 10px', color: '#f39c12', background: 'rgba(243,156,18,0.1)', borderRadius: '12px', border: '1px solid rgba(243,156,18,0.3)', fontWeight: 'bold' }}>
+                  ⏳ Please wait for our support team to reply...
+                </div>
+              );
+            }
+
+            return (
+              <>
+                {mediaFile && (
+                  <div className="hc-media-preview">
+                    <span className="preview-label">{mediaFile.type.toUpperCase()} Attached</span>
+                    <button onClick={() => { setMediaFile(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}>✕</button>
+                  </div>
+                )}
+                
+                <div className="hc-quick-messages">
+                  {quickMessages.map((qm, idx) => (
+                    <button key={idx} className="hc-quick-btn" onClick={() => handleSend(qm)}>
+                      {qm}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="hc-input-row">
+                  <input type="file" accept="image/*,video/*,application/pdf" ref={fileInputRef} onChange={handleFileUpload} style={{ display: 'none' }} />
+                  <button className="hc-attach-btn" onClick={() => fileInputRef.current?.click()}>📎</button>
+                  <input 
+                    type="text" 
+                    placeholder="Message Live Support..." 
+                    value={newMessage}
+                    onChange={e => setNewMessage(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && handleSend()}
+                    className="hc-text-input"
+                  />
+                  <button className="hc-send-btn" onClick={() => handleSend()} disabled={!newMessage.trim() && !mediaFile}>
+                    ➤
+                  </button>
+                </div>
+              </>
+            );
+          })()}
         </div>
+
+        {fullScreenMedia && (
+          <div className="hc-lightbox-overlay" onClick={() => setFullScreenMedia(null)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', zIndex: 999999, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)' }}>
+            <button style={{ position: 'absolute', top: '20px', right: '30px', background: 'transparent', border: 'none', color: '#fff', fontSize: '40px', cursor: 'pointer', textShadow: '0 0 10px rgba(0,0,0,0.5)' }} onClick={() => setFullScreenMedia(null)}>✕</button>
+            {fullScreenMedia.type === 'image' ? (
+              <img src={fullScreenMedia.url} alt="fullscreen attachment" style={{ maxWidth: '90%', maxHeight: '90%', borderRadius: '12px', objectFit: 'contain', boxShadow: '0 10px 50px rgba(0,0,0,0.8)' }} onClick={e => e.stopPropagation()} />
+            ) : (
+              <video src={fullScreenMedia.url} controls autoPlay style={{ maxWidth: '90%', maxHeight: '90%', borderRadius: '12px', boxShadow: '0 10px 50px rgba(0,0,0,0.8)' }} onClick={e => e.stopPropagation()} />
+            )}
+          </div>
+        )}
+  
       </div>
     </div>
   );

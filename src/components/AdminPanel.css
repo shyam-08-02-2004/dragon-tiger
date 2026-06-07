@@ -866,3 +866,1662 @@ html, body {
     padding: 6px 12px;
   }
 }
+
+/* VIP TRANSACTIONS GRID */
+.admin-tx-container {
+  padding: 10px;
+}
+
+.admin-tx-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 15px 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.admin-tx-header h3 {
+  margin: 0;
+  color: var(--gold);
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 1px;
+}
+
+.admin-tx-badge {
+  background: rgba(212, 175, 55, 0.15);
+  color: var(--gold);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.admin-tx-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.admin-tx-card {
+  background: rgba(15, 15, 15, 0.8);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+  backdrop-filter: blur(10px);
+}
+
+.admin-tx-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.admin-tx-card.deposit {
+  border-top: 3px solid #4CAF50;
+}
+
+.admin-tx-card.withdrawal {
+  border-top: 3px solid #F44336;
+}
+
+.admin-tx-card.deposit:hover {
+  box-shadow: 0 10px 25px rgba(76, 175, 80, 0.2);
+}
+
+.admin-tx-card.withdrawal:hover {
+  box-shadow: 0 10px 25px rgba(244, 67, 54, 0.2);
+}
+
+.tx-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tx-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tx-avatar {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.05));
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.tx-username {
+  color: #FFF;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+}
+
+.tx-time {
+  color: #888;
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.tx-status-pill {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 5px 10px;
+  border-radius: 20px;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.tx-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.tx-status-pill.pending { background: rgba(241, 196, 15, 0.1); color: #f1c40f; border: 1px solid rgba(241, 196, 15, 0.2); }
+.tx-status-dot.pending { background: #f1c40f; box-shadow: 0 0 5px #f1c40f; animation: pulsePending 1.5s infinite; }
+
+.tx-status-pill.approved { background: rgba(46, 204, 113, 0.1); color: #2ecc71; border: 1px solid rgba(46, 204, 113, 0.2); }
+.tx-status-dot.approved { background: #2ecc71; box-shadow: 0 0 5px #2ecc71; }
+
+.tx-status-pill.rejected { background: rgba(231, 76, 60, 0.1); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.2); }
+.tx-status-dot.rejected { background: #e74c3c; box-shadow: 0 0 5px #e74c3c; }
+
+@keyframes pulsePending {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.tx-card-middle {
+  padding: 20px;
+}
+
+.tx-amount-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.tx-type-label {
+  font-size: 11px;
+  color: #aaa;
+  letter-spacing: 2px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.tx-amount {
+  font-family: var(--font-tech);
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.tx-amount.deposit { color: #4CAF50; text-shadow: 0 2px 10px rgba(76, 175, 80, 0.3); }
+.tx-amount.withdrawal { color: #F44336; text-shadow: 0 2px 10px rgba(244, 67, 54, 0.3); }
+
+.tx-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.tx-info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.tx-info-label {
+  color: #888;
+}
+
+.tx-info-val {
+  color: #ddd;
+  font-family: monospace;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  word-break: break-all;
+  max-width: 180px;
+  text-align: right;
+}
+
+.tx-card-bottom {
+  padding: 15px 20px;
+  background: rgba(0, 0, 0, 0.5);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: auto;
+}
+
+.tx-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 45px;
+  gap: 10px;
+}
+
+.tx-actions.single-action {
+  grid-template-columns: 1fr;
+}
+
+.tx-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+}
+
+.tx-btn.approve {
+  background: rgba(46, 204, 113, 0.15);
+  color: #2ecc71;
+  border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.tx-btn.approve:hover {
+  background: rgba(46, 204, 113, 0.3);
+}
+
+.tx-btn.reject {
+  background: rgba(231, 76, 60, 0.15);
+  color: #e74c3c;
+  border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+.tx-btn.reject:hover {
+  background: rgba(231, 76, 60, 0.3);
+}
+
+.tx-btn.delete {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #aaa;
+}
+
+.tx-btn.delete:hover {
+  background: rgba(231, 76, 60, 0.8);
+  color: #fff;
+  border-color: #e74c3c;
+}
+
+.tx-btn.delete-only {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #888;
+}
+
+.tx-btn.delete-only:hover {
+  background: rgba(231, 76, 60, 0.2);
+  color: #e74c3c;
+  border-color: rgba(231, 76, 60, 0.4);
+}
+
+@media (max-width: 768px) {
+  .admin-tx-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ==========================================================================
+   PREMIUM VIP CASINO ADMIN PANEL - BASE OVERRIDES
+   ========================================================================== */
+
+.admin-layout {
+  display: flex;
+  height: 100vh;
+  background: radial-gradient(circle at top, #1a1a24 0%, #050508 100%);
+  color: #E0E0E0;
+  font-family: 'Inter', sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-layout::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h40v40H0z" fill="none"/><circle cx="20" cy="20" r="1" fill="rgba(212,175,55,0.05)"/></svg>') repeat;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.admin-sidebar {
+  width: 280px;
+  background: linear-gradient(180deg, rgba(15, 15, 20, 0.85) 0%, rgba(5, 5, 8, 0.95) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(212, 175, 55, 0.15);
+  display: flex;
+  flex-direction: column;
+  padding: 30px 20px;
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.8);
+  overflow-y: auto;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.admin-brand .admin-logo {
+  font-size: 36px;
+  filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.6));
+}
+
+.admin-brand h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: #FFD700;
+  margin: 0;
+  letter-spacing: 2px;
+  background: linear-gradient(to bottom, #FFF 0%, #D4AF37 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.admin-content {
+  flex: 1;
+  padding: 30px 40px;
+  overflow-y: auto;
+  z-index: 5;
+  position: relative;
+}
+
+.admin-table-v2 tr {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.admin-table-v2 tr:hover {
+  background: rgba(212, 175, 55, 0.08) !important;
+  transform: scale(1.01);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+@media (max-width: 768px) {
+  .admin-layout {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .admin-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+    padding: 20px;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+  .admin-content {
+    padding: 20px 15px;
+  }
+}
+
+/* ==========================================================================
+   MOBILE RESPONSIVENESS (FULL PAGE & BACK TOGGLES)
+   ========================================================================== */
+
+.mobile-nav-toggle {
+  display: none;
+  background: rgba(212, 175, 55, 0.15);
+  color: var(--gold);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-family: var(--font-tech);
+  font-weight: 700;
+  margin-bottom: 15px;
+  cursor: pointer;
+  width: max-content;
+}
+
+@media (max-width: 768px) {
+  .admin-layout.nav-closed .admin-sidebar {
+    display: none !important;
+  }
+  
+  .admin-layout.nav-open .admin-main {
+    display: none !important;
+  }
+  
+  .mobile-nav-toggle {
+    display: inline-block;
+  }
+
+  /* Admin Chat Mobile Full Screen Logic */
+  .admin-chat-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .admin-chat-layout.chat-active .admin-chat-sidebar {
+    display: none !important;
+  }
+
+  .admin-chat-layout:not(.chat-active) .admin-chat-main {
+    display: none !important;
+  }
+  
+  .admin-chat-sidebar {
+    width: 100% !important;
+    border-right: none !important;
+  }
+  
+  .admin-chat-main {
+    width: 100% !important;
+  }
+  
+  .admin-main {
+    padding: 15px !important;
+  }
+
+  .admin-card {
+    padding: 15px !important;
+  }
+}
+
+/* ==========================================================================
+   VIP LUXURY CASINO ADMIN CHAT OVERRIDES
+   ========================================================================== */
+
+.admin-chat-layout {
+  background: rgba(10, 10, 15, 0.9) !important;
+  border-radius: 20px !important;
+  border: 1px solid rgba(212, 175, 55, 0.3) !important;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(212, 175, 55, 0.05) !important;
+  backdrop-filter: blur(20px) !important;
+  overflow: hidden !important;
+}
+
+.admin-chat-sidebar {
+  background: linear-gradient(180deg, rgba(15, 15, 20, 0.95), rgba(5, 5, 8, 0.95)) !important;
+  border-right: 1px solid rgba(212, 175, 55, 0.2) !important;
+}
+
+.admin-chat-user {
+  padding: 15px 20px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 15px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+}
+
+.admin-chat-user:hover {
+  background: rgba(212, 175, 55, 0.1) !important;
+}
+
+.admin-chat-user.active {
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.2), transparent) !important;
+  border-left: 4px solid var(--gold) !important;
+}
+
+.admin-chat-user .user-avatar {
+  background: linear-gradient(135deg, #d4af37, #aa7c11) !important;
+  color: #000 !important;
+  width: 45px !important;
+  height: 45px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 900 !important;
+  font-size: 20px !important;
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.4) !important;
+  border: 2px solid #fff !important;
+}
+
+.admin-chat-user .user-info {
+  flex: 1 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+.admin-chat-user .user-name {
+  color: #FFF !important;
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  letter-spacing: 0.5px !important;
+}
+
+.admin-chat-user .unread-badge {
+  background: #E74C3C !important;
+  color: #FFF !important;
+  padding: 4px 10px !important;
+  border-radius: 20px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  box-shadow: 0 0 10px rgba(231, 76, 60, 0.5) !important;
+}
+
+.admin-chat-header {
+  background: rgba(0, 0, 0, 0.6) !important;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2) !important;
+  padding: 20px 25px !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.admin-chat-header h3 {
+  color: var(--gold) !important;
+  font-family: var(--font-display) !important;
+  font-size: 20px !important;
+  letter-spacing: 1px !important;
+}
+
+.admin-chat-main {
+  background: url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h40v40H0z" fill="none"/><circle cx="20" cy="20" r="1" fill="rgba(212,175,55,0.03)"/></svg>') repeat, radial-gradient(circle at center, rgba(15,15,20,0.9), rgba(5,5,8,0.95)) !important;
+}
+
+.admin-msg-row {
+  display: flex !important;
+  width: 100% !important;
+  margin-bottom: 20px !important;
+}
+
+.admin-msg-row.admin {
+  justify-content: flex-end !important;
+}
+
+.admin-msg-row.user {
+  justify-content: flex-start !important;
+}
+
+.admin-msg-bubble {
+  max-width: 70% !important;
+  padding: 15px 20px !important;
+  border-radius: 18px !important;
+  font-size: 15px !important;
+  line-height: 1.5 !important;
+  position: relative !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
+  animation: slideUpFade 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+}
+
+@keyframes slideUpFade {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.admin-msg-bubble.admin {
+  background: linear-gradient(135deg, #d4af37, #aa7c11) !important;
+  color: #000 !important;
+  border-bottom-right-radius: 4px !important;
+  font-weight: 600 !important;
+}
+
+.admin-msg-bubble.user {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #FFF !important;
+  border: 1px solid rgba(212, 175, 55, 0.2) !important;
+  border-bottom-left-radius: 4px !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.admin-msg-time {
+  font-size: 11px !important;
+  margin-top: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  opacity: 0.8 !important;
+}
+
+.admin-msg-bubble.admin .admin-msg-time {
+  color: rgba(0, 0, 0, 0.7) !important;
+}
+
+.admin-msg-bubble.user .admin-msg-time {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.hc-premium-actions {
+  display: flex !important;
+  gap: 10px !important;
+  margin-top: 10px !important;
+  animation: hcPop 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.premium-btn-edit, .premium-btn-delete {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: inherit !important;
+  border-radius: 6px !important;
+  padding: 5px 10px !important;
+  font-size: 11px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  transition: all 0.2s !important;
+}
+
+.premium-btn-edit:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.premium-btn-delete:hover {
+  background: rgba(231, 76, 60, 0.8) !important;
+  border-color: #E74C3C !important;
+  color: #FFF !important;
+}
+
+.admin-chat-input {
+  background: rgba(0, 0, 0, 0.6) !important;
+  border-top: 1px solid rgba(212, 175, 55, 0.2) !important;
+  padding: 20px 25px !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.admin-chat-input input {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(212, 175, 55, 0.3) !important;
+  color: #FFF !important;
+  font-size: 16px !important;
+  padding: 15px 25px !important;
+  border-radius: 30px !important;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.5) !important;
+}
+
+.admin-chat-input input:focus {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.3), inset 0 2px 5px rgba(0,0,0,0.5) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.admin-chat-input button {
+  background: linear-gradient(135deg, #d4af37, #aa7c11) !important;
+  color: #000 !important;
+  box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4) !important;
+  border-radius: 30px !important;
+  padding: 0 35px !important;
+  font-size: 16px !important;
+  font-weight: 900 !important;
+}
+
+.admin-chat-input button:hover {
+  transform: translateY(-2px) scale(1.05) !important;
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.6) !important;
+}
+
+.admin-chat-back {
+  background: rgba(212, 175, 55, 0.1) !important;
+  border: 1px solid rgba(212, 175, 55, 0.3) !important;
+  color: var(--gold) !important;
+  font-weight: 700 !important;
+}
+
+.admin-chat-delete {
+  background: rgba(231, 76, 60, 0.1) !important;
+  border: 1px solid rgba(231, 76, 60, 0.3) !important;
+  color: #E74C3C !important;
+  font-weight: 700 !important;
+}
+
+/* ==========================================================================
+   FULL PAGE CHAT FIX FOR ALL DEVICES
+   ========================================================================== */
+
+.admin-chat-layout.chat-active {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  z-index: 99999 !important;
+  border-radius: 0 !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.admin-chat-layout.chat-active .admin-chat-sidebar {
+  display: none !important;
+}
+
+.admin-chat-layout.chat-active .admin-chat-main {
+  display: flex !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.admin-chat-layout.chat-active .admin-chat-back {
+  display: flex !important;
+  align-items: center !important;
+  margin-right: 15px !important;
+}
+
+.admin-chat-layout.chat-active .admin-chat-header {
+  border-radius: 0 !important;
+}
+
+.admin-chat-layout.chat-active .admin-chat-input {
+  border-radius: 0 !important;
+  padding-bottom: 30px !important; /* Safe area for some mobile devices */
+}
+
+/* ==========================================================================
+   VIP ADMIN NAV MOBILE LAYOUT (LUXURY OVERRIDE)
+   ========================================================================== */
+
+.admin-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #aaa;
+  padding: 16px 20px;
+  border-radius: 12px;
+  font-family: var(--font-tech);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.admin-nav-btn:hover {
+  background: rgba(212, 175, 55, 0.1);
+  color: #fff;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  transform: translateX(5px);
+}
+
+.admin-nav-btn.active {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(212, 175, 55, 0.05));
+  color: var(--gold);
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+}
+
+.admin-nav-btn.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background: var(--gold);
+  box-shadow: 0 0 10px var(--gold);
+}
+
+@media (max-width: 768px) {
+  .admin-sidebar {
+    padding: 15px !important;
+  }
+  
+  .admin-nav {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    padding-bottom: 20px !important;
+    overflow: visible !important;
+  }
+
+  .admin-nav-btn {
+    flex: 1 1 calc(50% - 5px) !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 15px 10px !important;
+    gap: 8px !important;
+    text-align: center !important;
+    height: auto !important;
+    min-height: 80px !important;
+    background: rgba(10, 15, 10, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 16px !important;
+  }
+
+  .admin-nav-btn.active {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.05)) !important;
+    border: 1px solid var(--gold) !important;
+  }
+  
+  .admin-nav-btn.active::before {
+    display: none !important;
+  }
+
+  /* Make Live Round Badge full width */
+  .admin-nav > div[style*="linear-gradient"] {
+    width: 100% !important;
+    margin: 0 0 15px 0 !important;
+  }
+}
+
+/* ==========================================================================
+   VIP LUXURY USER MANAGEMENT CARDS
+   ========================================================================== */
+
+.admin-user-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  padding: 10px 0;
+}
+
+.admin-user-card {
+  background: rgba(15, 15, 20, 0.8);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.admin-user-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(212, 175, 55, 0.1);
+  border-color: rgba(212, 175, 55, 0.3);
+}
+
+.admin-user-card.vip-user {
+  background: linear-gradient(135deg, rgba(20, 15, 5, 0.9), rgba(15, 15, 20, 0.95));
+  border: 1px solid rgba(212, 175, 55, 0.4);
+}
+
+.admin-user-card.vip-user::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #d4af37, #f1c40f, #d4af37);
+  box-shadow: 0 0 10px #f1c40f;
+}
+
+.user-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.user-card-avatar {
+  width: 46px;
+  height: 46px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 22px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.vip-user .user-card-avatar {
+  background: linear-gradient(135deg, #d4af37, #aa7c11);
+  border: 2px solid #fff;
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+}
+
+.user-card-info {
+  flex: 1;
+  margin-left: 15px;
+}
+
+.user-card-phone {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  font-family: var(--font-tech);
+  letter-spacing: 1px;
+}
+
+.user-card-username {
+  color: #888;
+  font-size: 13px;
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+.user-card-badge {
+  font-size: 10px;
+  font-weight: 900;
+  padding: 6px 12px;
+  border-radius: 20px;
+  letter-spacing: 1px;
+}
+
+.user-card-badge.active {
+  background: rgba(46, 204, 113, 0.15);
+  color: #2ecc71;
+  border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.user-card-badge.inactive {
+  background: rgba(241, 196, 15, 0.15);
+  color: #f1c40f;
+  border: 1px solid rgba(241, 196, 15, 0.3);
+}
+
+.user-card-middle {
+  padding: 25px 20px;
+}
+
+.user-balance-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 16px;
+  border: 1px dashed rgba(212, 175, 55, 0.2);
+  box-shadow: inset 0 5px 15px rgba(0,0,0,0.5);
+}
+
+.balance-label {
+  font-size: 11px;
+  color: #aaa;
+  letter-spacing: 2px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.balance-amount {
+  font-family: var(--font-tech);
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--gold);
+  text-shadow: 0 2px 15px rgba(212, 175, 55, 0.3);
+}
+
+.user-password-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 12px 15px;
+  border-radius: 10px;
+}
+
+.password-label {
+  font-size: 12px;
+  color: #777;
+  font-weight: 700;
+}
+
+.password-mask {
+  font-family: monospace;
+  color: #ccc;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4px 10px;
+  border-radius: 6px;
+  letter-spacing: 2px;
+}
+
+.user-card-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr 45px;
+  gap: 10px;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: auto;
+}
+
+.user-action-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  font-family: var(--font-ui);
+}
+
+.user-action-btn.edit {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.05));
+  color: var(--gold);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.user-action-btn.edit:hover {
+  background: rgba(212, 175, 55, 0.3);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+}
+
+.user-action-btn.history {
+  background: rgba(52, 152, 219, 0.15);
+  color: #3498db;
+  border: 1px solid rgba(52, 152, 219, 0.3);
+}
+
+.user-action-btn.history:hover {
+  background: rgba(52, 152, 219, 0.3);
+  box-shadow: 0 0 15px rgba(52, 152, 219, 0.2);
+}
+
+.user-action-btn.delete {
+  background: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+  border: 1px solid rgba(231, 76, 60, 0.2);
+}
+
+.user-action-btn.delete:hover {
+  background: #e74c3c;
+  color: #fff;
+  box-shadow: 0 0 15px rgba(231, 76, 60, 0.4);
+}
+
+/* Edit Balance Inline styling */
+.vip-edit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 5px;
+  border-radius: 12px;
+  border: 1px solid var(--gold);
+}
+
+.vip-edit .balance-input {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 900;
+  width: 120px;
+  font-family: var(--font-tech);
+  outline: none;
+}
+
+.vip-edit .save-btn {
+  background: #2ecc71;
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  width: 32px; height: 32px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.vip-edit .cancel-btn {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  width: 32px; height: 32px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .admin-user-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+}
+
+/* ==========================================================================
+   GLOBAL FULL PAGE APP LAYOUT (ALL DEVICES)
+   ========================================================================== */
+
+/* When a tab is open, completely hide the sidebar */
+.admin-layout.nav-closed .admin-sidebar {
+  display: none !important;
+}
+
+/* When the menu is open, completely hide the content */
+.admin-layout.nav-open .admin-main,
+.admin-layout.nav-open .admin-content {
+  display: none !important;
+}
+
+/* Make the sidebar full width and full height when it's the only thing visible */
+.admin-layout.nav-open .admin-sidebar {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  border-right: none !important;
+}
+
+/* Fix the navigation grid to be centered and large on desktop as well */
+.admin-layout.nav-open .admin-nav {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+  gap: 20px !important;
+  padding: 40px !important;
+  align-content: center !important;
+  height: 100% !important;
+}
+
+.admin-layout.nav-open .admin-nav-btn {
+  height: 120px !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  font-size: 18px !important;
+}
+
+/* Ensure the back button is visible on ALL devices */
+.mobile-nav-toggle {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  background: rgba(212, 175, 55, 0.1) !important;
+  border: 1px solid rgba(212, 175, 55, 0.4) !important;
+  color: var(--gold) !important;
+  font-size: 16px !important;
+  padding: 12px 20px !important;
+  border-radius: 12px !important;
+  width: max-content;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.mobile-nav-toggle:hover {
+  background: rgba(212, 175, 55, 0.2) !important;
+  transform: translateX(-5px);
+}
+
+/* ==========================================================================
+   MOBILE NAV GRID FIX (2 ITEMS PER ROW)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .admin-layout.nav-open .admin-nav {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 15px !important;
+    padding: 20px 15px !important;
+    align-content: flex-start !important;
+    margin-top: 20px !important;
+  }
+  
+  .admin-layout.nav-open .admin-nav-btn {
+    height: 100px !important;
+    font-size: 14px !important;
+    padding: 10px !important;
+  }
+  
+  .admin-layout.nav-open .admin-nav-btn span {
+    font-size: 24px !important;
+    margin-bottom: 5px !important;
+  }
+}
+
+@keyframes hcPop {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ==========================================================================
+   GAME CONTROL PREMIUM UI
+   ========================================================================== */
+
+.admin-game-control-container {
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.game-control-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.game-control-header h2 {
+  margin: 0;
+  font-family: var(--font-display, sans-serif);
+  font-size: 28px;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+.game-history-btn {
+  background: linear-gradient(135deg, #2980b9, #3498db);
+  color: #fff;
+  border: 1px solid #3498db;
+  padding: 10px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 800;
+  font-family: var(--font-tech, sans-serif);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+  transition: all 0.3s ease;
+}
+
+.game-history-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(52, 152, 219, 0.6);
+}
+
+.game-control-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.game-control-card {
+  background: linear-gradient(145deg, rgba(20, 20, 25, 0.8), rgba(10, 10, 15, 0.9));
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 20px;
+  padding: 24px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(212, 175, 55, 0.05);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.game-control-card:hover {
+  border-color: rgba(212, 175, 55, 0.5);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6), inset 0 0 30px rgba(212, 175, 55, 0.1);
+}
+
+.game-control-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.8), transparent);
+  opacity: 0.5;
+}
+
+/* Live Round Card */
+.live-round-card {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  grid-column: 1 / -1;
+}
+
+.live-round-badge {
+  text-align: center;
+  min-width: 120px;
+}
+
+.live-round-label {
+  font-size: 12px;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+
+.live-round-number {
+  font-family: var(--font-tech, monospace);
+  font-size: 64px;
+  font-weight: 900;
+  color: #f1c40f;
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(241, 196, 15, 0.4);
+}
+
+.live-round-total {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
+}
+
+.live-round-status {
+  flex: 1;
+}
+
+.phase-indicator {
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 18px;
+  text-align: center;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.phase-indicator.betting {
+  background: rgba(243, 156, 18, 0.15);
+  border: 1px solid #f39c12;
+  color: #f39c12;
+  box-shadow: 0 0 20px rgba(243, 156, 18, 0.2);
+}
+
+.phase-indicator.dealing {
+  background: rgba(52, 152, 219, 0.15);
+  border: 1px solid #3498db;
+  color: #3498db;
+  box-shadow: 0 0 20px rgba(52, 152, 219, 0.2);
+}
+
+.phase-indicator.result {
+  background: rgba(46, 204, 113, 0.15);
+  border: 1px solid #2ecc71;
+  color: #2ecc71;
+  box-shadow: 0 0 20px rgba(46, 204, 113, 0.2);
+}
+
+.timer-bar-bg {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+}
+
+.timer-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #2ecc71, #f1c40f, #e74c3c);
+  transition: width 0.2s linear;
+  box-shadow: 0 0 10px rgba(241, 196, 15, 0.5);
+}
+
+/* Result Setter Card */
+.card-header h3 {
+  margin: 0 0 5px 0;
+  color: #fff;
+  font-size: 20px;
+}
+
+.card-header p {
+  color: #888;
+  font-size: 13px;
+  margin: 0 0 20px 0;
+}
+
+.result-setter-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.round-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 12px;
+  padding: 10px 16px;
+  flex: 0 0 auto;
+}
+
+.round-input-group span {
+  color: #f1c40f;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.round-input-group input {
+  width: 100px;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-family: var(--font-tech, monospace);
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.outcome-btn {
+  flex: 1;
+  min-width: 100px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.outcome-btn.dragon {
+  border: 1px solid #e74c3c;
+  background: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+}
+.outcome-btn.dragon:hover {
+  background: rgba(231, 76, 60, 0.3);
+  box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+}
+
+.outcome-btn.tiger {
+  border: 1px solid #3498db;
+  background: rgba(52, 152, 219, 0.1);
+  color: #3498db;
+}
+.outcome-btn.tiger:hover {
+  background: rgba(52, 152, 219, 0.3);
+  box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+}
+
+.outcome-btn.tie {
+  border: 1px solid #2ecc71;
+  background: rgba(46, 204, 113, 0.1);
+  color: #2ecc71;
+}
+.outcome-btn.tie:hover {
+  background: rgba(46, 204, 113, 0.3);
+  box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+}
+
+.set-rounds-list {
+  background: rgba(0,0,0,0.3);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.list-title {
+  font-size: 13px;
+  color: #aaa;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.round-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.round-tag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.round-tag.dragon { background: rgba(231, 76, 60, 0.15); border: 1px solid #e74c3c; }
+.round-tag.tiger { background: rgba(52, 152, 219, 0.15); border: 1px solid #3498db; }
+.round-tag.tie { background: rgba(46, 204, 113, 0.15); border: 1px solid #2ecc71; }
+
+.round-tag .round-id { color: #f1c40f; }
+.round-tag .round-outcome { color: #fff; text-transform: uppercase; }
+.remove-tag-btn {
+  background: rgba(255, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+.remove-tag-btn:hover {
+  transform: scale(1.1);
+  background: #ff4757;
+}
+
+.empty-rounds-msg {
+  color: #666;
+  font-size: 14px;
+  text-align: center;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Live Bets Card */
+.live-bets-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.live-bets-header h3 {
+  margin: 0 0 4px 0;
+  color: #fff;
+  font-size: 20px;
+}
+
+.live-bets-header p {
+  margin: 0;
+  color: #888;
+  font-size: 13px;
+}
+
+.live-bets-total-badge {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(0,0,0,0.5));
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  padding: 8px 16px;
+  border-radius: 20px;
+  color: #f1c40f;
+  font-weight: 800;
+  font-size: 14px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.live-bets-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat-box {
+  background: rgba(0,0,0,0.4);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-top: 3px solid;
+}
+
+.stat-box.dragon { border-color: #e74c3c; box-shadow: 0 -5px 15px rgba(231, 76, 60, 0.1); }
+.stat-box.tiger { border-color: #3498db; box-shadow: 0 -5px 15px rgba(52, 152, 219, 0.1); }
+.stat-box.tie { border-color: #2ecc71; box-shadow: 0 -5px 15px rgba(46, 204, 113, 0.1); }
+
+.stat-title {
+  color: #aaa;
+  font-size: 14px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.stat-amount {
+  color: #fff;
+  font-size: 24px;
+  font-family: var(--font-tech, monospace);
+  margin-bottom: 4px;
+}
+
+.stat-pct {
+  color: #888;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.live-bets-progress-bar {
+  display: flex;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.05);
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+}
+
+.progress-segment { height: 100%; transition: width 0.3s ease; }
+.progress-segment.dragon { background: linear-gradient(90deg, #c0392b, #e74c3c); }
+.progress-segment.tiger { background: linear-gradient(90deg, #2980b9, #3498db); }
+.progress-segment.tie { background: linear-gradient(90deg, #219a52, #2ecc71); }
+
+.live-bets-empty-state {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  margin-top: 20px;
+  padding: 10px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 8px;
+}
+
+/* Live Preview Card */
+.live-preview-card h3 {
+  margin: 0 0 16px 0;
+  color: #fff;
+  font-size: 20px;
+}
+
+.preview-scaler {
+  background: rgba(0,0,0,0.3);
+  border-radius: 16px;
+  padding: 20px 0;
+  display: flex;
+  justify-content: center;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.preview-result-msg {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 28px;
+  font-weight: 900;
+  color: #f1c40f;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 5px 15px rgba(241, 196, 15, 0.4);
+  animation: hcPop 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .live-round-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  .live-bets-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .live-bets-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .stat-box {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-top: none;
+    border-left: 3px solid;
+  }
+}
