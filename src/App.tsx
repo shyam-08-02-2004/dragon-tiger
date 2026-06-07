@@ -241,6 +241,9 @@ const App: React.FC = () => {
     voiceEnabled && speak(`Welcome ${user.username}`, muted);
     setState(prev => ({ ...prev, balance: Number(user.balance) || 0, history: [], roundNumber: getGlobalGameState().roundId, bets: {}, totalBet: 0 }));
     setIsAuthenticated(true);
+    if (user.id !== 'babu') {
+      setShowProfile(true);
+    }
   };
 
   const handleLogout = () => {
@@ -731,80 +734,16 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
     }
 
     return (
-      <>
-        <Header 
-          balance={balance}
-          roundNumber={roundNumber}
-          username={currentUser.username}
-          userId={currentUser.id || ''}
-          password={currentUser.password}
-          onLogout={handleLogout}
-          onShowHistory={currentUser.id !== 'babu' ? () => setHistoryOpen(true) : undefined}
-          onShowWallet={() => setWalletOpen(true)}
-          onShowSupport={currentUser.id !== 'babu' ? () => setHelpOpen(true) : undefined}
-          onShowRefer={currentUser.id !== 'babu' ? () => setReferOpen(true) : undefined}
-          onShowProfile={currentUser.id !== 'babu' ? () => setShowProfile(true) : undefined}
-          muted={muted} voiceEnabled={voiceEnabled}
-          onToggleMute={toggleMute}
+      <div 
+        onClick={() => setShowProfile(true)} 
+        style={{ width: '100%', minHeight: '100vh', cursor: 'pointer', background: '#000', display: 'flex', justifyContent: 'center' }}
+      >
+        <img 
+          src="/live-casino-mockup.png" 
+          alt="Premium Live Casino Mockup" 
+          style={{ width: '100%', maxWidth: '480px', height: '100%', objectFit: 'cover' }} 
         />
-
-        <GameControls
-          phase={phase}
-          result={result}
-          timer={timer}
-          totalBet={totalBet}
-          lastWin={lastWin}
-          dealerMessage={dealerMessage}
-          onDeal={handleDeal}
-          onNextRound={() => {}}
-          roundNumber={roundNumber}
-        />
-
-        <div className="cards-reveal-area">
-          <CardDisplay
-            card={dragonCard}
-            side="dragon"
-            isRevealing={phase === 'dealing'}
-            isWinner={dragonWins}
-          />
-          <CardDisplay
-            card={tigerCard}
-            side="tiger"
-            isRevealing={phase === 'dealing'}
-            isWinner={tigerWins}
-          />
-        </div>
-
-        <BettingTable
-          bets={bets}
-          onBet={handlePlaceBet}
-          phase={phase}
-          selectedChip={selectedChip}
-        />
-
-        <RoadMap history={history} />
-
-        <ChipSelector
-          selectedChip={selectedChip}
-          onSelectChip={handleSelectChip}
-          onClearBets={handleClearBets}
-          onDoubleBet={handleDoubleBet}
-          totalBet={totalBet}
-          phase={phase}
-        />
-
-        {/* Bottom Tabs */}
-        <div className="bottom-tabs">
-          <div className="tab active" onClick={() => {
-            sessionStorage.setItem('dt_historyTab', 'game');
-            setHistoryOpen(true);
-          }}>Game History</div>
-          <div className="tab" onClick={() => {
-            sessionStorage.setItem('dt_historyTab', 'bets');
-            setHistoryOpen(true);
-          }}>My Bets</div>
-        </div>
-      </>
+      </div>
     );
   };
 
