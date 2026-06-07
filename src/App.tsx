@@ -21,7 +21,7 @@ import {
 } from './types/game';
 import './App.css';
 import { speak, playSound, startAmbient, stopAmbient, setAmbientVolume } from './utils/voice';
-import dealerBgImage from './assets/royal_bg.png';
+import dealerBgImage from './assets/dealer_girl_bg.png';
 
 const BETTING_TIMER = 15;
 const INITIAL_BALANCE = 80;
