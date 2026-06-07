@@ -21,6 +21,7 @@ import {
 } from './types/game';
 import './App.css';
 import { speak, playSound, startAmbient, stopAmbient, setAmbientVolume } from './utils/voice';
+import dealerBgImage from './assets/dealer_bg.png';
 
 const BETTING_TIMER = 15;
 const INITIAL_BALANCE = 80;
@@ -813,7 +814,16 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
   };
 
   return (
-    <div className="app-header">
+    <div 
+      className="app-header" 
+      style={{ 
+        backgroundImage: `url(${dealerBgImage})`, 
+        backgroundSize: 'cover', 
+        backgroundPosition: 'center top', 
+        backgroundAttachment: 'fixed',
+        backgroundColor: '#000'
+      }}
+    >
       
       <div className="game-main-content" style={{ overflowY: 'auto', zIndex: 10, paddingTop: '90px' }}>
         {renderContent()}
