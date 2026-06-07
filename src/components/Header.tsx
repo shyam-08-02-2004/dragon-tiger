@@ -76,14 +76,16 @@ const Header: React.FC<HeaderProps> = ({
           </span>
           <div className="wallet-add-btn">+</div>
         </div>
-        <div className="user-info" onClick={() => setShowDropdown(!showDropdown)}>
-          <div className="user-avatar" style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#f1c40f', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '16px' }}>
-            {username?.charAt(0).toUpperCase()}
-          </div>
-          <button className="mute-btn" onClick={(e) => { e.stopPropagation(); onToggleMute(); }} style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer' }}>
-            {muted ? '🔇' : '🔊'}
-          </button>
+        <div className="user-info" onClick={onShowProfile} style={{ cursor: 'pointer', padding: '2px', border: '2px solid rgba(212, 160, 23, 0.5)', borderRadius: '50%', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center' }}>
+          <img 
+            src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${username || 'casino'}`} 
+            alt="Profile" 
+            style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} 
+          />
         </div>
+        <button className="mute-btn" onClick={(e) => { e.stopPropagation(); onToggleMute(); }} style={{ marginLeft: '4px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px' }}>
+          {muted ? '🔇' : '🔊'}
+        </button>
         {showDropdown && (
           <div className="user-dropdown-profile">
             <div className="udp-header">
