@@ -23,14 +23,14 @@ const RoadMap: React.FC<RoadMapProps> = ({ history }) => {
   // Pad the array with empty slots if less than 48 to keep the grid shape
   const gridCells = [...visible];
   while (gridCells.length < 48) {
-    gridCells.push({ id: `empty-${gridCells.length}`, result: 'empty' as any, timestamp: 0 });
+    gridCells.push({ id: gridCells.length as any, result: 'empty' as any } as RoundResult);
   }
 
   return (
     <div className="premium-roadmap-container">
       <div className="pr-grid">
         {gridCells.map((round) => {
-          if (round.result === 'empty') {
+          if ((round.result as any) === 'empty') {
             return <div key={round.id} className="pr-cell empty" />;
           }
           

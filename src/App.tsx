@@ -773,6 +773,8 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
         <ChipSelector
           selectedChip={selectedChip}
           onSelectChip={handleSelectChip}
+          onClearBets={() => {}}
+          onDoubleBet={() => {}}
           totalBet={totalBet}
           phase={phase}
         />

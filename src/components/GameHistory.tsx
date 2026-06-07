@@ -258,7 +258,7 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
                   );
                 })
               )}
-              {visibleCount < (activeTab === 'game' ? filteredRounds.length : filteredBets.length) && (
+              {visibleCount < filteredBets.length && (
                 <div className="gh-loading-more">Scroll for more...</div>
               )}
             </div>
