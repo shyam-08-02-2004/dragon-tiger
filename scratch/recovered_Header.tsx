@@ -14,8 +14,6 @@ interface HeaderProps {
   muted: boolean;
   voiceEnabled: boolean;
   onToggleMute: () => void;
-  onShowRefer?: () => void;
-  onShowProfile?: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -30,8 +28,6 @@ const Header: React.FC<HeaderProps> = ({
   onShowSupport,
   muted,
   onToggleMute,
-  onShowRefer,
-  onShowProfile,
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -114,16 +110,6 @@ const Header: React.FC<HeaderProps> = ({
             <button className="udp-btn udp-wallet" onClick={onShowWallet} style={{ background: 'rgba(241, 196, 15, 0.1)', color: '#f1c40f' }}>
               Wallet
             </button>
-            {onShowProfile && (
-              <button className="udp-btn udp-profile" onClick={onShowProfile} style={{ background: 'rgba(52, 152, 219, 0.1)', color: '#3498db' }}>
-                My Profile
-              </button>
-            )}
-            {onShowRefer && (
-              <button className="udp-btn udp-refer" onClick={onShowRefer} style={{ background: 'rgba(37, 211, 102, 0.1)', color: '#25D366' }}>
-                Refer & Earn
-              </button>
-            )}
             {onShowSupport && (
               <button className="udp-btn udp-support" onClick={onShowSupport}>
                 Support

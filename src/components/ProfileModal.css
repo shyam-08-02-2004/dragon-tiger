@@ -1,0 +1,122 @@
+.profile-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+}
+
+.profile-modal-content {
+  background: linear-gradient(165deg, #0d0b1a 0%, #13102b 40%, #0e0c1c 100%);
+  border: 1px solid rgba(212, 160, 23, 0.3);
+  border-radius: 20px;
+  width: 90%;
+  max-width: 350px;
+  padding: 24px;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  text-align: center;
+}
+
+.profile-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 28px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.profile-close-btn:hover {
+  color: #fff;
+}
+
+.profile-title {
+  color: #f5c842;
+  margin: 0 0 20px 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 10px rgba(212, 160, 23, 0.3);
+}
+
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d4a017, #f5c842);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: bold;
+  color: #111;
+  box-shadow: 0 4px 15px rgba(212, 160, 23, 0.4);
+  margin-bottom: 12px;
+}
+
+.profile-name {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.profile-id {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 10px;
+  border-radius: 10px;
+}
+
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profile-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.profile-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.profile-value {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.profile-value.gold {
+  color: #f5c842;
+}
+
+.profile-value.green {
+  color: #2ecc71;
+}

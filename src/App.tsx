@@ -11,6 +11,7 @@ import RoadMap from './components/RoadMap';
 import WalletModal from './components/WalletModal';
 import GameHistory from './components/GameHistory';
 import HelpCenter from './components/HelpCenter';
+import ProfileModal from './components/ProfileModal';
 import WinPopup from './components/WinPopup';
 import ReferAndEarn from './components/ReferAndEarn';
 import type { GameState, BetType, GameResult } from './types/game';
@@ -80,6 +81,7 @@ const App: React.FC = () => {
   const [showHistory, setShowHistory] = useState(() => sessionStorage.getItem('dt_showHistory') === 'true');
   const [showHelpCenter, setShowHelpCenter] = useState(() => sessionStorage.getItem('dt_showHelp') === 'true');
   const [showRefer, setShowRefer] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   const setWalletOpen = (val: boolean) => { setShowWallet(val); sessionStorage.setItem('dt_showWallet', String(val)); };
   const setHistoryOpen = (val: boolean) => { setShowHistory(val); sessionStorage.setItem('dt_showHistory', String(val)); };
@@ -741,6 +743,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
           onShowWallet={() => setWalletOpen(true)}
           onShowSupport={currentUser.id !== 'babu' ? () => setHelpOpen(true) : undefined}
           onShowRefer={currentUser.id !== 'babu' ? () => setReferOpen(true) : undefined}
+          onShowProfile={currentUser.id !== 'babu' ? () => setShowProfile(true) : undefined}
           muted={muted} voiceEnabled={voiceEnabled}
           onToggleMute={toggleMute}
         />
@@ -861,8 +864,15 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
         />
       )}
 
+      {showProfile && (
+        <ProfileModal 
+          user={currentUser} 
+          onClose={() => setShowProfile(false)} 
+        />
+      )}
+
       {showRefer && (
-        <ReferAndEarn 
+        <ReferAndEarn
           userId={currentUser?.id ?? currentUser?.username ?? ''}
           onClose={() => setReferOpen(false)}
         />
