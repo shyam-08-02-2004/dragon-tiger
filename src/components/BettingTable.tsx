@@ -11,13 +11,24 @@ interface BettingTableProps {
 const BettingTable: React.FC<BettingTableProps> = ({ bets, onBet, phase }) => {
   const canBet = phase === 'betting';
 
+  // Prevent double-taps on mobile
+  const lastBetTime = React.useRef(0);
+
+  const handleBetClick = (type: BetType) => {
+    if (!canBet) return;
+    const now = Date.now();
+    if (now - lastBetTime.current < 200) return; // 200ms debounce
+    lastBetTime.current = now;
+    onBet(type);
+  };
+
   const renderBetBox = (type: BetType, label: string, payout: string, className: string) => {
     const amount = bets[type] || 0;
     
     return (
       <div 
         className={`bet-box ${className} ${!canBet ? 'disabled' : ''} ${amount > 0 ? 'has-bet' : ''}`}
-        onClick={() => canBet && onBet(type)}
+        onClick={() => handleBetClick(type)}
       >
         <div className="bet-title">{label}</div>
         <div className="bet-payout">{payout}</div>
