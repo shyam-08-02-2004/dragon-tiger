@@ -27,10 +27,7 @@ const GameControls: React.FC<GameControlsProps> = ({
       <div className="pc-center-btn">
         <div className={`pc-center-inner ${!canBet ? 'disabled' : ''}`}>
           {phase === 'betting' ? (
-            <>
               <span>PLACE YOUR BET</span>
-              <div className="pc-timer-badge">{timer}</div>
-            </>
           ) : phase === 'dealing' ? (
             <span>DEALING...</span>
           ) : (
