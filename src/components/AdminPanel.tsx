@@ -511,61 +511,51 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
         <div className="admin-content">
           {/* â”€â”€ USERS TAB â”€â”€ */}
           {activeTab === 'users' && (
-            <div className="admin-card">
-              <h3>Registered Players</h3>
-              <div className="table-responsive">
-                <table className="admin-table-v2">
-                  <thead>
-                    <tr>
-                      <th>Mobile Number</th>
-                      <th>Username</th>
-                      <th>Password</th>
-                      <th>Balance</th>
-                      <th>Deposited</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {users.map((user: any) => {
-                      if (user.id === 'babu') return null;
-                      return (
-                        <tr key={user.id}>
-                          <td data-label="Mobile" className="fw-bold">{user.id}</td>
-                          <td data-label="Username">{user.username}</td>
-                          <td data-label="Password"><span className="password-mask">{user.password}</span></td>
-                          <td data-label="Balance">
-                            {editBalanceUser === user.id ? (
-                              <div className="edit-balance-group">
-                                <span className="currency-symbol">₹</span>
-                                <input type="number" value={newBalance} onChange={(e) => setNewBalance(e.target.value)} className="balance-input" autoFocus />
-                                <button className="save-btn" onClick={() => handleUpdateBalance(user.id)}>✓</button>
-                                <button className="cancel-btn" onClick={() => setEditBalanceUser(null)}>✕</button>
-                              </div>
-                            ) : (
-                              <span className="balance-display gold">₹{user.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-                            )}
-                          </td>
-                          <td data-label="Deposited">
-                            <span style={{ color: user.hasDeposited ? '#2ecc71' : '#e74c3c', fontWeight: 'bold' }}>
-                              {user.hasDeposited ? 'YES' : 'NO'}
-                            </span>
-                          </td>
-                          <td data-label="Actions">
-                            <div className="action-buttons">
-                              <button className="action-btn edit" onClick={() => { setEditBalanceUser(user.id); setNewBalance(user.balance.toString()); }} title="Edit Balance">💰</button>
-                              <button className="btn-secondary" onClick={() => handleUserHistory(user.id)}>View History</button>
-                              <button className="action-btn delete" onClick={() => handleDeleteUser(user.id)} title="Delete User">🗑️</button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                    {users.filter((u: any) => u.id !== 'babu').length === 0 && (
-                      <tr><td colSpan={6} className="text-center text-muted">No registered players yet.</td></tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+            <div className="admin-user-grid">
+              {users.map((user: any) => {
+                if (user.id === 'babu') return null;
+                return (
+                  <div key={user.id} className={`admin-user-card ${user.hasDeposited ? 'vip-user' : ''}`}>
+                    <div className="user-card-top">
+                      <div className="user-card-avatar">👤</div>
+                      <div className="user-card-info">
+                        <div className="user-card-phone">{user.id}</div>
+                        <div className="user-card-username">{user.username}</div>
+                      </div>
+                      <div className={`user-card-badge ${user.hasDeposited ? 'active' : 'inactive'}`}>
+                        {user.hasDeposited ? 'ACTIVE' : 'NEW'}
+                      </div>
+                    </div>
+                    <div className="user-card-middle">
+                      <div className="user-balance-box">
+                        <div className="balance-label">CURRENT BALANCE</div>
+                        {editBalanceUser === user.id ? (
+                          <div className="edit-balance-group" style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+                            <span className="currency-symbol" style={{ color: '#d4af37', fontSize: '20px' }}>₹</span>
+                            <input type="number" value={newBalance} onChange={(e) => setNewBalance(e.target.value)} className="balance-input" style={{ width: '100px', background: 'rgba(0,0,0,0.5)', border: '1px solid #d4af37', color: '#fff', padding: '5px', borderRadius: '5px' }} autoFocus />
+                            <button className="save-btn" onClick={() => handleUpdateBalance(user.id)} style={{ background: '#2ecc71', border: 'none', color: '#fff', borderRadius: '5px', padding: '5px 10px', cursor: 'pointer' }}>✓</button>
+                            <button className="cancel-btn" onClick={() => setEditBalanceUser(null)} style={{ background: '#e74c3c', border: 'none', color: '#fff', borderRadius: '5px', padding: '5px 10px', cursor: 'pointer' }}>✕</button>
+                          </div>
+                        ) : (
+                          <div className="balance-amount">₹{user.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>
+                        )}
+                      </div>
+                      <div className="user-password-box">
+                        <span className="password-label">PASSWORD</span>
+                        <span className="password-mask">{user.password}</span>
+                      </div>
+                    </div>
+                    <div className="user-card-bottom" style={{ display: 'flex', gap: '10px', padding: '15px 20px', background: 'rgba(0,0,0,0.2)', justifyContent: 'center' }}>
+                       <button className="action-btn edit" onClick={() => { setEditBalanceUser(user.id); setNewBalance(user.balance.toString()); }} title="Edit Balance" style={{ flex: 1, background: 'rgba(212,175,55,0.1)', border: '1px solid rgba(212,175,55,0.3)', color: '#d4af37', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>💰 Edit</button>
+                       <button className="btn-secondary" onClick={() => handleUserHistory(user.id)} style={{ flex: 1, background: 'rgba(52,152,219,0.1)', border: '1px solid rgba(52,152,219,0.3)', color: '#3498db', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>📜 Hist</button>
+                       <button className="action-btn delete" onClick={() => handleDeleteUser(user.id)} title="Delete User" style={{ flex: 1, background: 'rgba(231,76,60,0.1)', border: '1px solid rgba(231,76,60,0.3)', color: '#e74c3c', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>🗑️ Del</button>
+                    </div>
+                  </div>
+                );
+              })}
+              {users.filter((u: any) => u.id !== 'babu').length === 0 && (
+                <div style={{ padding: '40px', textAlign: 'center', color: '#888', gridColumn: '1 / -1' }}>No registered players yet.</div>
+              )}
             </div>
           )}
 
@@ -777,50 +767,58 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
             </div>
           )}
 
-          {/* â”€â”€ TRANSACTIONS TAB â”€â”€ */}
+          {/* ── TRANSACTIONS TAB ── */}
           {activeTab === 'transactions' && (
-            <div className="admin-card">
-              <h3>Pending Transactions</h3>
-              <div className="table-responsive">
-                <table className="admin-table-v2">
-                  <thead>
-                    <tr>
-                      <th>Time</th><th>User</th><th>Type</th><th>Amount</th><th>UTR / UPI</th><th>Status</th><th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transactions.slice().reverse().map((tx) => (
-                      <tr key={tx.id}>
-                        <td data-label="Time">{new Date(tx.timestamp).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}</td>
-                        <td data-label="User" className="fw-bold">{tx.username}</td>
-                        <td data-label="Type" className={tx.type === 'deposit' ? 'green' : 'gold'}>{tx.type.toUpperCase()}</td>
-                        <td data-label="Amount" className="gold">₹{tx.amount}</td>
-                        <td data-label="UTR/UPI" style={{ fontSize: '12px', maxWidth: '120px', wordBreak: 'break-all' }}>
-                          {tx.utr && <span style={{ color: '#aaa' }}>UTR: {tx.utr}</span>}
-                          {tx.upiId && <span style={{ color: '#7ec8e3' }}>UPI: {tx.upiId}</span>}
-                          {!tx.utr && !tx.upiId && '-'}
-                        </td>
-                        <td data-label="Status"><span className={`status-badge ${tx.status}`}>{tx.status.toUpperCase()}</span></td>
-                        <td data-label="Actions">
-                          {tx.status === 'pending' ? (
-                            <div className="action-buttons">
-                              <button className="action-btn edit" title="Approve" onClick={() => handleTransactionAction(tx.id, 'approve')}>✅</button>
-                              <button className="action-btn delete" title="Reject" onClick={() => handleTransactionAction(tx.id, 'reject')}>❌</button>
-                              <button className="action-btn delete" title="Delete" onClick={() => handleDeleteTransaction(tx.id)} style={{ background: '#e74c3c', color: 'white' }}>🗑️</button>
-                            </div>
-                          ) : (
-                            <div className="action-buttons">
-                              <button className="action-btn delete" title="Delete" onClick={() => handleDeleteTransaction(tx.id)} style={{ background: '#e74c3c', color: 'white' }}>🗑️</button>
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                    {transactions.length === 0 && (
-                      <tr><td colSpan={7} className="text-center text-muted">No transactions found.</td></tr>
+            <div className="admin-tx-layout active">
+              <div className="admin-chat-header-premium" style={{ position: 'sticky', top: 0, zIndex: 100 }}>
+                <button className="premium-back-btn" onClick={() => handleTabChange('game')}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                  <span>Back</span>
+                </button>
+                <div className="chat-username" style={{ fontSize: '18px', color: '#D4AF37' }}>Transactions</div>
+                <div style={{ width: '80px' }}></div>
+              </div>
+              <div className="admin-tx-grid" style={{ padding: '15px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                {transactions.slice().reverse().map((tx) => (
+                  <div key={tx.id} className={`admin-tx-card ${tx.type}`}>
+                    <div className="tx-card-header">
+                      <div className="tx-user-info">
+                        <div className="tx-avatar" style={{ background: tx.type === 'deposit' ? 'linear-gradient(135deg, #2ecc71, #27ae60)' : 'linear-gradient(135deg, #f1c40f, #d4af37)' }}>
+                          {tx.username.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <div className="tx-username">{tx.username}</div>
+                          <div className="tx-time">{new Date(tx.timestamp).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}</div>
+                        </div>
+                      </div>
+                      <div className={`tx-badge ${tx.status}`}>{tx.status.toUpperCase()}</div>
+                    </div>
+                    <div className="tx-card-body">
+                      <div className="tx-amount-section">
+                        <div className="tx-type-label" style={{ color: tx.type === 'deposit' ? '#2ecc71' : '#f1c40f' }}>{tx.type.toUpperCase()}</div>
+                        <div className="tx-amount">₹{tx.amount}</div>
+                      </div>
+                      <div className="tx-details">
+                        {tx.utr && <div className="tx-detail-row"><span>UTR:</span> <span style={{ color: '#fff' }}>{tx.utr}</span></div>}
+                        {tx.upiId && <div className="tx-detail-row"><span>UPI:</span> <span style={{ color: '#fff' }}>{tx.upiId}</span></div>}
+                      </div>
+                    </div>
+                    {tx.status === 'pending' ? (
+                      <div className="tx-card-actions">
+                        <button className="tx-action-btn approve" onClick={() => handleTransactionAction(tx.id, 'approve')}>✅ Approve</button>
+                        <button className="tx-action-btn reject" onClick={() => handleTransactionAction(tx.id, 'reject')}>❌ Reject</button>
+                        <button className="tx-action-btn delete" onClick={() => handleDeleteTransaction(tx.id)}>🗑️</button>
+                      </div>
+                    ) : (
+                      <div className="tx-card-actions">
+                         <button className="tx-action-btn delete" onClick={() => handleDeleteTransaction(tx.id)} style={{ width: '100%' }}>🗑️ Delete Transaction</button>
+                      </div>
                     )}
-                  </tbody>
-                </table>
+                  </div>
+                ))}
+                {transactions.length === 0 && (
+                  <div style={{ textAlign: 'center', padding: '40px', color: '#888' }}>No transactions found.</div>
+                )}
               </div>
             </div>
           )}

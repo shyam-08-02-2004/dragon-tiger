@@ -1,79 +1,47 @@
 const fs = require('fs');
 const css = `
-/* VIP TRANSACTIONS GRID */
-.admin-tx-container {
-  padding: 10px;
-}
+/* ==========================================================================
+   PREMIUM LUXURY TRANSACTIONS UI
+   ========================================================================== */
 
-.admin-tx-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  background: rgba(0, 0, 0, 0.4);
-  padding: 15px 20px;
-  border-radius: 16px;
-  border: 1px solid rgba(212, 175, 55, 0.2);
-}
-
-.admin-tx-header h3 {
-  margin: 0;
-  color: var(--gold);
-  font-family: var(--font-display);
-  font-size: 22px;
-  letter-spacing: 1px;
-}
-
-.admin-tx-badge {
-  background: rgba(212, 175, 55, 0.15);
-  color: var(--gold);
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
-  border: 1px solid rgba(212, 175, 55, 0.3);
-}
-
-.admin-tx-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 20px;
+/* Full screen mobile override for transactions */
+@media (max-width: 768px) {
+  .admin-tx-layout.active {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    z-index: 9999 !important;
+    background: radial-gradient(circle at center, #1e190a, #050508) !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
 }
 
 .admin-tx-card {
-  background: rgba(15, 15, 15, 0.8);
-  border-radius: 20px;
+  background: rgba(15, 15, 20, 0.8);
+  border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: all 0.3s ease;
-  position: relative;
-  backdrop-filter: blur(10px);
-}
-
-.admin-tx-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 .admin-tx-card.deposit {
-  border-top: 3px solid #4CAF50;
+  border-left: 4px solid #2ecc71;
 }
 
-.admin-tx-card.withdrawal {
-  border-top: 3px solid #F44336;
+.admin-tx-card.withdraw {
+  border-left: 4px solid #f1c40f;
 }
 
-.admin-tx-card.deposit:hover {
-  box-shadow: 0 10px 25px rgba(76, 175, 80, 0.2);
-}
-
-.admin-tx-card.withdrawal:hover {
-  box-shadow: 0 10px 25px rgba(244, 67, 54, 0.2);
-}
-
-.tx-card-top {
+.tx-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -82,210 +50,150 @@ const css = `
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.tx-user {
+.tx-user-info {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
 .tx-avatar {
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.05));
   width: 40px;
   height: 40px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 20px;
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  color: #fff;
+  font-weight: bold;
+  font-size: 18px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
 .tx-username {
-  color: #FFF;
-  font-weight: 700;
-  font-size: 15px;
-  letter-spacing: 0.5px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
 }
 
 .tx-time {
-  color: #888;
   font-size: 11px;
-  margin-top: 2px;
+  color: #888;
 }
 
-.tx-status-pill {
+.tx-badge {
   font-size: 10px;
-  font-weight: 800;
-  padding: 5px 10px;
+  font-weight: 900;
+  padding: 6px 12px;
   border-radius: 20px;
   letter-spacing: 1px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
 }
 
-.tx-status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
+.tx-badge.pending {
+  background: rgba(52, 152, 219, 0.15);
+  color: #3498db;
+  border: 1px solid rgba(52, 152, 219, 0.3);
 }
 
-.tx-status-pill.pending { background: rgba(241, 196, 15, 0.1); color: #f1c40f; border: 1px solid rgba(241, 196, 15, 0.2); }
-.tx-status-dot.pending { background: #f1c40f; box-shadow: 0 0 5px #f1c40f; animation: pulsePending 1.5s infinite; }
-
-.tx-status-pill.approved { background: rgba(46, 204, 113, 0.1); color: #2ecc71; border: 1px solid rgba(46, 204, 113, 0.2); }
-.tx-status-dot.approved { background: #2ecc71; box-shadow: 0 0 5px #2ecc71; }
-
-.tx-status-pill.rejected { background: rgba(231, 76, 60, 0.1); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.2); }
-.tx-status-dot.rejected { background: #e74c3c; box-shadow: 0 0 5px #e74c3c; }
-
-@keyframes pulsePending {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.5); opacity: 0.5; }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-.tx-card-middle {
-  padding: 20px;
-}
-
-.tx-amount-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 15px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 12px;
-  border: 1px dashed rgba(255, 255, 255, 0.1);
-}
-
-.tx-type-label {
-  font-size: 11px;
-  color: #aaa;
-  letter-spacing: 2px;
-  font-weight: 600;
-  margin-bottom: 5px;
-}
-
-.tx-amount {
-  font-family: var(--font-tech);
-  font-size: 28px;
-  font-weight: 900;
-}
-
-.tx-amount.deposit { color: #4CAF50; text-shadow: 0 2px 10px rgba(76, 175, 80, 0.3); }
-.tx-amount.withdrawal { color: #F44336; text-shadow: 0 2px 10px rgba(244, 67, 54, 0.3); }
-
-.tx-details {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.02);
-  padding: 12px;
-  border-radius: 8px;
-}
-
-.tx-info-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-}
-
-.tx-info-label {
-  color: #888;
-}
-
-.tx-info-val {
-  color: #ddd;
-  font-family: monospace;
-  font-size: 13px;
-  letter-spacing: 0.5px;
-  word-break: break-all;
-  max-width: 180px;
-  text-align: right;
-}
-
-.tx-card-bottom {
-  padding: 15px 20px;
-  background: rgba(0, 0, 0, 0.5);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  margin-top: auto;
-}
-
-.tx-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr 45px;
-  gap: 10px;
-}
-
-.tx-actions.single-action {
-  grid-template-columns: 1fr;
-}
-
-.tx-btn {
-  border: none;
-  border-radius: 8px;
-  padding: 10px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  transition: all 0.2s ease;
-}
-
-.tx-btn.approve {
+.tx-badge.approved {
   background: rgba(46, 204, 113, 0.15);
   color: #2ecc71;
   border: 1px solid rgba(46, 204, 113, 0.3);
 }
 
-.tx-btn.approve:hover {
-  background: rgba(46, 204, 113, 0.3);
-}
-
-.tx-btn.reject {
+.tx-badge.rejected {
   background: rgba(231, 76, 60, 0.15);
   color: #e74c3c;
   border: 1px solid rgba(231, 76, 60, 0.3);
 }
 
-.tx-btn.reject:hover {
-  background: rgba(231, 76, 60, 0.3);
+.tx-card-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-.tx-btn.delete {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #aaa;
+.tx-amount-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0,0,0,0.3);
+  padding: 15px;
+  border-radius: 12px;
 }
 
-.tx-btn.delete:hover {
-  background: rgba(231, 76, 60, 0.8);
+.tx-type-label {
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.tx-amount {
+  font-size: 28px;
+  font-weight: 900;
+  font-family: var(--font-tech);
   color: #fff;
-  border-color: #e74c3c;
 }
 
-.tx-btn.delete-only {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #888;
+.tx-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.tx-btn.delete-only:hover {
-  background: rgba(231, 76, 60, 0.2);
+.tx-detail-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #aaa;
+  background: rgba(255,255,255,0.02);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.tx-card-actions {
+  display: flex;
+  gap: 10px;
+  padding: 15px 20px;
+  background: rgba(0,0,0,0.2);
+}
+
+.tx-action-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  border: 1px solid;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+.tx-action-btn.approve {
+  background: rgba(46, 204, 113, 0.1);
+  color: #2ecc71;
+  border-color: rgba(46, 204, 113, 0.3);
+}
+
+.tx-action-btn.reject {
+  background: rgba(241, 196, 15, 0.1);
+  color: #f1c40f;
+  border-color: rgba(241, 196, 15, 0.3);
+}
+
+.tx-action-btn.delete {
+  background: rgba(231, 76, 60, 0.1);
   color: #e74c3c;
-  border-color: rgba(231, 76, 60, 0.4);
+  border-color: rgba(231, 76, 60, 0.3);
 }
 
-@media (max-width: 768px) {
-  .admin-tx-grid {
-    grid-template-columns: 1fr;
-  }
+.tx-action-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.2);
 }
 `;
-fs.appendFileSync('C:/dragonTiger/src/components/AdminPanel.css', css);
-console.log("Appended");
+
+fs.appendFileSync('src/components/AdminPanel.css', css, 'utf8');
