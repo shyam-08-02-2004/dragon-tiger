@@ -742,7 +742,6 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
           onShowHistory={currentUser.id !== 'babu' ? () => setHistoryOpen(true) : undefined}
           onShowWallet={() => setWalletOpen(true)}
           onShowSupport={currentUser.id !== 'babu' ? () => setHelpOpen(true) : undefined}
-          onShowRefer={currentUser.id !== 'babu' ? () => setReferOpen(true) : undefined}
           onShowProfile={currentUser.id !== 'babu' ? () => setShowProfile(true) : undefined}
           muted={muted} voiceEnabled={voiceEnabled}
           onToggleMute={toggleMute}
@@ -810,17 +809,8 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
 
   return (
     <div className="app-header">
-        <button onClick={toggleMute} style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: '18px' }}>
-          {muted ? '🔇' : '🔊'}
-        </button>
       
-      {/* Background Images - persistent across all views */}
-      <div className="game-backgrounds">
-        <img src="/assets/dragon_realistic.png" className="bg-dragon-img" alt="Dragon" />
-        <img src="/assets/tiger_realistic.png" className="bg-tiger-img" alt="Tiger" />
-      </div>
-
-      <div className="game-main-content" style={{ overflowY: 'auto' }}>
+      <div className="game-main-content" style={{ overflowY: 'auto', zIndex: 10, paddingTop: '90px' }}>
         {renderContent()}
       </div>
 
