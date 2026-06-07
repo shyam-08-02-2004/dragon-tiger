@@ -65,12 +65,6 @@ const Header: React.FC<HeaderProps> = ({
           <div className="ph-icon">{muted ? '🔇' : '🔊'}</div>
           <span className="ph-label">{muted ? 'Sound Off' : 'Sound On'}</span>
         </button>
-        {onShowHistory && (
-          <button className="ph-action-btn" onClick={onShowHistory}>
-            <div className="ph-icon">🕒</div>
-            <span className="ph-label">History</span>
-          </button>
-        )}
       </div>
 
       {/* Round Number Floating below header */}

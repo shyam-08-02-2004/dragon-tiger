@@ -740,7 +740,6 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
           userId={currentUser.id || ''}
           password={currentUser.password}
           onLogout={handleLogout}
-          onShowHistory={currentUser.id !== 'babu' ? () => setHistoryOpen(true) : undefined}
           onShowWallet={() => setWalletOpen(true)}
           onShowSupport={currentUser.id !== 'babu' ? () => setHelpOpen(true) : undefined}
           onShowProfile={currentUser.id !== 'babu' ? () => setShowProfile(true) : undefined}
@@ -836,9 +835,9 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
             <span className="pbn-icon">🎰</span>
             <span className="pbn-label">Games</span>
           </div>
-          <div className="pbn-item active">
-            <span className="pbn-icon">🃏</span>
-            <span className="pbn-label">Live Casino</span>
+          <div className="pbn-item" onClick={currentUser.id !== 'babu' ? () => setHistoryOpen(true) : undefined}>
+            <span className="pbn-icon">📜</span>
+            <span className="pbn-label">History</span>
           </div>
           <div className="pbn-item" onClick={() => setShowProfile(true)}>
             <span className="pbn-icon">👤</span>
