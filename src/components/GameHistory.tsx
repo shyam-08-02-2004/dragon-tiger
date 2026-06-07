@@ -19,9 +19,9 @@ interface PastRound {
 }
 
 const winnerInfo = (winner: GameResult) => {
-  if (winner === 'dragon') return { label: '🐉 Dragon', cls: 'gh-win-dragon', bar: 'gh-bar-dragon' };
-  if (winner === 'tiger') return { label: '🐯 Tiger', cls: 'gh-win-tiger', bar: 'gh-bar-tiger' };
-  return { label: '🤝 Tie', cls: 'gh-win-tie', bar: 'gh-bar-tie' };
+  if (winner === 'dragon') return { label: 'Dragon', icon: '🐉', cls: 'gh-win-dragon', glow: 'glow-red' };
+  if (winner === 'tiger') return { label: 'Tiger', icon: '🐯', cls: 'gh-win-tiger', glow: 'glow-blue' };
+  return { label: 'Tie', icon: '🤝', cls: 'gh-win-tie', glow: 'glow-green' };
 };
 
 const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isOpen, onClose, username }) => {
@@ -30,7 +30,11 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
   const [activeTab, setActiveTab] = useState<'game' | 'bets'>('game');
   const [betHistory, setBetHistory] = useState<any[]>([]);
 
-  // Re-read tab from sessionStorage every time the modal opens
+  // Filters
+  const [searchQuery, setSearchQuery] = useState('');
+  const [winLossFilter, setWinLossFilter] = useState<'all' | 'win' | 'loss'>('all');
+  const [visibleCount, setVisibleCount] = useState(20);
+
   useEffect(() => {
     if (isOpen) {
       const stored = sessionStorage.getItem('dt_historyTab') as 'game' | 'bets';
@@ -41,234 +45,226 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
   const handleTabChange = (tab: 'game' | 'bets') => {
     setActiveTab(tab);
     sessionStorage.setItem('dt_historyTab', tab);
+    setSearchQuery('');
+    setWinLossFilter('all');
+    setVisibleCount(20);
+  };
+
+  const fetchAllData = async () => {
+    try {
+      const p1 = fetch(`/api/history?t=${Date.now()}`).then(res => res.json());
+      const p2 = fetch(`/api/admin/round-outcomes?t=${Date.now()}`).then(res => res.json());
+      const res = await Promise.all([p1, p2]);
+      if (Array.isArray(res[0])) setServerHistory(res[0]);
+      if (Array.isArray(res[1])) setAdminOutcomes(res[1]);
+
+      if (username) {
+        const b = await fetch(`/api/users/bet-history/${username}?t=${Date.now()}`).then(r => r.json());
+        if (Array.isArray(b)) setBetHistory(b);
+      }
+    } catch (e) {
+      console.error('Failed to fetch history', e);
+    }
   };
 
   useEffect(() => {
     if (isOpen) {
-      fetch(`/api/history?t=${Date.now()}`)
-        .then(res => res.json())
-        .then(data => {
-          if (Array.isArray(data)) setServerHistory(data);
-        })
-        .catch(() => {});
-      // Also fetch admin-set round outcomes so forced results appear in history
-      fetch(`/api/admin/round-outcomes?t=${Date.now()}`)
-        .then(res => res.json())
-        .then(data => { if (Array.isArray(data)) setAdminOutcomes(data); })
-        .catch(() => {});
-      if (username) {
-        fetch(`/api/users/bet-history/${username}?t=${Date.now()}`)
-          .then(res => res.json())
-          .then(data => {
-            if (Array.isArray(data)) setBetHistory(data);
-          })
-          .catch(() => {});
-      }
+      fetchAllData();
     }
   }, [isOpen, username]);
+
   const pastRounds = useMemo(() => {
     const rounds: PastRound[] = [];
-    const maxHistory = 100;
+    const maxHistory = 200;
     const firstVisibleRawId = Math.max(rawRoundId - maxHistory, 0);
 
-    // Build lookup maps for O(1) access
     const serverMap = new Map<number, string>();
-    for (const h of serverHistory) {
-      serverMap.set(Number(h.roundId), h.result);
-    }
+    for (const h of serverHistory) serverMap.set(Number(h.roundId), h.result);
+    
     const adminMap = new Map<number, string>();
-    for (const a of adminOutcomes) {
-      adminMap.set(Number(a.roundId), a.outcome);
-    }
+    for (const a of adminOutcomes) adminMap.set(Number(a.roundId), a.outcome);
     
     for (let pastRawId = rawRoundId - 1; pastRawId >= firstVisibleRawId; pastRawId--) {
       if (pastRawId < 0) break;
       const pastRoundId = (pastRawId % 2000) + 1;
       
-      // 1. Server history is the source of truth (has actual played result)
       const serverResult = serverMap.get(pastRawId);
       if (serverResult) {
         rounds.push({ round: pastRoundId, rawRoundId: pastRawId, winner: serverResult as GameResult });
         continue;
       }
-
-      // 2. Check admin-set outcome (matched by cycle-local round number)
       const adminOutcome = adminMap.get(pastRoundId);
       if (adminOutcome && adminOutcome !== 'none') {
         rounds.push({ round: pastRoundId, rawRoundId: pastRawId, winner: adminOutcome as GameResult });
         continue;
       }
-
-      // 3. Fallback: deterministic cards
       const { dragonCard, tigerCard } = getDeterministicCards(pastRoundId, pastRawId);
-      const winner = determineResult(dragonCard, tigerCard);
-      rounds.push({ round: pastRoundId, rawRoundId: pastRawId, winner });
+      rounds.push({ round: pastRoundId, rawRoundId: pastRawId, winner: determineResult(dragonCard, tigerCard) });
     }
     return rounds;
   }, [currentRound, rawRoundId, serverHistory, adminOutcomes]);
 
-  // Stats
-  const dragonCount = pastRounds.filter(r => r.winner === 'dragon').length;
-  const tigerCount = pastRounds.filter(r => r.winner === 'tiger').length;
-  const tieCount = pastRounds.filter(r => r.winner === 'tie').length;
+  // Apply filters
+  const filteredRounds = pastRounds.filter(r => {
+    if (searchQuery && !String(r.round).includes(searchQuery)) return false;
+    return true;
+  });
+
+  const filteredBets = betHistory.filter(b => {
+    if (searchQuery && !String(b.roundNumber).includes(searchQuery)) return false;
+    const isWin = b.winAmount > 0;
+    if (winLossFilter === 'win' && !isWin) return false;
+    if (winLossFilter === 'loss' && isWin) return false;
+    return true;
+  });
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
+    if (scrollHeight - scrollTop <= clientHeight + 50) {
+      setVisibleCount(prev => prev + 20);
+    }
+  };
+
+  const handleRefresh = () => {
+    fetchAllData();
+  };
 
   if (!isOpen) return null;
 
   return (
-    <div className="gh-overlay" onClick={onClose} style={{ zIndex: 9999 }}>
-      <div className="gh-panel" onClick={(e) => e.stopPropagation()}>
-
+    <div className="gh-premium-overlay" onClick={onClose}>
+      <div className="gh-premium-modal" onClick={e => e.stopPropagation()}>
+        
         {/* Header */}
-        <div className="gh-header">
-          <div className="gh-header-left">
-            <span className="gh-icon">⏱</span>
-            <div>
-              <span className="gh-title">HISTORY</span>
-              <span className="gh-subtitle">Recent 100 rounds</span>
-            </div>
+        <div className="gh-premium-header">
+          <div className="gh-header-title">
+            <h2>{activeTab === 'game' ? '📊 Game History' : '🎯 My Bets'}</h2>
           </div>
-          <button className="gh-close" onClick={onClose}>✕</button>
+          <div className="gh-header-actions">
+            <button className="gh-action-btn" onClick={handleRefresh}>🔄 Refresh</button>
+            <button className="gh-close-btn" onClick={onClose}>✕</button>
+          </div>
         </div>
 
         {/* Tabs */}
         {username && (
-          <div className="gh-tabs">
-            <button
-              className={`gh-tab-btn ${activeTab === 'game' ? 'active' : ''}`}
+          <div className="gh-premium-tabs">
+            <button 
+              className={`gh-tab ${activeTab === 'game' ? 'active' : ''}`}
               onClick={() => handleTabChange('game')}
             >
-              📜 Game History
+              Game History
             </button>
-            <button
-              className={`gh-tab-btn ${activeTab === 'bets' ? 'active' : ''}`}
+            <button 
+              className={`gh-tab ${activeTab === 'bets' ? 'active' : ''}`}
               onClick={() => handleTabChange('bets')}
             >
-              💰 My Bets
+              My Bets
             </button>
           </div>
         )}
 
-        {activeTab === 'game' ? (
-          <>
-            {/* Stats Bar */}
-            <div className="gh-stats">
-              <div className="gh-stat gh-stat-dragon">
-                <span className="gh-stat-icon">🐉</span>
-                <span className="gh-stat-num">{dragonCount}</span>
-                <span className="gh-stat-lbl">Dragon</span>
-              </div>
-              <div className="gh-stat gh-stat-tie">
-                <span className="gh-stat-icon">🤝</span>
-                <span className="gh-stat-num">{tieCount}</span>
-                <span className="gh-stat-lbl">Tie</span>
-              </div>
-              <div className="gh-stat gh-stat-tiger">
-                <span className="gh-stat-icon">🐯</span>
-                <span className="gh-stat-num">{tigerCount}</span>
-                <span className="gh-stat-lbl">Tiger</span>
-              </div>
-            </div>
+        {/* Filters */}
+        <div className="gh-premium-filters">
+          <input 
+            type="text" 
+            placeholder="🔍 Search Round #" 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="gh-search-input"
+          />
+          
+          {activeTab === 'bets' && (
+            <select 
+              value={winLossFilter} 
+              onChange={(e) => setWinLossFilter(e.target.value as 'all' | 'win' | 'loss')}
+              className="gh-filter-select"
+            >
+              <option value="all">All Outcomes</option>
+              <option value="win">🟢 Won</option>
+              <option value="loss">🔴 Lost</option>
+            </select>
+          )}
+        </div>
 
-            {/* Table Header */}
-            <div className="gh-table-header" style={{ position: 'sticky', top: 0, background: 'rgba(0,0,0,0.6)', zIndex: 2 }}>
-              <span className="gh-col-round">Round</span>
-              <span className="gh-col-game" style={{ textAlign: 'center' }}>Time</span>
-              <span className="gh-col-winner">Winner</span>
-            </div>
-
-            {/* List */}
-            <div className="gh-list">
-              {pastRounds.length === 0 ? (
-                <div className="gh-empty">No history available</div>
+        {/* List Content */}
+        <div className="gh-premium-content" onScroll={handleScroll}>
+          {activeTab === 'game' ? (
+            <div className="gh-cards-grid">
+              {filteredRounds.length === 0 ? (
+                <div className="gh-empty">No history found</div>
               ) : (
-                pastRounds.map((r, i) => {
-                  const { label, cls, bar } = winnerInfo(r.winner);
-                  const roundTime = new Date(r.rawRoundId * 20000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+                filteredRounds.slice(0, visibleCount).map((r, i) => {
+                  const { label, icon, glow } = winnerInfo(r.winner);
+                  const roundTime = new Date(r.rawRoundId * 20000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
                   return (
-                    <div key={`${r.round}-${r.rawRoundId}`} className={`gh-row ${bar} ${i === 0 ? 'gh-latest' : ''}`} style={{ animation: 'ghRowFadeIn 0.3s ease forwards', animationDelay: `${i * 0.05}s` }}>
-                      <span className="gh-col-round">#{String(r.round).padStart(3, '0')}</span>
-                      <span className="gh-col-game" style={{ textAlign: 'center', fontSize: '11px', color: '#999' }}>{roundTime}</span>
-                      <span className={`gh-col-winner ${cls}`}>{label}</span>
+                    <div key={`${r.round}-${r.rawRoundId}`} className={`gh-history-card ${glow}`}>
+                      <div className="gh-card-top">
+                        <span className="gh-round-num">Round #{String(r.round).padStart(3, '0')}</span>
+                        <span className="gh-time">{roundTime}</span>
+                      </div>
+                      <div className="gh-card-bottom">
+                        <div className="gh-winner-badge">
+                          <span className="icon">{icon}</span>
+                          <span className="text">{label} Win</span>
+                        </div>
+                      </div>
                     </div>
                   );
                 })
               )}
             </div>
-          </>
-        ) : (
-          <>
-            {/* My Bets Summary */}
-            {betHistory.length > 0 && (
-              <div className="gh-stats">
-                <div className="gh-stat" style={{ borderColor: 'rgba(46,204,113,0.4)', background: 'linear-gradient(180deg, rgba(46,204,113,0.12), rgba(46,204,113,0.02))' }}>
-                  <span className="gh-stat-icon">🏆</span>
-                  <span className="gh-stat-num" style={{ color: '#2ecc71' }}>{betHistory.filter(b => b.winAmount > 0).length}</span>
-                  <span className="gh-stat-lbl">Wins</span>
-                </div>
-                <div className="gh-stat" style={{ borderColor: 'rgba(231,76,60,0.4)', background: 'linear-gradient(180deg, rgba(231,76,60,0.12), rgba(231,76,60,0.02))' }}>
-                  <span className="gh-stat-icon">💔</span>
-                  <span className="gh-stat-num" style={{ color: '#e74c3c' }}>{betHistory.filter(b => b.winAmount <= 0).length}</span>
-                  <span className="gh-stat-lbl">Losses</span>
-                </div>
-                <div className="gh-stat" style={{ borderColor: 'rgba(241,196,15,0.4)', background: 'linear-gradient(180deg, rgba(241,196,15,0.12), rgba(241,196,15,0.02))' }}>
-                  <span className="gh-stat-icon">💰</span>
-                  <span className="gh-stat-num" style={{ color: '#f1c40f' }}>₹{betHistory.reduce((sum, b) => sum + (b.winAmount || 0), 0)}</span>
-                  <span className="gh-stat-lbl">Total Won</span>
-                </div>
-              </div>
-            )}
-
-            <div className="gh-table-header gh-bets-header">
-              <span className="gh-bet-col-time">Time</span>
-              <span className="gh-bet-col-round">Round</span>
-              <span className="gh-bet-col-side">Bet On</span>
-              <span className="gh-bet-col-amount">Bet / Win</span>
-              <span className="gh-bet-col-status">Status</span>
-            </div>
-            <div className="gh-list">
-              {betHistory.length === 0 ? (
-                <div className="gh-empty">No bets in the last 24 hours.</div>
+          ) : (
+            <div className="gh-cards-grid">
+              {filteredBets.length === 0 ? (
+                <div className="gh-empty">No bets found</div>
               ) : (
-                betHistory.map(b => {
+                filteredBets.slice(0, visibleCount).map((b) => {
                   const isWin = b.winAmount > 0;
+                  const isPending = b.winAmount === 0 && b.betAmount > 0; // if status is somehow pending
+                  const statusLabel = isWin ? '🟢 Won' : isPending ? '🟡 Pending' : '🔴 Lost';
+                  const glowClass = isWin ? 'glow-green' : isPending ? 'glow-gold' : 'glow-red';
+                  
                   return (
-                    <div key={b._id || Math.random()} className={`gh-row gh-bet-row ${isWin ? 'gh-bar-tie' : 'gh-bar-dragon'}`}>
-                      <span className="gh-bet-col-time">
-                        {new Date(b.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
-                      </span>
-                      <span className="gh-bet-col-round">
-                        #{b.roundNumber}
-                      </span>
-                      <span className="gh-bet-col-side">
-                        {b.betSide || '-'}
-                      </span>
-                      <span className="gh-bet-col-amount">
-                        <span style={{ color: '#aaa' }}>₹{b.betAmount}</span>
-                        <span style={{ color: '#555', margin: '0 2px' }}>/</span>
-                        <span style={{ color: isWin ? '#2ecc71' : '#e74c3c', fontWeight: 700 }}>₹{b.winAmount}</span>
-                      </span>
-                      <span className={`gh-bet-col-status ${isWin ? 'gh-status-win' : 'gh-status-lost'}`}>
-                        {isWin ? '✅ WIN' : '❌ LOST'}
-                      </span>
+                    <div key={b._id || Math.random()} className={`gh-bet-card ${glowClass}`}>
+                      <div className="gh-card-header">
+                        <span className="gh-round-num">Round #{b.roundNumber}</span>
+                        <span className="gh-time">
+                          {new Date(b.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                        </span>
+                      </div>
+                      <div className="gh-card-body">
+                        <div className="gh-bet-detail">
+                          <span className="lbl">Bet Side</span>
+                          <span className="val">{b.betSide === 'dragon' ? '🐉 Dragon' : b.betSide === 'tiger' ? '🐅 Tiger' : '🟢 Tie'}</span>
+                        </div>
+                        <div className="gh-bet-detail">
+                          <span className="lbl">Bet Amount</span>
+                          <span className="val">₹{b.betAmount}</span>
+                        </div>
+                        <div className="gh-bet-detail">
+                          <span className="lbl">Result</span>
+                          <span className={`val ${isWin ? 'text-green' : 'text-red'}`}>
+                            {isWin ? `+₹${b.winAmount}` : `-₹${b.betAmount}`}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="gh-card-footer">
+                        <span className={`gh-status-badge ${isWin ? 'bg-green' : 'bg-red'}`}>
+                          {statusLabel}
+                        </span>
+                      </div>
                     </div>
                   );
                 })
               )}
+              {visibleCount < (activeTab === 'game' ? filteredRounds.length : filteredBets.length) && (
+                <div className="gh-loading-more">Scroll for more...</div>
+              )}
             </div>
-          </>
-        )}
+          )}
+        </div>
 
-        {/* Footer */}
-        {activeTab === 'game' && (
-          <div className="gh-footer">
-            📊 Showing last {pastRounds.length} {pastRounds.length === 1 ? 'round' : 'rounds'} of the most recent 100
-          </div>
-        )}
-        {activeTab === 'bets' && betHistory.length > 0 && (
-          <div className="gh-footer">
-            💰 Showing {betHistory.length} bet{betHistory.length !== 1 ? 's' : ''} from the last 24 hours
-          </div>
-        )}
       </div>
     </div>
   );
