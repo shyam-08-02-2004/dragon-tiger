@@ -816,16 +816,20 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
   };
 
   return (
-    <div 
-      className="app-header" 
-      style={{ 
-        backgroundImage: `url(${dealerBgImage})`, 
-        backgroundSize: 'cover', 
-        backgroundPosition: 'center top', 
-        backgroundAttachment: 'fixed',
-        backgroundColor: '#000'
-      }}
-    >
+    <div className="app-header">
+      {/* Bulletproof fixed background for mobile */}
+      <div 
+        style={{ 
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundImage: `url(${dealerBgImage})`, 
+          backgroundSize: 'cover', 
+          backgroundPosition: 'center top', 
+          backgroundColor: '#000',
+          zIndex: 0
+        }}
+      />
+
       
       <div className="game-main-content" style={{ overflowY: 'auto', zIndex: 10, paddingTop: '90px' }}>
         {renderContent()}
