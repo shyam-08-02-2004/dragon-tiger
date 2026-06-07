@@ -791,6 +791,10 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
             <span className="pbn-icon">🏠</span>
             <span className="pbn-label">Home</span>
           </div>
+          <div className="pbn-item" onClick={currentUser.id !== 'babu' ? () => setReferOpen(true) : undefined}>
+            <span className="pbn-icon">🎁</span>
+            <span className="pbn-label">Promotions</span>
+          </div>
           <div className="pbn-item">
             <span className="pbn-icon">🎮</span>
             <span className="pbn-label">Games</span>
