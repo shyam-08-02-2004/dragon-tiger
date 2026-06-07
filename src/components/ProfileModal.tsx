@@ -18,169 +18,123 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   onShowWallet,
   onShowRefer,
   onShowSupport,
-  onShowHistory
 }) => {
   if (!user) return null;
 
   return (
-    <div className="profile-modal-overlay" onClick={onClose}>
-      <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
+    <div className="ultra-profile-overlay">
+      
+      {/* Header */}
+      <div className="up-header">
+        <div className="up-logo">
+          DRAGON
+          <span>TIGER</span>
+        </div>
+        <button className="up-wallet-btn" onClick={onShowWallet}>
+          ₹ {user.balance?.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '12,500.00'}
+          <div className="up-wallet-add">+</div>
+        </button>
+      </div>
+
+      {/* Scroll Area */}
+      <div className="up-scroll-area">
         
-        <div className="pm-header">
-          <h2>My Profile</h2>
-          <button className="pm-close-btn" onClick={onClose}>✕</button>
+        {/* Profile Section */}
+        <div className="up-profile-section">
+          <div className="up-avatar-wrapper">
+            <div className="up-avatar-ring">
+              <img 
+                src="https://images.unsplash.com/photo-1583864697784-a0efc8379f70?w=400&q=80" 
+                alt="VIP Player" 
+                className="up-avatar-img"
+              />
+            </div>
+            <div className="up-camera-icon">✏️</div>
+          </div>
+
+          <div className="up-user-details">
+            <div className="up-username-row">
+              <h2 className="up-username">{user.username || 'VIP Player'}</h2>
+              <span className="up-verified-badge">✔</span>
+            </div>
+            <div className="up-uid-row">
+              <span className="up-uid">ID: {user.id || '78452196'}</span>
+              <span className="pm-copy-icon">📋</span>
+            </div>
+            <div className="up-status">
+              <span className="up-status-dot"></span>
+              Account Verified
+            </div>
+          </div>
         </div>
 
-        <div className="pm-content">
+        {/* Main Cards Grid */}
+        <div className="up-cards-grid">
           
-          {/* Profile Header */}
-          <div className="pm-profile-header">
-            <div className="pm-avatar-wrap">
-              <img 
-                src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${user.username || 'casino'}`} 
-                alt="Avatar" 
-                className="pm-avatar"
-              />
-              <div className="pm-verified">✓</div>
-            </div>
-            
-            <div className="pm-user-info">
-              <h3 className="pm-username">{user.username}</h3>
-              <div className="pm-uid-wrap">
-                <span className="pm-uid">UID: {user.id || '78452196'}</span>
-                <span className="pm-copy-icon">📋</span>
-              </div>
-              <div className="pm-vip-badge">💎 VIP 1 Member</div>
-            </div>
-          </div>
-
           {/* Wallet Card */}
-          <div className="pm-wallet-card">
-            <div className="pm-wallet-label">Available Balance</div>
-            <div className="pm-wallet-balance">
-              ₹ {user.balance?.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '12,500.00'}
+          <div className="up-card wallet" onClick={onShowWallet}>
+            <div className="up-card-icon">💰</div>
+            <div className="up-card-content">
+              <h3 className="up-card-title">Wallet & Banking</h3>
+              <p className="up-card-subtitle">Manage balance & transactions</p>
             </div>
-            <div className="pm-wallet-actions">
-              <button className="pm-btn pm-btn-primary" onClick={onShowWallet}>
-                💳 Deposit
-              </button>
-              <button className="pm-btn pm-btn-secondary" onClick={onShowWallet}>
-                💸 Withdraw
-              </button>
-            </div>
+            <div className="up-card-arrow">›</div>
           </div>
 
-          {/* Quick Actions */}
-          <div className="pm-section-title">Quick Actions</div>
-          <div className="pm-quick-actions">
-            <div className="pm-action-card" onClick={onShowRefer}>
-              <div className="pm-action-icon">🎁</div>
-              <div className="pm-action-title">Refer & Earn</div>
+          {/* Refer & Earn Card */}
+          <div className="up-card refer" onClick={onShowRefer}>
+            <div className="up-card-icon">🎁</div>
+            <div className="up-card-content">
+              <h3 className="up-card-title">Refer & Earn</h3>
+              <p className="up-card-subtitle">Invite friends, earn rewards</p>
             </div>
-            <div className="pm-action-card" onClick={onShowHistory}>
-              <div className="pm-action-icon">📊</div>
-              <div className="pm-action-title">Transaction History</div>
-            </div>
-            <div className="pm-action-card" onClick={onShowSupport}>
-              <div className="pm-action-icon">📞</div>
-              <div className="pm-action-title">Live Support</div>
-            </div>
-            <div className="pm-action-card">
-              <div className="pm-action-icon">🏆</div>
-              <div className="pm-action-title">VIP Rewards</div>
-            </div>
+            <div className="up-card-arrow">›</div>
           </div>
 
-          {/* Statistics Card */}
-          <div className="pm-section-title">Statistics</div>
-          <div className="pm-stats-card">
-            <div className="pm-stats-grid">
-              <div className="pm-stat-item">
-                <span className="pm-stat-label">Total Deposits</span>
-                <span className="pm-stat-value green">₹25,000</span>
-              </div>
-              <div className="pm-stat-item">
-                <span className="pm-stat-label">Total Withdrawals</span>
-                <span className="pm-stat-value">₹10,000</span>
-              </div>
-              <div className="pm-stat-item">
-                <span className="pm-stat-label">Referral Earnings</span>
-                <span className="pm-stat-value">₹2,500</span>
-              </div>
+          {/* Support Card */}
+          <div className="up-card support" onClick={onShowSupport}>
+            <div className="up-card-icon">🎧</div>
+            <div className="up-card-content">
+              <h3 className="up-card-title">Live Support</h3>
+              <p className="up-card-subtitle">24/7 VIP assistance</p>
             </div>
+            <div className="up-card-arrow">›</div>
           </div>
 
-          {/* Refer & Earn Banner */}
-          <div className="pm-banner-card">
-            <div className="pm-banner-info">
-              <h3>Refer & Earn</h3>
-              <p>Referral Code: VIP{user.id?.substring(0, 5) || '78452'}</p>
-            </div>
-            <button className="pm-banner-btn green" onClick={onShowRefer}>Share Link</button>
-          </div>
-
-          {/* Support Banner */}
-          <div className="pm-banner-card support">
-            <div className="pm-banner-info">
-              <h3>24×7 Live Support</h3>
-              <p>Need help with your account?</p>
-            </div>
-            <button className="pm-banner-btn blue" onClick={onShowSupport}>Live Chat</button>
-          </div>
-
-          {/* Account Section */}
-          <div className="pm-section-title">Account Settings</div>
-          <div className="pm-menu-list">
-            <div className="pm-menu-item">
-              <div className="pm-menu-left">
-                <span className="pm-menu-icon">👤</span>
-                <span className="pm-menu-text">Edit Profile</span>
-              </div>
-              <span className="pm-menu-arrow">›</span>
-            </div>
-            <div className="pm-menu-item">
-              <div className="pm-menu-left">
-                <span className="pm-menu-icon">🔐</span>
-                <span className="pm-menu-text">Security Settings</span>
-              </div>
-              <span className="pm-menu-arrow">›</span>
-            </div>
-            <div className="pm-menu-item">
-              <div className="pm-menu-left">
-                <span className="pm-menu-icon">💳</span>
-                <span className="pm-menu-text">Manage UPI</span>
-              </div>
-              <span className="pm-menu-arrow">›</span>
-            </div>
-            <div className="pm-menu-item">
-              <div className="pm-menu-left">
-                <span className="pm-menu-icon">📄</span>
-                <span className="pm-menu-text">KYC Verification</span>
-              </div>
-              <span className="pm-menu-arrow">›</span>
-            </div>
-            <div className="pm-menu-item">
-              <div className="pm-menu-left">
-                <span className="pm-menu-icon">🔔</span>
-                <span className="pm-menu-text">Notifications</span>
-              </div>
-              <span className="pm-menu-arrow">›</span>
-            </div>
-          </div>
-
-          {/* Logout Button */}
+          {/* Logout Card */}
           {onLogout && (
-            <button className="pm-logout-btn" onClick={() => {
-              if (window.confirm("Are you sure you want to logout?")) {
+            <div className="up-card logout" onClick={() => {
+              if (window.confirm("Are you sure you want to securely logout?")) {
                 onLogout();
               }
             }}>
-              🚪 Secure Logout
-            </button>
+              <div className="up-card-icon">🚪</div>
+              <div className="up-card-content">
+                <h3 className="up-card-title" style={{color: '#EF4444'}}>Secure Logout</h3>
+                <p className="up-card-subtitle">Sign out of your account</p>
+              </div>
+            </div>
           )}
 
         </div>
       </div>
+
+      {/* Bottom Navigation */}
+      <div className="up-bottom-nav">
+        <button className="up-nav-item" onClick={onClose}>
+          <span className="up-nav-icon">🏠</span>
+          <span className="up-nav-text">Home</span>
+        </button>
+        <button className="up-nav-item" onClick={onClose}>
+          <span className="up-nav-icon">🎮</span>
+          <span className="up-nav-text">Games</span>
+        </button>
+        <button className="up-nav-item active">
+          <span className="up-nav-icon">👤</span>
+          <span className="up-nav-text">Profile</span>
+        </button>
+      </div>
+
     </div>
   );
 };
