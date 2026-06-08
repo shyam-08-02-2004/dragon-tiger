@@ -757,6 +757,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
           onShowProfile={currentUser.id !== 'babu' ? () => setProfileOpen(true) : undefined}
           muted={muted} voiceEnabled={voiceEnabled}
           onToggleMute={toggleMute}
+          isGameView={currentTab === 'games'}
         />
 
         {currentTab === 'home' && (

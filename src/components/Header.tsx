@@ -17,6 +17,7 @@ interface HeaderProps {
   onToggleMute: () => void;
   onShowRefer?: () => void;
   onShowProfile?: () => void;
+  isGameView?: boolean;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -28,11 +29,12 @@ const Header: React.FC<HeaderProps> = ({
   muted,
   onToggleMute,
   onShowProfile,
+  isGameView = false,
 }) => {
   return (
     <header className="premium-header">
-      {/* Left: Profile & VIP */}
-      <div className="ph-left" onClick={onShowProfile} style={{ cursor: 'pointer' }}>
+      {/* Left: Profile & VIP (Hidden on Game View) */}
+      <div className="ph-left" onClick={!isGameView ? onShowProfile : undefined} style={{ cursor: isGameView ? 'default' : 'pointer', visibility: isGameView ? 'hidden' : 'visible' }}>
         <div className="vip-unified-wrapper size-md">
           <div className="vip-unified-ring">
             <img src={vipAvatar} alt="Profile" className="vip-unified-img" />
@@ -57,14 +59,22 @@ const Header: React.FC<HeaderProps> = ({
 
       {/* Right: Wallet Balance */}
       <div className="ph-right">
-        <div className="ph-wallet-card" onClick={onShowWallet}>
-          <div className="ph-wallet-icon">💳</div>
-          <div className="ph-wallet-details">
-            <span className="ph-wallet-label">WALLET BALANCE</span>
-            <span className="ph-wallet-amount">₹ {balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+        {isGameView ? (
+          <div className="ph-game-balance" onClick={onShowWallet}>
+            <span className="pgb-currency">₹</span>
+            <span className="pgb-amount">{balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            <button className="pgb-add">+</button>
           </div>
-          <div className="ph-wallet-arrow">›</div>
-        </div>
+        ) : (
+          <div className="ph-wallet-card" onClick={onShowWallet}>
+            <div className="ph-wallet-icon">💳</div>
+            <div className="ph-wallet-details">
+              <span className="ph-wallet-label">WALLET BALANCE</span>
+              <span className="ph-wallet-amount">₹ {balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            </div>
+            <div className="ph-wallet-arrow">›</div>
+          </div>
+        )}
       </div>
 
       {/* Round Number Floating below header */}
