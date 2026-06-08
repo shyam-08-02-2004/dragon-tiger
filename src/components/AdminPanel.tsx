@@ -511,36 +511,50 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
         <div className="admin-content">
           {/* ── DASHBOARD TAB ── */}
           {activeTab === 'dashboard' && (
-            <div className="admin-dashboard-container">
+            <div className="admin-dashboard-container premium-dashboard-layout">
+              <div className="admin-chat-header-premium" style={{ position: 'sticky', top: 0, zIndex: 100, marginBottom: '20px' }}>
+                <button className="premium-back-btn" onClick={onLogout}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                  <span>Exit</span>
+                </button>
+                <div className="chat-username" style={{ fontSize: '18px', color: '#D4AF37' }}>Admin VIP Panel</div>
+                <div style={{ width: '60px' }}></div>
+              </div>
+
               <div className="dashboard-card full-width" style={{
                   background: 'linear-gradient(135deg, rgba(212,160,23,0.15), rgba(212,160,23,0.05))',
                   border: '1px solid rgba(212,160,23,0.5)',
                   textAlign: 'center',
                   padding: '25px',
                   borderRadius: '16px',
-                  marginBottom: '15px'
+                  marginBottom: '20px',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
               }}>
                 <div style={{ fontSize: '14px', color: '#aaa', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '8px' }}>Live Round</div>
                 <div style={{ fontSize: '48px', fontWeight: '900', color: '#f1c40f', lineHeight: 1, textShadow: '0 0 20px rgba(241,196,15,0.4)', marginBottom: '10px' }}>#{simRoundId}</div>
                 <div style={{ fontSize: '16px', color: phaseColor, fontWeight: 'bold' }}>{phaseLabel}</div>
               </div>
 
-              <div className="admin-dashboard-grid">
-                <button className="dashboard-card nav-card" onClick={() => handleTabChange('users')}>
-                  <span className="nav-icon" style={{ color: '#3498db' }}>👥</span>
-                  <span className="nav-title">Users</span>
+              <div className="admin-dashboard-grid" style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '15px'
+              }}>
+                <button className="dashboard-card nav-card premium-grid-btn" onClick={() => handleTabChange('users')}>
+                  <span className="nav-icon" style={{ color: '#3498db', fontSize: '32px', marginBottom: '10px', display: 'block' }}>👥</span>
+                  <span className="nav-title" style={{ fontSize: '16px', fontWeight: 'bold', color: '#fff', letterSpacing: '1px' }}>Users</span>
                 </button>
-                <button className="dashboard-card nav-card" onClick={() => handleTabChange('game')}>
-                  <span className="nav-icon" style={{ color: '#f1c40f' }}>🎲</span>
-                  <span className="nav-title">Game Control</span>
+                <button className="dashboard-card nav-card premium-grid-btn" onClick={() => handleTabChange('game')}>
+                  <span className="nav-icon" style={{ color: '#f1c40f', fontSize: '32px', marginBottom: '10px', display: 'block' }}>🎲</span>
+                  <span className="nav-title" style={{ fontSize: '16px', fontWeight: 'bold', color: '#fff', letterSpacing: '1px' }}>Game Control</span>
                 </button>
-                <button className="dashboard-card nav-card" onClick={() => handleTabChange('transactions')}>
-                  <span className="nav-icon" style={{ color: '#2ecc71' }}>💳</span>
-                  <span className="nav-title">Transactions</span>
+                <button className="dashboard-card nav-card premium-grid-btn" onClick={() => handleTabChange('transactions')}>
+                  <span className="nav-icon" style={{ color: '#2ecc71', fontSize: '32px', marginBottom: '10px', display: 'block' }}>💳</span>
+                  <span className="nav-title" style={{ fontSize: '16px', fontWeight: 'bold', color: '#fff', letterSpacing: '1px' }}>Transactions</span>
                 </button>
-                <button className="dashboard-card nav-card" onClick={() => handleTabChange('support')}>
-                  <span className="nav-icon" style={{ color: '#e74c3c' }}>💬</span>
-                  <span className="nav-title">Support</span>
+                <button className="dashboard-card nav-card premium-grid-btn" onClick={() => handleTabChange('support')}>
+                  <span className="nav-icon" style={{ color: '#e74c3c', fontSize: '32px', marginBottom: '10px', display: 'block' }}>💬</span>
+                  <span className="nav-title" style={{ fontSize: '16px', fontWeight: 'bold', color: '#fff', letterSpacing: '1px' }}>Support</span>
                 </button>
               </div>
             </div>

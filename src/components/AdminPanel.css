@@ -3414,3 +3414,42 @@ html, body {
 .admin-chat-input button:hover {
   transform: scale(1.05);
 }
+
+/* Dashboard Luxury Full Screen Layout */
+.premium-dashboard-layout {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  z-index: 9999 !important;
+  background: radial-gradient(circle at center, #1e190a, #050508) !important;
+  border-radius: 0 !important;
+  padding: 15px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow-y: auto !important;
+}
+
+.premium-grid-btn {
+  background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(0,0,0,0.8)) !important;
+  border: 1px solid rgba(212,175,55,0.4) !important;
+  border-radius: 16px !important;
+  padding: 20px 10px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer !important;
+}
+
+.premium-grid-btn:active {
+  transform: scale(0.95) !important;
+  background: linear-gradient(135deg, rgba(212,175,55,0.3), rgba(0,0,0,0.9)) !important;
+}
+
