@@ -842,32 +842,62 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
 
         {/* Premium Bottom Navigation */}
         <div className="premium-bottom-nav">
-          <div 
-            className={`pbn-item ${currentTab === 'home' ? 'active' : ''}`} 
-            onClick={() => { setCurrentTab('home'); sessionStorage.setItem('dt_currentTab', 'home'); }}
-          >
-            <span className="pbn-icon">🏠</span>
-            <span className="pbn-label">Home</span>
-          </div>
-          <div className="pbn-item" onClick={currentUser.id !== 'babu' ? () => setReferOpen(true) : undefined}>
-            <span className="pbn-icon">🎁</span>
-            <span className="pbn-label">Promotions</span>
-          </div>
-          <div 
-            className={`pbn-item ${currentTab === 'games' ? 'active' : ''}`} 
-            onClick={() => { setCurrentTab('games'); sessionStorage.setItem('dt_currentTab', 'games'); }}
-          >
-            <span className="pbn-icon">🎰</span>
-            <span className="pbn-label">Games</span>
-          </div>
-          <div className="pbn-item" onClick={currentUser.id !== 'babu' ? () => setHistoryOpen(true) : undefined}>
-            <span className="pbn-icon">📜</span>
-            <span className="pbn-label">History</span>
-          </div>
-          <div className="pbn-item" onClick={() => setProfileOpen(true)}>
-            <span className="pbn-icon">👤</span>
-            <span className="pbn-label">Profile</span>
-          </div>
+          {currentTab === 'home' ? (
+            <>
+              <div 
+                className="pbn-item active" 
+                onClick={() => { setCurrentTab('home'); sessionStorage.setItem('dt_currentTab', 'home'); }}
+              >
+                <span className="pbn-icon">🏠</span>
+                <span className="pbn-label">Home</span>
+              </div>
+              <div 
+                className="pbn-item" 
+                onClick={() => { setCurrentTab('games'); sessionStorage.setItem('dt_currentTab', 'games'); }}
+              >
+                <span className="pbn-icon">🎰</span>
+                <span className="pbn-label">Games</span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div 
+                className="pbn-item" 
+                onClick={() => { setCurrentTab('home'); sessionStorage.setItem('dt_currentTab', 'home'); }}
+              >
+                <span className="pbn-icon">🏠</span>
+                <span className="pbn-label">Home</span>
+              </div>
+              <div 
+                className="pbn-item" 
+                onClick={currentUser.id !== 'babu' ? () => setReferOpen(true) : undefined}
+              >
+                <span className="pbn-icon">🎁</span>
+                <span className="pbn-label">Promotions</span>
+              </div>
+              <div 
+                className="pbn-item active" 
+                onClick={() => { setCurrentTab('games'); sessionStorage.setItem('dt_currentTab', 'games'); }}
+              >
+                <span className="pbn-icon">🎰</span>
+                <span className="pbn-label">Games</span>
+              </div>
+              <div 
+                className="pbn-item" 
+                onClick={currentUser.id !== 'babu' ? () => setHistoryOpen(true) : undefined}
+              >
+                <span className="pbn-icon">📜</span>
+                <span className="pbn-label">History</span>
+              </div>
+              <div 
+                className="pbn-item" 
+                onClick={() => setProfileOpen(true)}
+              >
+                <span className="pbn-icon">👤</span>
+                <span className="pbn-label">Profile</span>
+              </div>
+            </>
+          )}
         </div>
       </>
     );
