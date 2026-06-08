@@ -828,14 +828,6 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
               selectedChip={selectedChip}
             />
 
-            <GameControls
-              phase={phase}
-              timer={timer}
-              onUndo={handleClearBets}
-              onRepeat={handleDoubleBet}
-            />
-
-            <RoadMap history={history} />
 
             <div style={{ marginTop: 'auto', marginBottom: '5px' }}>
               <ChipSelector
