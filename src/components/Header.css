@@ -281,10 +281,39 @@
   box-shadow: 0 4px 15px rgba(0,0,0,0.6), inset 0 0 10px rgba(212,175,55,0.2);
   cursor: pointer;
   position: absolute;
-  top: 5px;
+  top: 45px;
   right: 15px;
   overflow: hidden;
   animation: balanceGlow 3s infinite alternate;
+}
+
+.ph-sound-toggle {
+  position: absolute;
+  top: 5px;
+  right: 15px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(20,20,25,0.95), rgba(5,5,10,0.98));
+  border: 1px solid rgba(212, 175, 55, 0.6);
+  border-radius: 50%;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.6), inset 0 0 10px rgba(212,175,55,0.2);
+  cursor: pointer;
+  animation: pulseGlowIcon 2s infinite alternate;
+  font-size: 16px;
+  z-index: 40;
+  transition: all 0.2s ease;
+}
+
+.ph-sound-toggle:active {
+  transform: scale(0.9);
+}
+
+@keyframes pulseGlowIcon {
+  0% { box-shadow: 0 0 5px rgba(212,175,55,0.4), inset 0 0 5px rgba(212,175,55,0.2); }
+  100% { box-shadow: 0 0 15px rgba(212,175,55,0.8), inset 0 0 15px rgba(212,175,55,0.6); border-color: #FFD700; }
 }
 
 @keyframes balanceGlow {

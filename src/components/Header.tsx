@@ -71,6 +71,11 @@ const Header: React.FC<HeaderProps> = ({
 
       {/* Right: Actions */}
       <div className="ph-right">
+        {/* Sound Toggle */}
+        <div className="ph-sound-toggle" onClick={onToggleMute}>
+          {muted ? '🔇' : '🔊'}
+        </div>
+
         {isGameView && (
           <div className="ph-game-balance" onClick={onShowWallet}>
             <span className="pgb-currency">₹</span>
