@@ -828,15 +828,6 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
               selectedChip={selectedChip}
             />
 
-            <ChipSelector
-              selectedChip={selectedChip}
-              onSelectChip={handleSelectChip}
-              onClearBets={() => {}}
-              onDoubleBet={() => {}}
-              totalBet={totalBet}
-              phase={phase}
-            />
-
             <GameControls
               phase={phase}
               timer={timer}
@@ -845,6 +836,17 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
             />
 
             <RoadMap history={history} />
+
+            <div style={{ marginTop: 'auto', marginBottom: '5px' }}>
+              <ChipSelector
+                selectedChip={selectedChip}
+                onSelectChip={handleSelectChip}
+                onClearBets={() => {}}
+                onDoubleBet={() => {}}
+                totalBet={totalBet}
+                phase={phase}
+              />
+            </div>
           </div>
         )}
 
@@ -907,7 +909,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
         }}
       />
 
-      <div className="app-content-wrapper" style={{ flex: 1, position: 'relative', zIndex: 10 }}>
+      <div className="app-content-wrapper" style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 10 }}>
         {renderContent()}
       </div>
 
