@@ -100,14 +100,7 @@ const App: React.FC = () => {
         setVoiceEnabled(true);
       }
       
-      // Auto-hide browser address bar by entering Fullscreen
-      try {
-        const docEl = document.documentElement as any;
-        if (!document.fullscreenElement && !docEl.webkitFullscreenElement) {
-          if (docEl.requestFullscreen) docEl.requestFullscreen().catch(() => {});
-          else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen().catch(() => {});
-        }
-      } catch (e) {}
+      // Fullscreen mode removed as per request
 
       // start ambient sound if not muted
       if (!muted) startAmbient(false, 0.035);
