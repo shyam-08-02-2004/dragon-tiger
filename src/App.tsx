@@ -842,12 +842,15 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
               </div>
             </div>
 
-            <div className="game-bottom-ui" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div className="game-bottom-ui" style={{ marginTop: '-40px', position: 'relative', zIndex: 20, display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div style={{ 
-                padding: '0 5px',
-                marginTop: '-35px', /* Pull up to cover background chips */
-                position: 'relative',
-                zIndex: 20
+                padding: '10px',
+                background: 'rgba(0,0,0,0.4)',
+                backdropFilter: 'blur(5px)',
+                WebkitBackdropFilter: 'blur(5px)',
+                borderRadius: '20px',
+                border: '1px solid rgba(212, 175, 55, 0.2)',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.5)'
               }}>
                 <ChipSelector
                   selectedChip={selectedChip}
