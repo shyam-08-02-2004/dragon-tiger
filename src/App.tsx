@@ -785,7 +785,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
               flexDirection: 'column',
               justifyContent: 'space-between'
             }}>
-              <div className="cards-reveal-area" style={{ flexShrink: 0, marginTop: '2%' }}>
+              <div className="cards-reveal-area" style={{ flexShrink: 0, marginTop: '12%' }}>
                 <CardDisplay
                   card={dragonCard}
                   side="dragon"
