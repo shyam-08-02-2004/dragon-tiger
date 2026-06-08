@@ -842,7 +842,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
               </div>
             </div>
 
-            <div className="game-bottom-ui" style={{ marginTop: '-40px', position: 'relative', zIndex: 20, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div className="game-bottom-ui" style={{ marginTop: '-25px', position: 'relative', zIndex: 20, display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div style={{ 
                 padding: '10px',
                 background: 'rgba(0,0,0,0.4)',
