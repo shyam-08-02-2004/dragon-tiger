@@ -1,10 +1,11 @@
 import React from 'react';
 import './ProfileModal.css';
-import vipAvatar from '../assets/vip-girl.png';
+import vipAvatar from '../assets/vip-man.png';
 
 interface ProfileModalProps {
   user: any;
   onClose: () => void;
+  onPlayGame?: () => void;
   onLogout?: () => void;
   onShowWallet?: () => void;
   onShowRefer?: () => void;
@@ -15,10 +16,12 @@ interface ProfileModalProps {
 const ProfileModal: React.FC<ProfileModalProps> = ({ 
   user, 
   onClose, 
+  onPlayGame,
   onLogout,
   onShowWallet,
   onShowRefer,
   onShowSupport,
+  onShowHistory
 }) => {
   if (!user) return null;
 
@@ -121,7 +124,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
           <span className="up-nav-icon">🏠</span>
           <span className="up-nav-text">Home</span>
         </button>
-        <button className="up-nav-item" onClick={onClose}>
+        <button className="up-nav-item" onClick={onPlayGame || onClose}>
           <span className="up-nav-icon">🎮</span>
           <span className="up-nav-text">Games</span>
         </button>

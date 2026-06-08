@@ -956,6 +956,11 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
         <ProfileModal 
           user={currentUser} 
           onClose={() => setProfileOpen(false)} 
+          onPlayGame={() => {
+            setCurrentTab('games');
+            sessionStorage.setItem('dt_currentTab', 'games');
+            setProfileOpen(false);
+          }}
           onLogout={() => { setProfileOpen(false); handleLogout(); }}
           onShowWallet={() => { setProfileOpen(false); setWalletOpen(true); }}
           onShowRefer={currentUser?.id !== 'babu' ? () => { setProfileOpen(false); setReferOpen(true); } : undefined}
