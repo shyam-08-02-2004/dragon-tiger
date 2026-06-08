@@ -882,7 +882,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
           {/* ── SUPPORT TAB ── */}
           {activeTab === 'support' && (
-            <div className={`admin-chat-layout active ${selectedSupportUser ? 'chat-active' : ''}`} style={{ background: 'var(--dark-bg)', display: 'flex', flexDirection: 'column', height: '100%', flex: 1, borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <div className={`premium-support-layout ${selectedSupportUser ? 'chat-active' : ''}`} style={{ background: 'var(--dark-bg)', display: 'flex', flexDirection: 'column', height: '100%', flex: 1, borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
               {!selectedSupportUser ? (
                 /* USER LIST VIEW */
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
