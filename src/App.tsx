@@ -772,7 +772,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
         )}
 
         {currentTab === 'games' && (
-          <>
+          <div className="game-main-content" style={{ overflowY: 'auto', paddingTop: '90px' }}>
             <div className="cards-reveal-area">
               <CardDisplay
                 card={dragonCard}
@@ -845,7 +845,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
             />
 
             <RoadMap history={history} />
-          </>
+          </div>
         )}
 
         {/* Premium Bottom Navigation */}
@@ -907,8 +907,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
         }}
       />
 
-      
-      <div className="game-main-content" style={{ overflowY: 'auto', zIndex: 10, paddingTop: '90px' }}>
+      <div className="app-content-wrapper" style={{ flex: 1, position: 'relative', zIndex: 10 }}>
         {renderContent()}
       </div>
 
