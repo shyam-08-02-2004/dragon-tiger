@@ -1,7 +1,6 @@
 .admin-layout {
   display: flex;
-  height: 100vh
-  height: 100dvh;
+  height: 100vh; height: 100dvh;
   background-color: transparent;
   color: var(--text-primary);
   font-family: var(--font-ui);
@@ -11,11 +10,9 @@
   touch-action: manipulation;
 }
 
-@supports (height: 100vh
-  height: 100dvh) {
+@supports (height: 100vh; height: 100dvh) {
   .admin-layout {
-    height: 100vh
-  height: 100dvh;
+    height: 100vh; height: 100dvh;
   }
 }
 
@@ -597,10 +594,8 @@ html, body {
   .admin-layout {
     flex-direction: column;
     height: auto;
-    min-height: 100vh
-  height: 100dvh;
-    min-height: 100vh
-  height: 100dvh;
+    min-height: 100vh; height: 100dvh;
+    min-height: 100vh; height: 100dvh;
     overflow-x: hidden;
     overflow-y: auto;
   }
@@ -836,10 +831,8 @@ html, body {
   }
 
   .admin-layout {
-    min-height: 100vh
-  height: 100dvh;
-    min-height: 100vh
-  height: 100dvh;
+    min-height: 100vh; height: 100dvh;
+    min-height: 100vh; height: 100dvh;
   }
 
   .admin-content {
@@ -1168,8 +1161,7 @@ html, body {
 
 .admin-layout {
   display: flex;
-  height: 100vh
-  height: 100dvh;
+  height: 100vh; height: 100dvh;
   background: radial-gradient(circle at top, #1a1a24 0%, #050508 100%);
   color: #E0E0E0;
   font-family: 'Inter', sans-serif;
@@ -1569,10 +1561,8 @@ html, body {
   right: 0 !important;
   bottom: 0 !important;
   width: 100vw !important;
-  height: 100vh
-  height: 100dvh !important;
-  max-height: 100vh
-  height: 100dvh !important;
+  height: 100vh; height: 100dvh !important;
+  max-height: 100vh; height: 100dvh !important;
   z-index: 99999 !important;
   border-radius: 0 !important;
   border: none !important;
@@ -1995,8 +1985,7 @@ html, body {
 .admin-layout.nav-open .admin-sidebar {
   width: 100% !important;
   max-width: 100% !important;
-  height: 100vh
-  height: 100dvh !important;
+  height: 100vh; height: 100dvh !important;
   display: flex !important;
   flex-direction: column !important;
   border-right: none !important;
@@ -2544,8 +2533,7 @@ html, body {
   .admin-layout {
     flex-direction: column !important;
     height: auto !important;
-    min-height: 100vh
-  height: 100dvh !important;
+    min-height: 100vh; height: 100dvh !important;
     overflow-y: auto !important;
   }
 
@@ -2651,8 +2639,7 @@ html, body {
     right: 0 !important;
     bottom: 0 !important;
     width: 100vw !important;
-    height: 100vh
-  height: 100dvh !important;
+    height: 100vh; height: 100dvh !important;
     z-index: 9999 !important;
     background: radial-gradient(circle at center, #1e190a, #050508) !important;
     border-radius: 0 !important;
@@ -3114,8 +3101,7 @@ html, body {
     right: 0 !important;
     bottom: 0 !important;
     width: 100vw !important;
-    height: 100vh
-  height: 100dvh !important;
+    height: 100vh; height: 100dvh !important;
     z-index: 9999 !important;
     background: radial-gradient(circle at center, #1e190a, #050508) !important;
     border-radius: 0 !important;
@@ -3310,8 +3296,7 @@ html, body {
     right: 0 !important;
     bottom: 0 !important;
     width: 100vw !important;
-    height: 100vh
-  height: 100dvh !important;
+    height: 100vh; height: 100dvh !important;
     z-index: 9999 !important;
     background: radial-gradient(circle at center, #1e190a, #050508) !important;
     border-radius: 0 !important;
