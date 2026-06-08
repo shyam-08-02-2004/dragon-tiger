@@ -60,16 +60,7 @@ const Header: React.FC<HeaderProps> = ({
         )}
       </div>
 
-      {/* Round Number Floating below header */}
-      {isGameView && (
-        <div className="ph-round-floating">
-          <span className="ph-round-icon">🔄</span>
-          <div className="ph-round-details">
-            <div className="ph-round-label">ROUND</div>
-            <div className="ph-round-val"># {roundNumber}</div>
-          </div>
-        </div>
-      )}
+
     </header>
   );
 };

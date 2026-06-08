@@ -786,9 +786,9 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
               justifyContent: 'space-between'
             }}>
               {/* Overlay for Round Number */}
-              <div style={{
+              <div className="round-pulse-anim" style={{
                 position: 'absolute',
-                top: '5%',
+                top: '2.5%',
                 left: '5%',
                 background: 'rgba(0,0,0,0.8)',
                 color: '#D4AF37',
