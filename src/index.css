@@ -25,13 +25,16 @@
 }
 
 body {
-  font-family: var(--font-ui);
-  background-color: transparent;
-  color: var(--text-primary);
+  margin: 0;
+  font-family: var(--font-main), 'Inter', sans-serif;
+  background-color: #000;
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
   user-select: none;
   -webkit-user-select: none;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 #root {
@@ -40,7 +43,6 @@ body {
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow: hidden;
 }
 
 ::-webkit-scrollbar {
