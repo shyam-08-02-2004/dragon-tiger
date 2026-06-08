@@ -762,7 +762,8 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
 
         {currentTab === 'home' && (
           <HomeTab 
-            balance={balance} 
+            username={currentUser.username}
+            onShowProfile={currentUser.id !== 'babu' ? () => setProfileOpen(true) : () => {}}
             onPlayGame={() => {
               setCurrentTab('games');
               sessionStorage.setItem('dt_currentTab', 'games');

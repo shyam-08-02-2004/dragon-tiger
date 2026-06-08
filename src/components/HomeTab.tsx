@@ -4,12 +4,15 @@ import bgImage from '../assets/luxury_lobby_bg.png';
 import walletIcon from '../assets/luxury_3d_wallet.png';
 import chairImage from '../assets/vip_purple_chair.png';
 
+import vipAvatar from '../assets/vip-man.png';
+
 interface HomeTabProps {
-  balance: number;
+  username: string;
   onPlayGame: () => void;
+  onShowProfile: () => void;
 }
 
-const HomeTab: React.FC<HomeTabProps> = ({ balance, onPlayGame }) => {
+const HomeTab: React.FC<HomeTabProps> = ({ username, onPlayGame, onShowProfile }) => {
   return (
     <div className="home-tab-container">
       {/* Background Image */}
@@ -22,22 +25,22 @@ const HomeTab: React.FC<HomeTabProps> = ({ balance, onPlayGame }) => {
       {/* Main Content Area */}
       <div className="home-tab-content">
         
-        {/* Wallet Balance Section */}
-        <div className="home-wallet-card">
-          <div className="hwc-left">
-            <h3 className="hwc-title">WALLET BALANCE</h3>
-            <div className="hwc-amount">
-              <span className="hwc-currency">₹</span>
-              {balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        {/* Profile Section */}
+        <div className="home-profile-card" onClick={onShowProfile} style={{ cursor: 'pointer' }}>
+          <div className="hpc-left">
+            <h3 className="hpc-title">ROYAL MEMBER</h3>
+            <div className="hpc-name-row">
+              <span className="hpc-username">{username || 'Guest'}</span>
             </div>
-            <div className="hwc-crown-divider">
-              <div className="hwc-line" />
-              <span className="hwc-crown-icon">👑</span>
-              <div className="hwc-line" />
+            <div className="hpc-badges">
+              <span className="hpc-vip-badge">👑 VIP 8</span>
+              <span className="hpc-view-profile">View Profile ➔</span>
             </div>
           </div>
-          <div className="hwc-right">
-            <img src={walletIcon} alt="Wallet" className="hwc-wallet-img" />
+          <div className="hpc-right">
+            <div className="hpc-avatar-wrapper">
+              <img src={vipAvatar} alt="Profile" className="hpc-avatar-img" />
+            </div>
           </div>
         </div>
 
