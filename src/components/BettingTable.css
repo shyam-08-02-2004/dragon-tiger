@@ -2,13 +2,12 @@
   position: relative;
   width: 100%;
   padding: 0 10px;
-  /* Push to bottom of available space, right above chips */
-  margin-top: auto; 
+  margin-top: 15px; 
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  margin-bottom: 5px;
+  justify-content: flex-start;
+  margin-bottom: 10px;
 }
 
 .premium-table-surface {
