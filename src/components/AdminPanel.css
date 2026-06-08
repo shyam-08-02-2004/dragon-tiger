@@ -3643,3 +3643,9 @@ html, body {
   .tx-badge { align-self: flex-start; }
 }
 
+
+@media (max-width: 768px) {
+  .tx-card-actions { display: flex !important; flex-wrap: wrap !important; gap: 10px !important; }
+  .tx-action-btn { flex: 1 1 100% !important; width: 100% !important; font-size: 14px !important; padding: 12px !important; margin: 0 !important; }
+}
+
