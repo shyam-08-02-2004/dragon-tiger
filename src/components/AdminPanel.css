@@ -3649,3 +3649,6 @@ html, body {
   .tx-action-btn { flex: 1 1 100% !important; width: 100% !important; font-size: 14px !important; padding: 12px !important; margin: 0 !important; }
 }
 
+
+.admin-tx-card { flex-shrink: 0 !important; }
+
