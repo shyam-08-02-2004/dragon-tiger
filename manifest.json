@@ -3,7 +3,7 @@
   "short_name": "Dragon Tiger",
   "description": "Live Casino Dragon Tiger",
   "start_url": "/",
-  "display": "standalone",
+  "display": "browser",
   "background_color": "#050508",
   "theme_color": "#050508",
   "icons": [
