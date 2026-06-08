@@ -379,3 +379,20 @@ body {
   padding-bottom: 70px; /* Space for bottom nav */
 }
 
+
+.game-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly; /* Better distribution on mobile */
+  z-index: 10;
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding-top: 80px; /* Reduced to fit on screen */
+  padding-bottom: 5px;
+  height: 100%;
+  box-sizing: border-box;
+}
+

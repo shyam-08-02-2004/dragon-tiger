@@ -908,7 +908,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
       />
 
       
-      <div className="game-main-content" style={{ overflowY: 'auto', zIndex: 10, paddingTop: '90px' }}>
+      <div className="game-main-content">
         {renderContent()}
       </div>
 
