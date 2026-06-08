@@ -91,7 +91,7 @@ const App: React.FC = () => {
   const setProfileOpen = (val: boolean) => { setShowProfile(val); sessionStorage.setItem('dt_showProfile', String(val)); };
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const toggleMute = () => setMuted(prev => !prev);
-  // Unlock speech synthesis on first user interaction
+  // Unlock speech synthesis and trigger Fullscreen on first user interaction
   useEffect(() => {
     const unlock = () => {
       if ('speechSynthesis' in window) {
@@ -99,12 +99,25 @@ const App: React.FC = () => {
         window.speechSynthesis.speak(utter);
         setVoiceEnabled(true);
       }
+      
+      // Auto-hide browser address bar by entering Fullscreen
+      try {
+        const docEl = document.documentElement as any;
+        if (!document.fullscreenElement && !docEl.webkitFullscreenElement) {
+          if (docEl.requestFullscreen) docEl.requestFullscreen().catch(() => {});
+          else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen().catch(() => {});
+        }
+      } catch (e) {}
+
       // start ambient sound if not muted
       if (!muted) startAmbient(false, 0.035);
-      window.removeEventListener('click', unlock);
     };
-    window.addEventListener('click', unlock);
-    return () => window.removeEventListener('click', unlock);
+    document.addEventListener('click', unlock, { once: true });
+    document.addEventListener('touchstart', unlock, { once: true });
+    return () => {
+      document.removeEventListener('click', unlock);
+      document.removeEventListener('touchstart', unlock);
+    };
   }, []);
 
   useEffect(() => {
