@@ -90,53 +90,6 @@
   font-weight: bold;
   font-size: 14px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-}
-
-/* CENTER: Logo */
-.ph-center {
-  display: flex;
-  justify-content: center;
-  margin-top: -4px;
-}
-
-.ph-logo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.ph-crown {
-  font-size: 20px;
-  margin-bottom: -4px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-}
-
-.ph-logo-text {
-  font-family: 'Times New Roman', serif;
-  font-size: 22px;
-  font-weight: 900;
-  letter-spacing: 2px;
-  color: #FFD700;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-  background: -webkit-linear-gradient(#FFDF00, #B8860B);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.ph-logo-sub {
-  font-size: 10px;
-  color: #FFD700;
-  letter-spacing: 4px;
-  opacity: 0.8;
-}
-
-/* RIGHT: Actions */
-.ph-right {
-  display: flex;
   gap: 15px;
   padding-top: 4px;
 }
@@ -261,6 +214,61 @@
   .ph-wallet-label { font-size: 8px; }
 }
 
+/* RIGHT: Actions */
+.ph-right {
+  display: flex;
+  gap: 15px;
+  padding-top: 4px;
+}
+
+/* CENTER: Logo */
+.ph-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  margin-top: -4px;
+  z-index: 2;
+}
+
+.ph-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ph-crown {
+  font-size: 22px;
+  margin-bottom: -6px;
+  text-shadow: 0 0 10px rgba(255,215,0,0.8);
+  animation: floatCrown 3s ease-in-out infinite;
+}
+
+@keyframes floatCrown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.ph-logo-text {
+  font-family: 'Cinzel', serif;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  background: linear-gradient(90deg, #FFDF00, #FFF, #B8860B, #FFDF00);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: goldShimmerText 3s infinite linear;
+  filter: drop-shadow(0 2px 5px rgba(212,175,55,0.4));
+}
+
+.ph-logo-sub {
+  font-size: 10px;
+  color: #FFD700;
+  letter-spacing: 4px;
+  opacity: 0.8;
+}
 
 .ph-game-balance {
   display: flex;
