@@ -785,6 +785,24 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
               flexDirection: 'column',
               justifyContent: 'space-between'
             }}>
+              {/* Overlay for Round Number */}
+              <div style={{
+                position: 'absolute',
+                top: '5%',
+                left: '5%',
+                background: 'rgba(0,0,0,0.8)',
+                color: '#D4AF37',
+                padding: '4px 8px',
+                fontSize: '12px',
+                fontFamily: 'Inter, sans-serif',
+                fontWeight: 'bold',
+                borderRadius: '4px',
+                border: '1px solid rgba(212, 175, 55, 0.3)',
+                zIndex: 30
+              }}>
+                Round: {roundNumber}
+              </div>
+
               <div className="cards-reveal-area" style={{ flexShrink: 0, marginTop: '12%' }}>
                 <CardDisplay
                   card={dragonCard}
