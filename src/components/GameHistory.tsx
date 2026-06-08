@@ -240,7 +240,12 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
                       <div className="gh-card-body">
                         <div className="gh-bet-detail">
                           <span className="lbl">Bet Side</span>
-                          <span className="val">{b.betSide === 'dragon' ? '🐉 Dragon' : b.betSide === 'tiger' ? '🐅 Tiger' : '🟢 Tie'}</span>
+                          <span className="val" style={{ textTransform: 'capitalize' }}>
+                            {b.betSide.toLowerCase().includes('dragon') ? '🐉 ' : ''}
+                            {b.betSide.toLowerCase().includes('tiger') ? '🐅 ' : ''}
+                            {b.betSide.toLowerCase().includes('tie') ? '🟢 ' : ''}
+                            {b.betSide}
+                          </span>
                         </div>
                         <div className="gh-bet-detail">
                           <span className="lbl">Bet Amount</span>
