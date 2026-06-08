@@ -562,8 +562,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
           {/* ── USERS TAB ── */}
           {activeTab === 'users' && (
-            <div className="admin-user-layout active">
-              <div className="admin-chat-header-premium" style={{ position: 'sticky', top: 0, zIndex: 100 }}>
+            <div className="admin-user-layout premium-dashboard-layout">
+              <div className="admin-chat-header-premium" style={{ position: 'sticky', top: 0, zIndex: 100, marginBottom: '15px' }}>
                 <button className="premium-back-btn" onClick={() => handleTabChange('dashboard')}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                   <span>Back</span>
@@ -571,16 +571,18 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                 <div className="chat-username" style={{ fontSize: '18px', color: '#D4AF37' }}>Users Management</div>
                 <div style={{ width: '80px' }}></div>
               </div>
-              <div className="admin-user-grid" style={{ padding: '15px', overflowY: 'auto', flex: 1 }}>
-                {users.map((user: any) => {
+              <div className="admin-user-grid" style={{ padding: '5px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                {[...users].reverse().map((user: any) => {
                 if (user.id === 'babu') return null;
                 return (
-                  <div key={user.id} className={`admin-user-card ${user.hasDeposited ? 'vip-user' : ''}`}>
-                    <div className="user-card-top">
-                      <div className="user-card-avatar">👤</div>
-                      <div className="user-card-info">
-                        <div className="user-card-phone">{user.id}</div>
-                        <div className="user-card-username">{user.username}</div>
+                  <div key={user.id} className={`admin-user-card premium-user-card ${user.hasDeposited ? 'vip-user' : ''}`}>
+                    <div className="user-card-top" style={{ padding: '15px', borderBottom: '1px solid rgba(212,175,55,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div className="user-card-avatar" style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'linear-gradient(135deg, rgba(212,175,55,0.3), rgba(0,0,0,0.8))', border: '2px solid #D4AF37', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>👤</div>
+                        <div className="user-card-info">
+                          <div className="user-card-phone" style={{ fontSize: '16px', fontWeight: 'bold', color: '#fff' }}>{user.id}</div>
+                          <div className="user-card-username" style={{ fontSize: '12px', color: '#aaa' }}>{user.username}</div>
+                        </div>
                       </div>
                       <div className={`user-card-badge ${user.hasDeposited ? 'active' : 'inactive'}`}>
                         {user.hasDeposited ? 'ACTIVE' : 'NEW'}
@@ -620,10 +622,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
             </div>
           )}
 
-          {/* ── GAME TAB ── */}
+          {/* ── GAME CONTROL TAB ── */}
           {activeTab === 'game' && (
-            <div className="admin-game-layout active">
-              <div className="admin-chat-header-premium" style={{ position: 'sticky', top: 0, zIndex: 100 }}>
+            <div className="admin-game-layout premium-dashboard-layout">
+              <div className="admin-chat-header-premium" style={{ position: 'sticky', top: 0, zIndex: 100, marginBottom: '15px' }}>
                 <button className="premium-back-btn" onClick={() => handleTabChange('dashboard')}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                   <span>Back</span>
@@ -840,8 +842,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
           {/* ── TRANSACTIONS TAB ── */}
           {activeTab === 'transactions' && (
-            <div className="admin-tx-layout active">
-              <div className="admin-chat-header-premium" style={{ position: 'sticky', top: 0, zIndex: 100 }}>
+            <div className="admin-tx-layout premium-dashboard-layout">
+              <div className="admin-chat-header-premium" style={{ position: 'sticky', top: 0, zIndex: 100, marginBottom: '15px' }}>
                 <button className="premium-back-btn" onClick={() => handleTabChange('dashboard')}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                   <span>Back</span>
