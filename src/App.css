@@ -38,7 +38,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: 100px;
   padding: 10px 12px;
   position: relative;
   z-index: 5;
@@ -190,7 +190,7 @@ body {
     font-size: 9px;
   }
   .cards-reveal-area {
-    gap: 6px;
+    gap: 70px;
     padding: 8px 8px;
   }
 }
