@@ -758,6 +758,8 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
           muted={muted} voiceEnabled={voiceEnabled}
           onToggleMute={toggleMute}
           isGameView={currentTab === 'games'}
+          timer={timer}
+          phase={phase}
         />
 
         {currentTab === 'home' && (
@@ -812,36 +814,6 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
                   isRevealing={phase === 'dealing'}
                   isWinner={dragonWins}
                 />
-                
-                <div className="center-timer-wrapper" style={{ position: 'absolute', top: '10%', left: '50%', transform: 'translateX(-50%)', zIndex: 30 }}>
-                  <div className="center-timer-ring">
-                    <svg viewBox="0 0 80 80" className="center-timer-svg">
-                      <circle className="center-timer-bg" cx="40" cy="40" r="34" />
-                      <circle 
-                        className="center-timer-progress" 
-                        cx="40" cy="40" r="34"
-                        style={{
-                          strokeDasharray: `${2 * Math.PI * 34}`,
-                          strokeDashoffset: phase === 'betting' 
-                            ? `${2 * Math.PI * 34 * (1 - timer / 15)}` 
-                            : '0'
-                        }}
-                      />
-                    </svg>
-                    <div className="center-timer-content">
-                      {phase === 'betting' ? (
-                        <>
-                          <span className={`center-timer-number ${timer <= 5 ? 'urgent' : ''}`}>{timer}</span>
-                          <span className="center-timer-label">SEC</span>
-                        </>
-                      ) : phase === 'dealing' ? (
-                        <span className="center-timer-status dealing">⚡</span>
-                      ) : (
-                        <span className="center-timer-status result">✨</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
 
                 <CardDisplay
                   card={tigerCard}
