@@ -3626,3 +3626,20 @@ html, body {
   filter: brightness(1.2);
 }
 
+
+/* Hide obsolete sidebar since we use full-screen app layout */
+.admin-sidebar { display: none !important; }
+
+
+@media (max-width: 768px) { .admin-chat-input button { padding: 0 15px !important; font-size: 14px !important; white-space: nowrap; flex-shrink: 0; } .admin-chat-input { padding: 10px !important; gap: 8px !important; } .admin-chat-input input { padding: 10px 15px !important; font-size: 14px !important; } }
+
+
+@media (max-width: 768px) {
+  .admin-tx-grid { padding: 10px !important; }
+  .tx-card-actions { flex-wrap: wrap; }
+  .tx-action-btn { flex: 1 1 calc(50% - 10px); font-size: 13px !important; padding: 12px 10px !important; }
+  .tx-action-btn.delete { flex: 1 1 100%; }
+  .tx-card-header { flex-direction: column; align-items: flex-start !important; gap: 10px; }
+  .tx-badge { align-self: flex-start; }
+}
+

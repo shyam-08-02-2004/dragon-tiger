@@ -852,7 +852,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                 <div style={{ width: '80px' }}></div>
               </div>
               <div className="admin-tx-grid" style={{ padding: '15px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                {transactions.slice().reverse().map((tx) => (
+                {transactions.slice().map((tx) => (
                   <div key={tx.id} className={`admin-tx-card ${tx.type}`}>
                     <div className="tx-card-header">
                       <div className="tx-user-info">
@@ -1003,14 +1003,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                                 {new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
                               </div>
                               {msg.sender === 'admin' && (
-                                <div className="admin-chat-actions" style={{ display: 'flex', gap: '10px', marginTop: '8px', justifyContent: 'flex-end', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '6px' }}>
-                                  {Date.now() - new Date(msg.timestamp).getTime() <= 10 * 60 * 1000 && (
-                                    <button onClick={() => { setEditingChatId(msg.id); setEditingChatText(msg.message); }} style={{ background: 'none', border: 'none', color: '#D4AF37', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                      ✏️ Edit
-                                    </button>
-                                  )}
-                                  <button onClick={() => handleAdminDeleteMessage(msg.id)} style={{ background: 'none', border: 'none', color: '#e74c3c', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    🗑️ Delete
+                                <div className="chat-hover-actions">
+                                  <button className="action-hover-btn edit-btn" onClick={() => { setEditingChatId(msg.id); setEditingChatText(msg.message); }} title="Edit">
+                                    ✏️
+                                  </button>
+                                  <button className="action-hover-btn delete-btn" onClick={() => handleAdminDeleteMessage(msg.id)} title="Delete">
+                                    🗑️
                                   </button>
                                 </div>
                               )}
@@ -1069,7 +1067,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                 <table className="admin-table-v2">
                   <thead><tr><th>Time</th><th>Type</th><th>Amount</th><th>Status</th></tr></thead>
                   <tbody>
-                    {transactions.filter(t => t.username === selectedUserHistory).slice().reverse().map(tx => (
+                    {transactions.filter(t => t.username === selectedUserHistory).slice().map(tx => (
                       <tr key={tx.id}>
                         <td data-label="Time">{new Date(tx.timestamp).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}</td>
                         <td data-label="Type" className={tx.type === 'deposit' ? 'green' : 'gold'}>{tx.type.toUpperCase()}</td>
