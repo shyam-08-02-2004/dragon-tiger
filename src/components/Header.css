@@ -340,3 +340,24 @@
   100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
 }
 
+
+.ph-animated-username {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, #FFDF00, #FFF, #B8860B, #FFDF00);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: goldShimmerText 4s infinite linear;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  padding-top: 5px;
+}
+
+@keyframes goldShimmerText {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+

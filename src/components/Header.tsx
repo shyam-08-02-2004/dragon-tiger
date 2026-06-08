@@ -33,18 +33,10 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   return (
     <header className="premium-header">
-      {/* Left: Profile & VIP (Hidden on Game View) */}
+      {/* Left: Animated Username (Hidden on Game View) */}
       <div className="ph-left" onClick={!isGameView ? onShowProfile : undefined} style={{ cursor: isGameView ? 'default' : 'pointer', visibility: isGameView ? 'hidden' : 'visible' }}>
-        <div className="vip-unified-wrapper size-md">
-          <div className="vip-unified-ring">
-            <img src={vipAvatar} alt="Profile" className="vip-unified-img" />
-          </div>
-        </div>
-        <div className="ph-user-info">
-          <div className="ph-name-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
-            <span className="ph-username">{username || 'Guest'}</span>
-            <span className="ph-vip-badge">👑 VIP 8</span>
-          </div>
+        <div className="ph-animated-username">
+          {username || 'Guest'}
         </div>
       </div>
 
