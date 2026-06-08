@@ -772,7 +772,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
         )}
 
         {currentTab === 'games' && (
-          <div className="game-main-content" style={{ overflowY: 'auto', paddingTop: '90px' }}>
+          <div className="game-main-content" style={{ overflow: 'hidden', paddingTop: '90px', height: '100%' }}>
             <div className="cards-reveal-area">
               <CardDisplay
                 card={dragonCard}
