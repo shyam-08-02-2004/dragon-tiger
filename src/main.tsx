@@ -15,26 +15,6 @@ window.fetch = async (...args) => {
     resource = new Request(url, resource);
   }
 
-  if (url && config && config.headers) {
-    const headers = new Headers(config.headers);
-    if (headers.get('Content-Type') === 'application/json' && config.body && typeof config.body === 'string') {
-      headers.set('Content-Type', 'application/x-www-form-urlencoded');
-      try {
-        const bodyObj = JSON.parse(config.body);
-        const urlParams = new URLSearchParams();
-        for (const [key, value] of Object.entries(bodyObj)) {
-            if (typeof value === 'object') {
-                urlParams.append(key, JSON.stringify(value));
-            } else {
-                urlParams.append(key, String(value));
-            }
-        }
-        config.body = urlParams.toString();
-      } catch(e) {}
-      config.headers = headers;
-    }
-  }
-
   return originalFetch(resource, config);
 };
 
