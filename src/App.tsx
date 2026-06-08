@@ -855,8 +855,6 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
                 onUndo={handleClearBets}
                 onRepeat={handleDoubleBet}
               />
-
-              <RoadMap history={history} />
             </div>
           </div>
         )}
