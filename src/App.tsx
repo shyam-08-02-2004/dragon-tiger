@@ -829,7 +829,17 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
             />
 
 
-            <div style={{ marginTop: 'auto', marginBottom: '5px' }}>
+            <div style={{ 
+              marginTop: 'auto', 
+              marginBottom: '15px',
+              padding: '10px',
+              background: 'rgba(0,0,0,0.4)',
+              backdropFilter: 'blur(5px)',
+              WebkitBackdropFilter: 'blur(5px)',
+              borderRadius: '20px',
+              border: '1px solid rgba(212, 175, 55, 0.2)',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.5)'
+            }}>
               <ChipSelector
                 selectedChip={selectedChip}
                 onSelectChip={handleSelectChip}

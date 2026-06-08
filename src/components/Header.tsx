@@ -33,11 +33,33 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   return (
     <header className="premium-header">
-      {/* Left: Animated Username (Hidden on Game View) */}
-      <div className="ph-left" onClick={!isGameView ? onShowProfile : undefined} style={{ cursor: isGameView ? 'default' : 'pointer', visibility: isGameView ? 'hidden' : 'visible' }}>
-        <div className="ph-animated-username">
-          {username || 'Guest'}
-        </div>
+      {/* Left: Refresh (Game View) or Animated Username */}
+      <div className="ph-left">
+        {isGameView ? (
+          <button 
+            onClick={() => window.location.reload()} 
+            style={{ 
+              background: 'rgba(0,0,0,0.5)', 
+              border: '1px solid rgba(212, 175, 55, 0.4)', 
+              color: '#D4AF37', 
+              fontSize: '18px', 
+              cursor: 'pointer', 
+              padding: '6px 12px',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              backdropFilter: 'blur(4px)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.5)'
+            }}
+          >
+            ↻ <span style={{ fontSize: '10px', fontWeight: 'bold' }}>RELOAD</span>
+          </button>
+        ) : (
+          <div className="ph-animated-username" onClick={onShowProfile} style={{ cursor: 'pointer' }}>
+            {username || 'Guest'}
+          </div>
+        )}
       </div>
 
       {/* Center: Royal Casino Logo */}
