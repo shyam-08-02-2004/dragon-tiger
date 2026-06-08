@@ -194,3 +194,44 @@
   color: #FFD700;
   font-family: monospace;
 }
+
+.ph-wallet-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(10, 10, 10, 0.8);
+  border: 1px solid #D4AF37;
+  border-radius: 12px;
+  padding: 6px 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.15);
+}
+.ph-wallet-icon {
+  font-size: 24px;
+}
+.ph-wallet-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.ph-wallet-label {
+  font-size: 10px;
+  color: #D4AF37;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+.ph-wallet-amount {
+  font-size: 16px;
+  color: white;
+  font-weight: bold;
+}
+.ph-wallet-arrow {
+  color: #D4AF37;
+  font-size: 20px;
+  margin-left: 5px;
+}
+@media (max-width: 768px) {
+  .ph-wallet-amount { font-size: 13px; }
+  .ph-wallet-label { font-size: 8px; }
+}
+

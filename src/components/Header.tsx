@@ -1,6 +1,6 @@
 import React from 'react';
 import './Header.css';
-import vipAvatar from '../assets/vip-girl.png';
+import vipAvatar from '../assets/vip-man.png';
 
 interface HeaderProps {
   balance: number;
@@ -31,7 +31,7 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   return (
     <header className="premium-header">
-      {/* Left: Profile & Wallet */}
+      {/* Left: Profile & VIP */}
       <div className="ph-left" onClick={onShowProfile} style={{ cursor: 'pointer' }}>
         <div className="vip-unified-wrapper size-md">
           <div className="vip-unified-ring">
@@ -39,15 +39,9 @@ const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
         <div className="ph-user-info">
-          <div className="ph-name-row">
+          <div className="ph-name-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
             <span className="ph-username">{username || 'Guest'}</span>
-            <span className="ph-vip-badge">VIP 8</span>
-          </div>
-          <div className="ph-balance-row" onClick={(e) => { e.stopPropagation(); onShowWallet(); }}>
-            <span className="ph-balance">
-              ₹{balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </span>
-            <button className="ph-add-btn">+</button>
+            <span className="ph-vip-badge">👑 VIP 8</span>
           </div>
         </div>
       </div>
@@ -61,12 +55,16 @@ const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Right: Actions */}
+      {/* Right: Wallet Balance */}
       <div className="ph-right">
-        <button className="ph-action-btn" onClick={onToggleMute}>
-          <div className="ph-icon">{muted ? '🔇' : '🔊'}</div>
-          <span className="ph-label">{muted ? 'Sound Off' : 'Sound On'}</span>
-        </button>
+        <div className="ph-wallet-card" onClick={onShowWallet}>
+          <div className="ph-wallet-icon">💳</div>
+          <div className="ph-wallet-details">
+            <span className="ph-wallet-label">WALLET BALANCE</span>
+            <span className="ph-wallet-amount">₹ {balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+          </div>
+          <div className="ph-wallet-arrow">›</div>
+        </div>
       </div>
 
       {/* Round Number Floating below header */}

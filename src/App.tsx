@@ -59,7 +59,12 @@ const initialState: GameState = {
   dealerMessage: DEALER_MESSAGES.betting[0],
 };
 
+import HomeTab from './components/HomeTab';
+
 const App: React.FC = () => {
+  const [currentTab, setCurrentTab] = useState<'home' | 'games'>(() => {
+    return (sessionStorage.getItem('dt_currentTab') as 'home' | 'games') || 'home';
+  });
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return !!sessionStorage.getItem('dragonTigerCurrentUser');
   });
@@ -754,101 +759,102 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
           onToggleMute={toggleMute}
         />
 
-        <div className="cards-reveal-area">
-          <CardDisplay
-            card={dragonCard}
-            side="dragon"
-            isRevealing={phase === 'dealing'}
-            isWinner={dragonWins}
-          />
+        {currentTab === 'home' && (
+          <HomeTab balance={balance} />
+        )}
 
-          {/* Center Timer Between Cards */}
-          <div className={`center-timer-wrapper ${phase}`}>
-            <div className="center-timer-ring">
-              <svg className="center-timer-svg" viewBox="0 0 80 80">
-                <circle className="center-timer-bg-circle" cx="40" cy="40" r="34" />
-                <circle 
-                  className="center-timer-progress" 
-                  cx="40" cy="40" r="34"
-                  style={{
-                    strokeDasharray: `${2 * Math.PI * 34}`,
-                    strokeDashoffset: phase === 'betting' 
-                      ? `${2 * Math.PI * 34 * (1 - timer / 15)}` 
-                      : '0'
-                  }}
-                />
-              </svg>
-              <div className="center-timer-content">
-                {phase === 'betting' ? (
-                  <>
-                    <span className={`center-timer-number ${timer <= 5 ? 'urgent' : ''}`}>{timer}</span>
-                    <span className="center-timer-label">SEC</span>
-                  </>
-                ) : phase === 'dealing' ? (
-                  <span className="center-timer-status dealing">⚡</span>
-                ) : (
-                  <span className="center-timer-status result">✨</span>
-                )}
+        {currentTab === 'games' && (
+          <>
+            <div className="cards-reveal-area">
+              <CardDisplay
+                card={dragonCard}
+                side="dragon"
+                isRevealing={phase === 'dealing'}
+                isWinner={dragonWins}
+              />
+
+              {/* Center Timer Between Cards */}
+              <div className={`center-timer-wrapper ${phase}`}>
+                <div className="center-timer-ring">
+                  <svg className="center-timer-svg" viewBox="0 0 80 80">
+                    <circle className="center-timer-bg-circle" cx="40" cy="40" r="34" />
+                    <circle 
+                      className="center-timer-progress" 
+                      cx="40" cy="40" r="34"
+                      style={{
+                        strokeDasharray: `${2 * Math.PI * 34}`,
+                        strokeDashoffset: phase === 'betting' 
+                          ? `${2 * Math.PI * 34 * (1 - timer / 15)}` 
+                          : '0'
+                      }}
+                    />
+                  </svg>
+                  <div className="center-timer-content">
+                    {phase === 'betting' ? (
+                      <>
+                        <span className={`center-timer-number ${timer <= 5 ? 'urgent' : ''}`}>{timer}</span>
+                        <span className="center-timer-label">SEC</span>
+                      </>
+                    ) : phase === 'dealing' ? (
+                      <span className="center-timer-status dealing">⚡</span>
+                    ) : (
+                      <span className="center-timer-status result">✨</span>
+                    )}
+                  </div>
+                </div>
+                <div className="center-vs-text">VS</div>
               </div>
+
+              <CardDisplay
+                card={tigerCard}
+                side="tiger"
+                isRevealing={phase === 'dealing'}
+                isWinner={tigerWins}
+              />
             </div>
-            <div className="center-vs-text">VS</div>
-          </div>
 
-          <CardDisplay
-            card={tigerCard}
-            side="tiger"
-            isRevealing={phase === 'dealing'}
-            isWinner={tigerWins}
-          />
-        </div>
+            <BettingTable
+              bets={bets}
+              onBet={handlePlaceBet}
+              phase={phase}
+              selectedChip={selectedChip}
+            />
 
+            <ChipSelector
+              selectedChip={selectedChip}
+              onSelectChip={handleSelectChip}
+              onClearBets={() => {}}
+              onDoubleBet={() => {}}
+              totalBet={totalBet}
+              phase={phase}
+            />
 
-        <BettingTable
-          bets={bets}
-          onBet={handlePlaceBet}
-          phase={phase}
-          selectedChip={selectedChip}
-        />
+            <GameControls
+              phase={phase}
+              timer={timer}
+              onUndo={handleClearBets}
+              onRepeat={handleDoubleBet}
+            />
 
-        <ChipSelector
-          selectedChip={selectedChip}
-          onSelectChip={handleSelectChip}
-          onClearBets={() => {}}
-          onDoubleBet={() => {}}
-          totalBet={totalBet}
-          phase={phase}
-        />
+            <RoadMap history={history} />
+          </>
+        )}
 
-        <GameControls
-          phase={phase}
-          timer={timer}
-          onUndo={handleClearBets}
-          onRepeat={handleDoubleBet}
-        />
-
-        <RoadMap history={history} />
-
-        {/* Premium Bottom Navigation */}
+        {/* Premium Bottom Navigation (Only 2 Tabs) */}
         <div className="premium-bottom-nav">
-          <div className="pbn-item">
+          <div 
+            className={`pbn-item ${currentTab === 'home' ? 'active' : ''}`} 
+            onClick={() => { setCurrentTab('home'); sessionStorage.setItem('dt_currentTab', 'home'); }}
+          >
             <span className="pbn-icon">🏠</span>
             <span className="pbn-label">Home</span>
           </div>
-          <div className="pbn-item" onClick={currentUser.id !== 'babu' ? () => setReferOpen(true) : undefined}>
-            <span className="pbn-icon">🎁</span>
-            <span className="pbn-label">Promotions</span>
-          </div>
-          <div className="pbn-item">
+          <div 
+            className={`pbn-item ${currentTab === 'games' ? 'active' : ''}`} 
+            onClick={() => { setCurrentTab('games'); sessionStorage.setItem('dt_currentTab', 'games'); }}
+          >
             <span className="pbn-icon">🎰</span>
             <span className="pbn-label">Games</span>
-          </div>
-          <div className="pbn-item" onClick={currentUser.id !== 'babu' ? () => setHistoryOpen(true) : undefined}>
-            <span className="pbn-icon">📜</span>
-            <span className="pbn-label">History</span>
-          </div>
-          <div className="pbn-item" onClick={() => setProfileOpen(true)}>
-            <span className="pbn-icon">👤</span>
-            <span className="pbn-label">Profile</span>
           </div>
         </div>
       </>
