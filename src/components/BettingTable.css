@@ -2,26 +2,20 @@
   position: relative;
   width: 100%;
   padding: 0 10px;
-  margin-top: 15px; 
+  margin-top: auto; 
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  margin-bottom: 10px;
+  justify-content: flex-end;
+  margin-bottom: 5px;
 }
 
 .premium-table-surface {
   position: relative;
   width: 100%;
-  border-radius: 20px;
-  /* Glassmorphism instead of solid dark bg */
-  background: rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(212, 175, 55, 0.3);
-  box-shadow: inset 0 0 15px rgba(212,175,55,0.05);
+  background: transparent;
   padding: 10px 5px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* TOP TEXT (DRAGON * TIGER) */
@@ -43,24 +37,11 @@
 /* BETTING LAYOUT GRID */
 .pt-betting-layout {
   display: grid;
-  grid-template-columns: 1fr 80px 1fr;
-  gap: 0;
-  border-top: 1px solid rgba(212, 175, 55, 0.2);
+  grid-template-columns: 1fr 90px 1fr;
+  gap: 10px;
   position: relative;
+  height: 180px; /* Adjust height to match the physical box on the table */
 }
-
-/* Vertical dividers */
-.pt-betting-layout::before,
-.pt-betting-layout::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 1px;
-  background: rgba(212, 175, 55, 0.2);
-}
-.pt-betting-layout::before { left: calc(50% - 40px); }
-.pt-betting-layout::after { right: calc(50% - 40px); }
 
 /* Horizontal divider for TIE section */
 .pt-center-column {
@@ -77,14 +58,13 @@
   padding: 10px 5px;
   cursor: pointer;
   position: relative;
-  transition: all 0.2s ease;
-  overflow: hidden;
-  border-radius: 10px;
+  transition: transform 0.2s ease;
+  overflow: visible;
+  background: transparent;
 }
 
 .premium-bet-box:active {
   transform: scale(0.95);
-  background: rgba(255,255,255,0.05);
 }
 
 .pbb-img-wrapper {
@@ -124,20 +104,19 @@
 
 /* DRAGON */
 .pt-dragon .pbb-title { color: #FF5252; text-shadow: 0 0 8px rgba(255, 82, 82, 0.6); }
-.pt-dragon:active, .pt-dragon.has-bet { background: rgba(229, 57, 53, 0.15); box-shadow: inset 0 0 20px rgba(229, 57, 53, 0.2); }
-.pt-dragon .pbb-img { filter: drop-shadow(0 0 12px rgba(229, 57, 53, 0.5)); opacity: 1; }
 
 /* TIGER */
 .pt-tiger .pbb-title { color: #448AFF; text-shadow: 0 0 8px rgba(68, 138, 255, 0.6); }
-.pt-tiger:active, .pt-tiger.has-bet { background: rgba(41, 98, 255, 0.15); box-shadow: inset 0 0 20px rgba(41, 98, 255, 0.2); }
-.pt-tiger .pbb-img { filter: drop-shadow(0 0 12px rgba(41, 98, 255, 0.5)); opacity: 1; }
 
 /* TIE */
 .pt-tie {
   height: 100%;
 }
 .pt-tie .pbb-title { color: #69F0AE; text-shadow: 0 0 8px rgba(105, 240, 174, 0.6); font-size: 15px; }
-.pt-tie:active, .pt-tie.has-bet { background: rgba(0, 200, 83, 0.15); box-shadow: inset 0 0 20px rgba(0, 200, 83, 0.2); }
+
+.pt-dragon, .pt-tiger, .pt-tie {
+  height: 100%;
+}
 
 .premium-bet-box.disabled {
   opacity: 0.9;
@@ -147,30 +126,49 @@
 /* Placed Chips Display */
 .pbb-chips {
   position: absolute;
-  bottom: 8px;
-  right: 8px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   animation: dropChip 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  z-index: 20;
 }
 
 .pbb-chips-inner {
-  background: radial-gradient(circle at 30% 30%, #ffd700, #b8860b);
-  width: 26px;
-  height: 26px;
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle at 30% 30%, #FFD700 0%, #B8860B 60%, #8B6508 100%);
   border-radius: 50%;
-  border: 1px dashed rgba(0,0,0,0.8);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.9), inset 0 2px 4px rgba(255,255,255,0.4);
+  box-shadow: 
+    0 4px 8px rgba(0,0,0,0.6),
+    inset 0 2px 4px rgba(255,255,255,0.5),
+    inset 0 -2px 4px rgba(0,0,0,0.5),
+    0 0 0 2px rgba(255,215,0,0.3);
+  position: relative;
+}
+
+.pbb-chips-inner::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  border: 1px dashed rgba(0,0,0,0.3);
 }
 
 .pbb-chips-val {
-  font-size: 9px;
-  font-weight: 900;
   color: #000;
+  font-weight: 900;
+  font-size: 13px;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.5);
+  font-family: var(--font-tech), monospace;
+  z-index: 2;
 }
 
 @keyframes dropChip {
-  0% { transform: translateY(-20px) scale(1.5); opacity: 0; }
-  100% { transform: translateY(0) scale(1); opacity: 1; }
+  0% { transform: translate(-50%, -100px) scale(1.5); opacity: 0; }
+  60% { transform: translate(-50%, -40%) scale(0.9); opacity: 1; }
+  80% { transform: translate(-50%, -55%) scale(1.05); }
+  100% { transform: translate(-50%, -50%) scale(1); }
 }

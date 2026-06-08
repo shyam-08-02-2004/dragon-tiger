@@ -32,15 +32,6 @@ const BettingTable: React.FC<BettingTableProps> = ({ bets, onBet, phase }) => {
         className={`premium-bet-box ${className} ${!canBet ? 'disabled' : ''} ${amount > 0 ? 'has-bet' : ''}`}
         onClick={() => handleBetClick(type)}
       >
-        {imgSrc && (
-          <div className="pbb-img-wrapper">
-            <img src={imgSrc} alt={label} className="pbb-img" />
-          </div>
-        )}
-        <div className="pbb-content">
-          <div className="pbb-title">{label}</div>
-          <div className="pbb-payout">{payout}</div>
-        </div>
         {amount > 0 && (
           <div className="pbb-chips">
             <div className="pbb-chips-inner">
@@ -55,20 +46,14 @@ const BettingTable: React.FC<BettingTableProps> = ({ bets, onBet, phase }) => {
   return (
     <div className="premium-table-wrapper">
       <div className="premium-table-surface">
-        <div className="pt-top-text">
-          <span className="pt-text-dragon">DRAGON</span>
-          <span className="pt-text-diamond">❖</span>
-          <span className="pt-text-tiger">TIGER</span>
-        </div>
-        
         <div className="pt-betting-layout">
-          {renderBetBox('dragon', 'DRAGON', '1:1', 'pt-dragon', dragonOutline)}
+          {renderBetBox('dragon', 'DRAGON', '1:1', 'pt-dragon')}
           
           <div className="pt-center-column">
-            {renderBetBox('tie', 'TIE', '8:1', 'pt-tie', undefined, true)}
+            {renderBetBox('tie', 'TIE', '8:1', 'pt-tie')}
           </div>
           
-          {renderBetBox('tiger', 'TIGER', '1:1', 'pt-tiger', tigerOutline)}
+          {renderBetBox('tiger', 'TIGER', '1:1', 'pt-tiger')}
         </div>
       </div>
     </div>
