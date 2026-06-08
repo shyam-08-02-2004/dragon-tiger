@@ -11,7 +11,8 @@ body {
 
 .app-header {
   width: 100%;
-  min-height: 100vh;
+  min-height: 100vh
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -255,7 +256,8 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  height: 100vh
+  height: 100dvh;
   color: white;
   padding: 20px;
 }
