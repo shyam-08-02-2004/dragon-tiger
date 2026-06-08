@@ -77,7 +77,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [fullScreenMedia, setFullScreenMedia] = useState<{ url: string; type: string } | null>(null);
 
   // State Setters with sessionStorage wrappers
-  const handleTabChange = (tab: 'users' | 'game' | 'transactions' | 'support') => {
+  const handleTabChange = (tab: 'dashboard' | 'users' | 'game' | 'transactions' | 'support') => {
     setActiveTab(tab); sessionStorage.setItem('dt_adminTab', tab);
   };
   const handleUserHistory = (val: string | null) => {
@@ -821,6 +821,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
               </div>
             </div>
+          </div>
           )}
 
           {/* ── TRANSACTIONS TAB ── */}
