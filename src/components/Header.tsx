@@ -57,31 +57,27 @@ const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Right: Wallet Balance */}
+      {/* Right: Actions */}
       <div className="ph-right">
-        {isGameView ? (
+        {isGameView && (
           <div className="ph-game-balance" onClick={onShowWallet}>
             <span className="pgb-currency">₹</span>
             <span className="pgb-amount">{balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             <button className="pgb-add">+</button>
           </div>
-        ) : (
-          <div className="ph-wallet-card" onClick={onShowWallet}>
-            <div className="ph-wallet-icon">💳</div>
-            <div className="ph-wallet-details">
-              <span className="ph-wallet-label">WALLET BALANCE</span>
-              <span className="ph-wallet-amount">₹ {balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-            </div>
-            <div className="ph-wallet-arrow">›</div>
-          </div>
         )}
       </div>
 
       {/* Round Number Floating below header */}
-      <div className="ph-round-floating">
-        <div className="ph-round-label">Round No.</div>
-        <div className="ph-round-val"># {roundNumber}</div>
-      </div>
+      {isGameView && (
+        <div className="ph-round-floating">
+          <span className="ph-round-icon">🔄</span>
+          <div className="ph-round-details">
+            <div className="ph-round-label">ROUND</div>
+            <div className="ph-round-val"># {roundNumber}</div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };
