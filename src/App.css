@@ -3,6 +3,25 @@
 body {
   margin: 0;
   padding: 0;
+  background-color: transparent;
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.app-header {
+  width: 100%;
+  min-height: 100vh; height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
+  padding-bottom: 70px; /* Space for bottom nav */
+}
+
+/* Background image is handled in index.css (#root) */
+
+.game-main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -185,99 +204,7 @@ body {
     font-size: 16px;
   }
   .center-vs-text {
-  align-items: center;
-  justify-content: center;
-  height: 100vh; height: 100dvh;
-  color: white;
-  padding: 20px;
-}
-
-/* Premium Chat Hover Actions */
-.hc-message, .premium-chat-bubble {
-  position: relative;
-}
-
-.chat-hover-actions {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%) scale(0.9);
-  display: flex;
-  gap: 8px;
-  background: rgba(10, 10, 15, 0.85);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding: 6px 12px;
-  border-radius: 20px;
-  border: 1px solid rgba(212, 175, 55, 0.3);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  z-index: 10;
-}
-
-.hc-user .chat-hover-actions, 
-.admin-msg-row.admin .chat-hover-actions {
-  right: 100%;
-  margin-right: 10px;
-}
-
-.hc-admin .chat-hover-actions, 
-.admin-msg-row.user .chat-hover-actions {
-  left: 100%;
-  margin-left: 10px;
-}
-
-.hc-message:hover .chat-hover-actions,
-.premium-chat-bubble:hover .chat-hover-actions {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(-50%) scale(1);
-}
-
-.action-hover-btn {
-  background: none;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-}
-
-.action-hover-btn.edit-btn {
-  color: #D4AF37;
-  background: rgba(212, 175, 55, 0.1);
-}
-.action-hover-btn.edit-btn:hover {
-  background: rgba(212, 175, 55, 0.3);
-  transform: scale(1.15);
-}
-
-.action-hover-btn.delete-btn {
-  color: #e74c3c;
-  background: rgba(231, 76, 60, 0.1);
-}
-.action-hover-btn.delete-btn:hover {
-  background: rgba(231, 76, 60, 0.3);
-  transform: scale(1.15);
-}
-
-@media (max-width: 768px) {
-  .chat-hover-actions {
-    top: auto;
-    bottom: -35px;
-    right: 0 !important;
-    left: auto !important;
-    transform: translateY(10px) scale(0.9);
-  }
-  .hc-message:hover .chat-hover-actions,
-  .premium-chat-bubble:hover .chat-hover-actions {
-    transform: translateY(0) scale(1);
+    font-size: 8px;
   }
 }
 
@@ -288,111 +215,47 @@ body {
   bottom: 0;
   left: 0;
   width: 100%;
-  background: linear-gradient(0deg, rgba(10,5,15,0.95), rgba(20,10,30,0.85));
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(10px);
   border-top: 1px solid rgba(212, 175, 55, 0.4);
   display: flex;
   justify-content: space-around;
-  align-items: center;
-  padding: 12px 10px;
+  padding: 10px 0;
   z-index: 200;
-  box-shadow: 0 -10px 30px rgba(0,0,0,0.8), inset 0 1px 15px rgba(212,175,55,0.1);
-  padding-bottom: env(safe-area-inset-bottom, 12px);
+  box-shadow: 0 -4px 10px rgba(0,0,0,0.5);
+  padding-bottom: env(safe-area-inset-bottom, 10px);
 }
 
 .pbn-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #6B7280;
-  gap: 6px;
+  color: #888;
+  gap: 4px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  flex: 1;
-  position: relative;
-}
-
-.pbn-item:hover {
-  color: #A3A3A3;
+  transition: all 0.2s;
 }
 
 .pbn-item.active {
-  color: #FFD700;
-  transform: translateY(-4px);
-}
-
-.pbn-item.active::after {
-  content: '';
-  position: absolute;
-  bottom: -10px;
-  width: 20px;
-  height: 4px;
-  background: linear-gradient(90deg, #FFDF00, #B8860B);
-  border-radius: 4px;
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
-  animation: pbnGlow 2s infinite alternate;
-}
-
-@keyframes pbnGlow {
-  0% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.3); width: 15px; }
-  100% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.8); width: 25px; }
+  color: #D4AF37;
 }
 
 .pbn-icon {
-  font-size: 22px;
-  transition: all 0.3s;
-  filter: drop-shadow(0 0 0 transparent);
-}
-
-.pbn-item.active .pbn-icon {
-  font-size: 24px;
-  filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.6));
-  animation: pbnIconFloat 3s infinite ease-in-out;
-}
-
-@keyframes pbnIconFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
+  font-size: 20px;
 }
 
 .pbn-label {
-  font-family: 'Inter', sans-serif;
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+  font-weight: bold;
 }
 
-.pbn-item.active .pbn-label {
-  text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
-}
-
-
-.app-header {
-  width: 100%;
+/* Auth Modal Styles (Kept intact) */
+.auth-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   height: 100vh; height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: hidden;
-  padding-bottom: 70px; /* Space for bottom nav */
+  color: white;
+  padding: 20px;
 }
-
-
-.game-main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly; /* Better distribution on mobile */
-  z-index: 10;
-  position: relative;
-  width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
-  padding-top: 80px; /* Reduced to fit on screen */
-  padding-bottom: 5px;
-  height: 100%;
-  box-sizing: border-box;
-}
-
