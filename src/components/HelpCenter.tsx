@@ -128,16 +128,14 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
 
   return (
     <div className="hc-overlay" onClick={onClose}>
-      <div className="hc-modal premium-chat" onClick={e => e.stopPropagation()}>
-        <div className="hc-header glass-header">
-          <div className="hc-header-profile">
-            <div className="hc-support-avatar">🤵</div>
-            <div className="hc-support-info">
-              <h2>Live Support</h2>
-              <span className="hc-online-status">🟢 Online</span>
-            </div>
-          </div>
-          <button className="hc-close-btn" onClick={onClose}>✕</button>
+      <div className="hc-modal premium-help-center" onClick={e => e.stopPropagation()}>
+        <div className="hc-header premium-hc-header">
+          <button className="hc-back-btn" onClick={onClose}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <span>Back</span>
+          </button>
+          <h3><span className="live-dot"></span> VIP Support</h3>
+          <div style={{ width: '60px' }}></div>
         </div>
         
         <div className="hc-messages-container">

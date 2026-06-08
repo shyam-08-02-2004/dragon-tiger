@@ -451,3 +451,48 @@
 .hc-messages-container::-webkit-scrollbar-thumb:hover {
   background: rgba(212, 175, 55, 0.4);
 }
+
+
+/* PREMIUM FULL PAGE MOBILE HELP CENTER */
+@media (max-width: 768px) {
+  .premium-help-center {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: none !important;
+    max-width: none !important;
+    border-radius: 0 !important;
+    background: radial-gradient(circle at center, #1e190a, #050508) !important;
+    display: flex;
+    flex-direction: column;
+    z-index: 99999 !important;
+  }
+}
+
+.premium-hc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  background: rgba(10, 10, 15, 0.95);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.hc-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  color: #D4AF37;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
