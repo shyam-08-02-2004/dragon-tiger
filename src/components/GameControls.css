@@ -18,14 +18,14 @@
   background: transparent;
   border: 1px solid #D4AF37;
   color: #D4AF37;
-  border-radius: 16px;
-  padding: 6px 12px;
+  border-radius: 12px;
+  padding: 4px 8px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   font-family: 'Inter', sans-serif;
   font-weight: 600;
-  font-size: 12px;
+  font-size: 10px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -51,13 +51,13 @@
 .pc-center-inner {
   background: linear-gradient(to right, #B8860B, #FFD700, #B8860B);
   border: 1px solid #FFF;
-  border-radius: 20px;
-  padding: 8px 12px;
+  border-radius: 16px;
+  padding: 6px 10px;
   color: #000;
   text-align: center;
   font-family: 'Inter', sans-serif;
   font-weight: 800;
-  font-size: 14px;
+  font-size: 12px;
   letter-spacing: 1px;
   box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
   position: relative;

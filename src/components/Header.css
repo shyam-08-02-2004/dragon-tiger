@@ -277,10 +277,12 @@
   background: linear-gradient(135deg, rgba(20,20,25,0.95), rgba(5,5,10,0.98));
   border: 1px solid rgba(212, 175, 55, 0.6);
   border-radius: 20px;
-  padding: 5px 5px 5px 15px;
+  padding: 4px 10px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.6), inset 0 0 10px rgba(212,175,55,0.2);
   cursor: pointer;
-  position: relative;
+  position: absolute;
+  top: 5px;
+  right: 15px;
   overflow: hidden;
   animation: balanceGlow 3s infinite alternate;
 }
