@@ -16,6 +16,8 @@ const ReferAndEarn: React.FC<ReferAndEarnProps> = ({ userId, onClose }) => {
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
   
+  const [history, setHistory] = useState<{name: string, date: string, status: string, reward: number}[]>([]);
+
   const [stats, setStats] = useState({
     referralCode: `VIP${Math.floor(100000 + Math.random() * 900000)}`,
     totalReferrals: 0,
@@ -29,9 +31,18 @@ const ReferAndEarn: React.FC<ReferAndEarnProps> = ({ userId, onClose }) => {
         if (data && data.referralCode) {
           setStats({
             referralCode: data.referralCode,
-            totalReferrals: data.totalReferrals || 25,
-            referralEarnings: data.referralEarnings || 1250
+            totalReferrals: data.totalReferrals || 0,
+            referralEarnings: data.referralEarnings || 0
           });
+        }
+      })
+      .catch(console.error);
+
+    fetch(`/api/users/${userId}/referrals`)
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setHistory(data);
         }
       })
       .catch(console.error);
@@ -169,7 +180,7 @@ const ReferAndEarn: React.FC<ReferAndEarnProps> = ({ userId, onClose }) => {
             </div>
 
             <div className="history-list">
-              {dummyHistory.map((item, idx) => (
+              {history.length > 0 ? history.map((item, idx) => (
                 <div key={idx} className="history-row animated-row" style={{ animationDelay: `${idx * 0.1}s` }}>
                   <div className="history-left">
                     <div className="h-name">{item.name}</div>
@@ -182,7 +193,11 @@ const ReferAndEarn: React.FC<ReferAndEarnProps> = ({ userId, onClose }) => {
                     </div>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <div style={{ textAlign: 'center', padding: '20px', color: '#999', fontSize: '14px' }}>
+                  No referrals yet. Share your link to start earning!
+                </div>
+              )}
             </div>
           </div>
 

@@ -8,7 +8,9 @@ const userSchema = new mongoose.Schema({
   hasDeposited: { type: Boolean, default: false },
   referralCode: { type: String, unique: true, sparse: true },
   totalReferrals: { type: Number, default: 0 },
-  referralEarnings: { type: Number, default: 0 }
+  referralEarnings: { type: Number, default: 0 },
+  referredBy: { type: String, default: null }, // ID of the user who referred them
+  createdAt: { type: Date, default: Date.now }
 });
 
 const transactionSchema = new mongoose.Schema({

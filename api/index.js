@@ -58,6 +58,8 @@ app.post('/api/auth/signup', async (req, res) => {
   const generatedRefCode = `DT-${id.substring(0, 6).toUpperCase()}`;
   let startBalance = 50;
 
+  let referredBy = null;
+
   // Process incoming referral code
   if (referralCode && referralCode.trim() !== '') {
     const referrer = await User.findOne({ referralCode: referralCode.trim().toUpperCase() });
@@ -67,6 +69,7 @@ app.post('/api/auth/signup', async (req, res) => {
       referrer.totalReferrals = (referrer.totalReferrals || 0) + 1;
       referrer.referralEarnings = (referrer.referralEarnings || 0) + 50;
       await referrer.save();
+      referredBy = referrer.id;
     }
   }
 
@@ -76,7 +79,8 @@ app.post('/api/auth/signup', async (req, res) => {
     password, 
     balance: startBalance, 
     hasDeposited: false,
-    referralCode: generatedRefCode
+    referralCode: generatedRefCode,
+    referredBy
   });
   await newUser.save();
 
@@ -100,6 +104,17 @@ app.get('/api/users/:id', async (req, res) => {
   const user = await User.findOne({ id: req.params.id });
   if (user) res.json(user);
   else res.status(404).json({ error: 'User not found' });
+});
+
+app.get('/api/users/:id/referrals', async (req, res) => {
+  const referrals = await User.find({ referredBy: req.params.id }).sort({ createdAt: -1 }).select('username createdAt hasDeposited');
+  const history = referrals.map(ref => ({
+    name: ref.username,
+    date: ref.createdAt ? new Date(ref.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Unknown',
+    status: ref.hasDeposited ? 'Verified' : 'Pending',
+    reward: ref.hasDeposited ? 50 : 0
+  }));
+  res.json(history);
 });
 
 app.put('/api/users/:id/balance', async (req, res) => {

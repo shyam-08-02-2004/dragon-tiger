@@ -569,3 +569,14 @@
     margin-top: 0;
   }
 }
+
+.h-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+
+.history-left { min-width: 0; flex: 1; overflow: hidden; }
+
