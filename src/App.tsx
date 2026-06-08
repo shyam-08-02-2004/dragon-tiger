@@ -761,7 +761,13 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
         />
 
         {currentTab === 'home' && (
-          <HomeTab balance={balance} />
+          <HomeTab 
+            balance={balance} 
+            onPlayGame={() => {
+              setCurrentTab('games');
+              sessionStorage.setItem('dt_currentTab', 'games');
+            }} 
+          />
         )}
 
         {currentTab === 'games' && (

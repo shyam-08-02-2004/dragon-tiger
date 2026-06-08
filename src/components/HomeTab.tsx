@@ -6,9 +6,10 @@ import chairImage from '../assets/vip_purple_chair.png';
 
 interface HomeTabProps {
   balance: number;
+  onPlayGame: () => void;
 }
 
-const HomeTab: React.FC<HomeTabProps> = ({ balance }) => {
+const HomeTab: React.FC<HomeTabProps> = ({ balance, onPlayGame }) => {
   return (
     <div className="home-tab-container">
       {/* Background Image */}
@@ -41,10 +42,11 @@ const HomeTab: React.FC<HomeTabProps> = ({ balance }) => {
         </div>
 
         {/* VIP Lounge Section */}
-        <div className="home-vip-card">
+        <div className="home-vip-card" onClick={onPlayGame} style={{ cursor: 'pointer' }}>
           <div className="hvc-left">
             <h2 className="hvc-title">VIP LOUNGE</h2>
             <p className="hvc-subtitle">Step into Royalty</p>
+            <div className="hvc-games-text">► PLAY GAMES</div>
             <div className="hvc-ornament">
               <span className="hvc-diamond">♦</span>
             </div>
