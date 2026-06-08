@@ -31,15 +31,15 @@ body {
   line-height: 1.5;
   user-select: none;
   -webkit-user-select: none;
-  overflow-y: auto;
+  overflow: hidden; /* Lock body scrolling for app feel */
 }
 
 #root {
-  min-height: 100vh; height: 100dvh; /* Fallback for older browsers */
-  min-height: 100vh; height: 100dvh;
+  height: 100vh; height: 100dvh;
   display: flex;
   flex-direction: column;
   position: relative;
+  overflow: hidden;
 }
 
 ::-webkit-scrollbar {
