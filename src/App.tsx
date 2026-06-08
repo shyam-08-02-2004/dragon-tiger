@@ -785,19 +785,21 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
               flexDirection: 'column',
               justifyContent: 'space-between'
             }}>
-              {/* Overlay for Round Number */}
               <div className="round-pulse-anim" style={{
                 position: 'absolute',
                 top: '2.5%',
                 left: '5%',
-                background: 'rgba(0,0,0,0.8)',
-                color: '#D4AF37',
-                padding: '4px 8px',
-                fontSize: '12px',
+                background: 'linear-gradient(135deg, rgba(30,30,40,0.95), rgba(10,10,15,0.98))',
+                color: '#FFD700',
+                padding: '6px 16px',
+                fontSize: '14px',
                 fontFamily: 'Inter, sans-serif',
-                fontWeight: 'bold',
-                borderRadius: '4px',
-                border: '1px solid rgba(212, 175, 55, 0.3)',
+                fontWeight: '900',
+                letterSpacing: '1px',
+                borderRadius: '8px',
+                border: '1px solid rgba(212, 175, 55, 0.6)',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.8), inset 0 2px 4px rgba(255,215,0,0.2)',
+                textShadow: '0 2px 4px rgba(0,0,0,0.8)',
                 zIndex: 30
               }}>
                 Round: {roundNumber}
