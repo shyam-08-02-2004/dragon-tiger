@@ -3521,3 +3521,108 @@ html, body {
   }
 }
 
+
+/* Premium Casino Luxury Transaction Cards */
+.admin-tx-card {
+  background: linear-gradient(145deg, rgba(20, 20, 25, 0.9), rgba(5, 5, 10, 0.95)) !important;
+  border-radius: 20px !important;
+  border: 1px solid rgba(212, 175, 55, 0.3) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 2px 10px rgba(212, 175, 55, 0.1) !important;
+  backdrop-filter: blur(15px) !important;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.admin-tx-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.8), transparent);
+}
+
+.admin-tx-card.deposit {
+  border-left: 4px solid #2ecc71 !important;
+  box-shadow: 0 8px 32px rgba(46, 204, 113, 0.1) !important;
+}
+
+.admin-tx-card.withdraw,
+.admin-tx-card.withdrawal {
+  border-left: 4px solid #e74c3c !important;
+  box-shadow: 0 8px 32px rgba(231, 76, 60, 0.1) !important;
+}
+
+.tx-card-header {
+  background: rgba(0, 0, 0, 0.4) !important;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.1) !important;
+  padding: 16px 20px !important;
+}
+
+.tx-username {
+  font-family: 'Cinzel', serif !important;
+  font-size: 18px !important;
+  color: #D4AF37 !important;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.tx-time {
+  color: #aaa !important;
+  font-size: 12px !important;
+}
+
+.tx-avatar {
+  border: 2px solid rgba(212, 175, 55, 0.5) !important;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.3) !important;
+  font-weight: bold;
+}
+
+.tx-amount {
+  font-size: 28px !important;
+  font-weight: 900 !important;
+  color: #fff !important;
+  text-shadow: 0 2px 10px rgba(255,255,255,0.3) !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.tx-card-actions {
+  background: rgba(0,0,0,0.3) !important;
+  padding: 15px !important;
+  border-top: 1px solid rgba(255,255,255,0.05) !important;
+  gap: 12px !important;
+}
+
+.tx-action-btn {
+  border-radius: 12px !important;
+  font-weight: bold !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  padding: 12px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4) !important;
+}
+
+.tx-action-btn.approve {
+  background: linear-gradient(135deg, #2ecc71, #27ae60) !important;
+  border: 1px solid rgba(46,204,113,0.5) !important;
+  color: white !important;
+}
+
+.tx-action-btn.reject {
+  background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+  border: 1px solid rgba(231,76,60,0.5) !important;
+  color: white !important;
+}
+
+.tx-action-btn.delete {
+  background: rgba(255,255,255,0.05) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  color: #aaa !important;
+}
+
+.tx-action-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.2);
+}
+
