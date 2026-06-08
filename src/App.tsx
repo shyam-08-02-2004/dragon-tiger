@@ -793,7 +793,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
                   isWinner={dragonWins}
                 />
                 
-                <div className="center-timer-wrapper">
+                <div className="center-timer-wrapper" style={{ position: 'absolute', top: '10%', left: '50%', transform: 'translateX(-50%)', zIndex: 30 }}>
                   <div className="center-timer-ring">
                     <svg viewBox="0 0 80 80" className="center-timer-svg">
                       <circle className="center-timer-bg" cx="40" cy="40" r="34" />
@@ -821,7 +821,6 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
                       )}
                     </div>
                   </div>
-                  <div className="center-vs-text">VS</div>
                 </div>
 
                 <CardDisplay
