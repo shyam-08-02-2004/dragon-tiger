@@ -773,71 +773,81 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
 
         {currentTab === 'games' && (
           <div className="game-main-content" style={{ overflowY: 'auto', paddingTop: '90px' }}>
-            <div className="cards-reveal-area">
-              <CardDisplay
-                card={dragonCard}
-                side="dragon"
-                isRevealing={phase === 'dealing'}
-                isWinner={dragonWins}
-              />
-
-              {/* Center Timer Between Cards */}
-              <div className={`center-timer-wrapper ${phase}`}>
-                <div className="center-timer-ring">
-                  <svg className="center-timer-svg" viewBox="0 0 80 80">
-                    <circle className="center-timer-bg-circle" cx="40" cy="40" r="34" />
-                    <circle 
-                      className="center-timer-progress" 
-                      cx="40" cy="40" r="34"
-                      style={{
-                        strokeDasharray: `${2 * Math.PI * 34}`,
-                        strokeDashoffset: phase === 'betting' 
-                          ? `${2 * Math.PI * 34 * (1 - timer / 15)}` 
-                          : '0'
-                      }}
-                    />
-                  </svg>
-                  <div className="center-timer-content">
-                    {phase === 'betting' ? (
-                      <>
-                        <span className={`center-timer-number ${timer <= 5 ? 'urgent' : ''}`}>{timer}</span>
-                        <span className="center-timer-label">SEC</span>
-                      </>
-                    ) : phase === 'dealing' ? (
-                      <span className="center-timer-status dealing">⚡</span>
-                    ) : (
-                      <span className="center-timer-status result">✨</span>
-                    )}
+            <div className="game-board-area" style={{
+              position: 'relative',
+              width: '100%',
+              aspectRatio: '682 / 540',
+              backgroundImage: `url(${dealerBgImage})`,
+              backgroundSize: '100% 100%',
+              backgroundPosition: 'center top',
+              backgroundRepeat: 'no-repeat',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between'
+            }}>
+              <div className="cards-reveal-area" style={{ flexShrink: 0, marginTop: '2%' }}>
+                <CardDisplay
+                  card={dragonCard}
+                  side="dragon"
+                  isRevealing={phase === 'dealing'}
+                  isWinner={dragonWins}
+                />
+                
+                <div className="center-timer-wrapper">
+                  <div className="center-timer-ring">
+                    <svg viewBox="0 0 80 80" className="center-timer-svg">
+                      <circle className="center-timer-bg" cx="40" cy="40" r="34" />
+                      <circle 
+                        className="center-timer-progress" 
+                        cx="40" cy="40" r="34"
+                        style={{
+                          strokeDasharray: `${2 * Math.PI * 34}`,
+                          strokeDashoffset: phase === 'betting' 
+                            ? `${2 * Math.PI * 34 * (1 - timer / 15)}` 
+                            : '0'
+                        }}
+                      />
+                    </svg>
+                    <div className="center-timer-content">
+                      {phase === 'betting' ? (
+                        <>
+                          <span className={`center-timer-number ${timer <= 5 ? 'urgent' : ''}`}>{timer}</span>
+                          <span className="center-timer-label">SEC</span>
+                        </>
+                      ) : phase === 'dealing' ? (
+                        <span className="center-timer-status dealing">⚡</span>
+                      ) : (
+                        <span className="center-timer-status result">✨</span>
+                      )}
+                    </div>
                   </div>
+                  <div className="center-vs-text">VS</div>
                 </div>
-                <div className="center-vs-text">VS</div>
+
+                <CardDisplay
+                  card={tigerCard}
+                  side="tiger"
+                  isRevealing={phase === 'dealing'}
+                  isWinner={tigerWins}
+                />
               </div>
 
-              <CardDisplay
-                card={tigerCard}
-                side="tiger"
-                isRevealing={phase === 'dealing'}
-                isWinner={tigerWins}
-              />
+              <div style={{ position: 'relative', width: '100%', paddingBottom: '3%' }}>
+                <BettingTable
+                  bets={bets}
+                  onBet={handlePlaceBet}
+                  phase={phase}
+                  selectedChip={selectedChip}
+                />
+              </div>
             </div>
 
-            <BettingTable
-              bets={bets}
-              onBet={handlePlaceBet}
-              phase={phase}
-              selectedChip={selectedChip}
-            />
-
-
-            <div className="game-bottom-ui" style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div className="game-bottom-ui" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div style={{ 
-                padding: '10px',
-                background: 'rgba(0,0,0,0.4)',
-                backdropFilter: 'blur(5px)',
-                WebkitBackdropFilter: 'blur(5px)',
-                borderRadius: '20px',
-                border: '1px solid rgba(212, 175, 55, 0.2)',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.5)'
+                padding: '0 5px',
+                marginTop: '-35px', /* Pull up to cover background chips */
+                position: 'relative',
+                zIndex: 20
               }}>
                 <ChipSelector
                   selectedChip={selectedChip}
@@ -910,10 +920,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
         style={{ 
           position: 'fixed',
           top: 0, left: 0, right: 0, bottom: 0,
-          backgroundImage: `url(${dealerBgImage})`, 
-          backgroundSize: 'cover', 
-          backgroundPosition: 'center top', 
-          backgroundColor: '#000',
+          background: 'radial-gradient(circle at center, #1a1a1a 0%, #000000 100%)',
           zIndex: 0
         }}
       />
