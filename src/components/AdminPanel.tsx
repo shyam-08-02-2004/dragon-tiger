@@ -45,7 +45,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [users, setUsers] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'game' | 'transactions' | 'support' | 'notifications'>(() => (sessionStorage.getItem('dt_adminTab') as any) || 'dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'game' | 'transactions' | 'support' | 'notifications' | 'blocked'>(() => (sessionStorage.getItem('dt_adminTab') as any) || 'dashboard');
   const [simPhase, setSimPhase] = useState<'betting' | 'dealing' | 'result'>('betting');
   const [simTimer, setSimTimer] = useState<number>(15);
   const [muted, setMuted] = useState<boolean>(() => localStorage.getItem('dt_admin_muted') === 'true');

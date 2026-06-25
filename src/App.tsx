@@ -623,8 +623,9 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
       // Voice announcement for result
       if (voiceEnabled) {
         speak(`Result is ${result}`, muted);
-      playSound(result, muted);
-
+        playSound(result, muted);
+      }
+      
       // Check if already processed
       if (stateRef.current.history.some(h => h.id === roundId)) return;
       const currentPrev = stateRef.current;
