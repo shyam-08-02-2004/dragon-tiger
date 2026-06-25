@@ -96,51 +96,43 @@
 
 /* ── HIDDEN / FACE-DOWN ── */
 .playing-card.hidden-back {
-  background:
-    repeating-linear-gradient(
-      45deg,
-      rgba(212, 160, 23, 0.08) 0px,
-      rgba(212, 160, 23, 0.08) 2px,
-      transparent 2px,
-      transparent 8px
-    ),
-    repeating-linear-gradient(
-      -45deg,
-      rgba(212, 160, 23, 0.05) 0px,
-      rgba(212, 160, 23, 0.05) 2px,
-      transparent 2px,
-      transparent 8px
-    ),
-    linear-gradient(145deg, #1c1c3a 0%, #0d0d22 60%, #1a1a38 100%);
-  border: 2px solid rgba(212, 160, 23, 0.5);
-  box-shadow:
-    0 6px 24px rgba(0, 0, 0, 0.7),
-    0 0 0 1px rgba(212, 160, 23, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  animation: cardBreath 3s ease-in-out infinite;
+  background: 
+    radial-gradient(circle at top right, rgba(212, 175, 55, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at bottom left, rgba(212, 175, 55, 0.15) 0%, transparent 40%),
+    repeating-linear-gradient(45deg, rgba(20, 20, 20, 0.9) 0px, rgba(20, 20, 20, 0.9) 2px, transparent 2px, transparent 4px),
+    linear-gradient(135deg, #1a0b0b 0%, #000000 100%);
+  border: 2px solid #d4af37;
+  border-radius: 14px;
+  box-shadow: 
+    0 8px 30px rgba(0, 0, 0, 0.9), 
+    inset 0 0 10px rgba(212, 175, 55, 0.5), 
+    0 0 15px rgba(212, 175, 55, 0.3);
+  animation: luxuryCardBreath 4s ease-in-out infinite;
 }
 
-/* ── REVEALED / FACE-UP — REALISTIC WHITE THEME ── */
+/* ── REVEALED / FACE-UP — HD CASINO THEME ── */
 .playing-card.revealed {
-  background: #fdfbf7;
-  border: 5px solid #dcd1c0;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 12px;
   box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.4),
-    inset 0 0 15px rgba(0,0,0,0.06);
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    0 12px 30px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 1);
   animation: dealCard 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   position: relative;
+  overflow: hidden;
 }
 
-/* subtle drop shadow inside card */
+/* subtle inner shadow to mimic paper depth */
 .playing-card.revealed::before {
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: 8px;
-  box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: inset 0px 0px 20px rgba(0, 0, 0, 0.03);
   pointer-events: none;
-  z-index: 0;
+  z-index: 1;
 }
 
 /* ── FLIPPING ── */
@@ -152,26 +144,31 @@
 .playing-card.winner-card {
   animation:
     dealCard 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards,
-    pulseGold 1.6s ease-in-out 0.6s infinite;
+    pulseWinner 1.6s ease-in-out 0.6s infinite;
   box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.6),
-    0 0 50px rgba(212, 160, 23, 0.7),
-    0 0 80px rgba(212, 160, 23, 0.3) !important;
+    0 10px 40px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(255, 215, 0, 0.6),
+    0 0 60px rgba(255, 215, 0, 0.3) !important;
 }
 
-/* ── SUIT COLOURS — realistic on white background ── */
+@keyframes pulseWinner {
+  0%, 100% { box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 0 30px rgba(255,215,0,0.6), 0 0 60px rgba(255,215,0,0.3); }
+  50%       { box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 0 50px rgba(255,215,0,0.9), 0 0 90px rgba(255,215,0,0.5); }
+}
+
+/* ── SUIT COLOURS — high contrast HD ── */
 .playing-card.red-card .card-rank,
 .playing-card.red-card .card-small-suit,
 .playing-card.red-card .card-center-suit {
-  color: #d32f2f !important;
-  text-shadow: none;
+  color: #e60000 !important;
+  text-shadow: 0 0.5px 0.5px rgba(230, 0, 0, 0.2);
 }
 
 .playing-card.black-card .card-rank,
 .playing-card.black-card .card-small-suit,
 .playing-card.black-card .card-center-suit {
-  color: #1c2025 !important;
-  text-shadow: none;
+  color: #000000 !important;
+  text-shadow: 0 0.5px 0.5px rgba(0, 0, 0, 0.2);
 }
 
 /* ───────────────────────────────────────────
@@ -183,30 +180,31 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  line-height: 1;
+  line-height: 0.85;
   transform: translateZ(2px);
 }
 
 .card-corner.top-left {
-  top: 6px;
-  left: 6px;
+  top: 8px;
+  left: 8px;
 }
 
 .card-corner.bottom-right {
-  bottom: 6px;
-  right: 6px;
+  bottom: 8px;
+  right: 8px;
   transform: rotate(180deg) translateZ(2px);
 }
 
 .card-rank {
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 900;
-  font-family: var(--font-display), Georgia, serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  letter-spacing: -2px;
 }
 
 .card-small-suit {
-  font-size: 16px;
-  margin-top: -2px;
+  font-size: 18px;
+  margin-top: 4px;
 }
 
 /* ───────────────────────────────────────────
@@ -217,10 +215,9 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) translateZ(2px);
-  font-size: 50px;
+  font-size: 72px;
   line-height: 1;
   z-index: 3;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
 }
 
 /* ───────────────────────────────────────────
@@ -229,44 +226,64 @@
 .card-back-design {
   width: 100%;
   height: 100%;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(212, 175, 55, 0.8);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: inset 0 0 15px rgba(0,0,0,0.9);
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
-  gap: 6px;
-  border-radius: 12px;
-  position: relative;
-  overflow: hidden;
-  border: 4px solid transparent;
-  background:
-    linear-gradient(#0d1b3e, #0d1b3e) padding-box,
-    linear-gradient(135deg, rgba(212,160,23,0.5), rgba(212,160,23,0.1), rgba(212,160,23,0.5)) border-box;
+}
+
+.card-back-design::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  border-radius: 8px;
+  pointer-events: none;
 }
 
 /* sweeping shimmer on back */
 .card-back-design::after {
   content: "";
   position: absolute;
-  top: -60%;
-  left: -60%;
-  width: 60%;
-  height: 220%;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
   background: linear-gradient(
     105deg,
-    transparent 30%,
-    rgba(212, 160, 23, 0.12) 50%,
-    transparent 70%
+    transparent 40%,
+    rgba(255, 215, 0, 0.4) 50%,
+    transparent 60%
   );
-  animation: backShimmer 4s ease-in-out infinite;
+  animation: luxuryShimmer 4s infinite linear;
   pointer-events: none;
+  mix-blend-mode: overlay;
 }
 
 .card-back-center {
-  font-size: 40px;
-  color: rgba(212, 160, 23, 0.4);
+  font-size: 50px;
+  font-family: var(--font-display), 'Cinzel', serif;
+  font-weight: 900;
+  color: #d4af37;
   position: relative;
   z-index: 1;
-  animation: backCenterPulse 3s ease-in-out infinite;
+  text-shadow: 0 0 15px rgba(212, 175, 55, 0.8), 0 0 5px rgba(255, 255, 255, 0.5);
+  animation: backCenterPulse 2.5s ease-in-out infinite;
+  background: radial-gradient(circle, rgba(20,0,0,0.9) 30%, rgba(20,0,0,0.6) 70%, transparent 100%);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px rgba(0,0,0,0.8);
 }
 
 .card-value-label {
@@ -305,9 +322,9 @@
 }
 
 /* gentle breathing for face-down */
-@keyframes cardBreath {
-  0%, 100% { box-shadow: 0 6px 24px rgba(0,0,0,0.7), 0 0 0 1px rgba(212,160,23,0.15); }
-  50%       { box-shadow: 0 6px 30px rgba(0,0,0,0.8), 0 0 16px rgba(212,160,23,0.22); }
+@keyframes luxuryCardBreath {
+  0%, 100% { box-shadow: 0 8px 30px rgba(0,0,0,0.9), inset 0 0 10px rgba(212,175,55,0.5), 0 0 15px rgba(212,175,55,0.3); transform: translateY(0); }
+  50%       { box-shadow: 0 12px 40px rgba(0,0,0,1), inset 0 0 20px rgba(212,175,55,0.8), 0 0 25px rgba(212,175,55,0.6); transform: translateY(-4px); }
 }
 
 /* winner gold pulse */
@@ -323,11 +340,9 @@
 }
 
 /* back shimmer sweep */
-@keyframes backShimmer {
-  0%   { left: -60%; opacity: 0; }
-  20%  { opacity: 1; }
-  80%  { opacity: 1; }
-  100% { left: 120%; opacity: 0; }
+@keyframes luxuryShimmer {
+  0%   { left: -100%; top: -100%; }
+  100% { left: 100%; top: 100%; }
 }
 
 /* back center pulse */

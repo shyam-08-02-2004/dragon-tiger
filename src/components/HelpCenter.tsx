@@ -88,11 +88,49 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
     if (file.type.startsWith('video/')) type = 'video';
     if (file.type === 'application/pdf') type = 'pdf';
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      setMediaFile({ url: event.target?.result as string, type });
-    };
-    reader.readAsDataURL(file);
+    if (type === 'image') {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 800;
+
+          if (width > height) {
+            if (width > maxDim) {
+              height *= maxDim / width;
+              width = maxDim;
+            }
+          } else {
+            if (height > maxDim) {
+              width *= maxDim / height;
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressedUrl = canvas.toDataURL('image/jpeg', 0.7);
+            setMediaFile({ url: compressedUrl, type });
+          } else {
+            setMediaFile({ url: event.target?.result as string, type });
+          }
+        };
+        img.src = event.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setMediaFile({ url: event.target?.result as string, type });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSend = async (quickMsg?: string) => {
@@ -128,7 +166,7 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
 
   return (
     <div className="hc-overlay" onClick={onClose}>
-      <div className="hc-modal premium-help-center" onClick={e => e.stopPropagation()}>
+      <div className="hc-modal premium-help-center" onClick={(e) => { e.stopPropagation(); setActiveMenuMsgId(null); }}>
         <div className="hc-header premium-hc-header">
           <button className="hc-back-btn" onClick={onClose}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
@@ -138,7 +176,7 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
           <div style={{ width: '60px' }}></div>
         </div>
         
-        <div className="hc-messages-container">
+        <div className="hc-messages-container" onClick={() => setActiveMenuMsgId(null)}>
           {messages.length === 0 ? (
             <div className="hc-empty">
               <span className="hc-empty-icon">🎧</span>
@@ -150,7 +188,10 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
               <div key={msg.id} className={`hc-message-wrapper ${msg.sender === 'user' ? 'hc-user' : 'hc-admin'}`}>
                 <div 
                   className={`hc-message ${msg.isDeleted ? 'deleted' : ''}`}
-                  onClick={() => msg.sender === 'user' && !msg.isDeleted && setActiveMenuMsgId(curr => curr === msg.id ? null : msg.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    msg.sender === 'user' && !msg.isDeleted && setActiveMenuMsgId(curr => curr === msg.id ? null : msg.id);
+                  }}
                 >
                   {msg.isDeleted ? (
                     <span className="deleted-text">🚫 This message was deleted.</span>
@@ -188,13 +229,13 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ userId, isOpen, onClose }) => {
                         {new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                       </div>
 
-                      {msg.sender === 'user' && activeMenuMsgId === msg.id && Date.now() - new Date(msg.timestamp).getTime() <= 5 * 60 * 1000 && (
-                        <div className="hc-premium-actions">
-                          <button className="premium-btn-edit" onClick={(e) => { e.stopPropagation(); setEditingChatId(msg.id); setEditingChatText(msg.message); setActiveMenuMsgId(null); }}>
-                            <span>✏️</span> Edit
+                      {msg.sender === 'user' && Date.now() - new Date(msg.timestamp).getTime() <= 5 * 60 * 1000 && (
+                        <div className={`chat-hover-actions ${activeMenuMsgId === msg.id ? 'active' : ''}`}>
+                          <button className="action-hover-btn edit-btn" onClick={(e) => { e.stopPropagation(); setEditingChatId(msg.id); setEditingChatText(msg.message); setActiveMenuMsgId(null); }} title="Edit">
+                            ✏️
                           </button>
-                          <button className="premium-btn-delete" onClick={(e) => { e.stopPropagation(); handleDeleteMessage(msg.id); }}>
-                            <span>🗑️</span> Delete
+                          <button className="action-hover-btn delete-btn" onClick={(e) => { e.stopPropagation(); handleDeleteMessage(msg.id); }} title="Delete">
+                            🗑️
                           </button>
                         </div>
                       )}

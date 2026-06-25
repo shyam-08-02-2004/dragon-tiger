@@ -623,7 +623,6 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
       // Voice announcement for result
       if (voiceEnabled) {
         speak(`Result is ${result}`, muted);
-      }
       playSound(result, muted);
 
       // Check if already processed
@@ -632,6 +631,16 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
       const winnings = calculateWinnings(currentPrev.bets, result, dragonCard, tigerCard);
       const newBalance = Number(currentPrev.balance) + winnings;
 
+      // Update local state immediately for responsive UI
+      setState(prev => ({
+        ...prev,
+        balance: newBalance,
+        // Reset bets for the next round
+        bets: {},
+        totalBet: 0,
+      }));
+
+      // Play congratulatory audio and sound if won
       if (winnings > 0) {
         if (!muted) {
           const congratsAudio = new Audio('/assets/congratulations.mp3');
@@ -644,30 +653,29 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
       } else if (currentPrev.totalBet > 0) {
         playSound('lose', muted);
       }
-      // ---- SIDE EFFECTS (Out of setState to avoid double execution in StrictMode) ----
-      if (currentUserRef.current && currentUserRef.current.id !== 'babu') {
-         if (currentPrev.totalBet > 0) {
-           lastLocalBalanceUpdate.current = Date.now();
-           syncBalanceToServer(newBalance, currentPrev.balance);
-           
-           const betSideStr = Object.entries(currentPrev.bets)
-             .filter(([k, v]) => v && v > 0)
-             .map(([k, v]) => `${k.charAt(0).toUpperCase() + k.slice(1)}`)
-             .join(', ');
 
-           fetch('/api/users/bet-history', {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify({
-              username: currentUserRef.current.id || currentUserRef.current.username,
-              roundId: seed,
-              roundNumber: roundId,
-              betSide: betSideStr,
-              betAmount: currentPrev.totalBet,
-              winAmount: winnings
-             })
-           }).catch(() => {});
-         }
+      // Sync balance to server (including when no win) and record bet history
+      if (currentUserRef.current && currentUserRef.current.id !== 'babu') {
+        lastLocalBalanceUpdate.current = Date.now();
+        syncBalanceToServer(newBalance, currentPrev.balance);
+
+        const betSideStr = Object.entries(currentPrev.bets)
+          .filter(([k, v]) => v && v > 0)
+          .map(([k, v]) => `${k.charAt(0).toUpperCase() + k.slice(1)}`)
+          .join(', ');
+
+        fetch('/api/users/bet-history', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: currentUserRef.current.id,
+            roundId: roundId,
+            roundNumber: roundId % 2000 + 1,
+            betAmount: currentPrev.totalBet,
+            winAmount: winnings,
+            betSide: betSideStr,
+          }),
+        }).catch(() => {});
       }
 
       fetch('/api/history/record', {
@@ -758,8 +766,6 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
           muted={muted} voiceEnabled={voiceEnabled}
           onToggleMute={toggleMute}
           isGameView={currentTab === 'games'}
-          timer={timer}
-          phase={phase}
         />
 
         {currentTab === 'home' && (
@@ -770,6 +776,10 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
               setCurrentTab('games');
               sessionStorage.setItem('dt_currentTab', 'games');
             }} 
+            onShowWallet={() => setWalletOpen(true)}
+            onShowRefer={currentUser.id !== 'babu' ? () => setReferOpen(true) : () => {}}
+            onShowSupport={currentUser.id !== 'babu' ? () => setHelpOpen(true) : () => {}}
+            onLogout={handleLogout}
           />
         )}
 
@@ -787,24 +797,25 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
               flexDirection: 'column',
               justifyContent: 'space-between'
             }}>
-              <div className="round-pulse-anim" style={{
+              <div className="premium-round-box" style={{
                 position: 'absolute',
-                top: '2.5%',
+                top: '3%',
                 left: '5%',
-                background: 'linear-gradient(135deg, rgba(30,30,40,0.95), rgba(10,10,15,0.98))',
-                color: '#FFD700',
-                padding: '6px 16px',
-                fontSize: '14px',
-                fontFamily: 'Inter, sans-serif',
-                fontWeight: '900',
-                letterSpacing: '1px',
-                borderRadius: '8px',
-                border: '1px solid rgba(212, 175, 55, 0.6)',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.8), inset 0 2px 4px rgba(255,215,0,0.2)',
-                textShadow: '0 2px 4px rgba(0,0,0,0.8)',
-                zIndex: 30
+                background: 'linear-gradient(180deg, rgba(30,25,10,0.95), rgba(5,5,8,0.98))',
+                padding: '6px 20px',
+                borderRadius: '12px',
+                border: '1px solid rgba(212, 175, 55, 0.4)',
+                boxShadow: '0 5px 20px rgba(0,0,0,0.8), inset 0 2px 10px rgba(212,175,55,0.1)',
+                zIndex: 30,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}>
-                Round: {roundNumber}
+                <div style={{ fontSize: '10px', color: '#D4AF37', letterSpacing: '2px', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '2px', opacity: 0.9 }}>ROUND</div>
+                <div style={{ fontSize: '20px', color: '#fff', fontFamily: 'Cinzel, serif', fontWeight: '900', letterSpacing: '1px', textShadow: '0 2px 10px rgba(255,255,255,0.4), 0 0 5px rgba(212,175,55,0.5)' }}>
+                  <span style={{ color: '#D4AF37', marginRight: '4px', fontSize: '16px' }}>#</span>{roundNumber}
+                </div>
               </div>
 
               <div className="cards-reveal-area" style={{ flexShrink: 0, marginTop: '12%' }}>
@@ -814,6 +825,36 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
                   isRevealing={phase === 'dealing'}
                   isWinner={dragonWins}
                 />
+                
+                <div className="center-timer-wrapper" style={{ position: 'absolute', top: '22%', left: '50%', transform: 'translateX(-50%)', zIndex: 30 }}>
+                  <div className="center-timer-ring">
+                    <svg viewBox="0 0 80 80" className="center-timer-svg">
+                      <circle className="center-timer-bg" cx="40" cy="40" r="34" />
+                      <circle 
+                        className="center-timer-progress" 
+                        cx="40" cy="40" r="34"
+                        style={{
+                          strokeDasharray: `${2 * Math.PI * 34}`,
+                          strokeDashoffset: phase === 'betting' 
+                            ? `${2 * Math.PI * 34 * (1 - timer / 15)}` 
+                            : '0'
+                        }}
+                      />
+                    </svg>
+                    <div className="center-timer-content">
+                      {phase === 'betting' ? (
+                        <>
+                          <span className={`center-timer-number ${timer <= 5 ? 'urgent' : ''}`}>{timer}</span>
+                          <span className="center-timer-label">SEC</span>
+                        </>
+                      ) : phase === 'dealing' ? (
+                        <span className="center-timer-status dealing">⚡</span>
+                      ) : (
+                        <span className="center-timer-status result">✨</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
                 <CardDisplay
                   card={tigerCard}
@@ -834,7 +875,7 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
             </div>
 
             <div className="game-bottom-ui" style={{ marginTop: '-25px', position: 'relative', zIndex: 20, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <div style={{ 
+              <div style={{
                 padding: '10px',
                 background: 'rgba(0,0,0,0.4)',
                 backdropFilter: 'blur(5px)',
@@ -872,13 +913,6 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
             >
               <span className="pbn-icon">🏠</span>
               <span className="pbn-label">Home</span>
-            </div>
-            <div 
-              className="pbn-item" 
-              onClick={currentUser.id !== 'babu' ? () => setReferOpen(true) : undefined}
-            >
-              <span className="pbn-icon">🎁</span>
-              <span className="pbn-label">Promotions</span>
             </div>
             <div 
               className="pbn-item active" 
@@ -967,6 +1001,11 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
         <ProfileModal 
           user={currentUser} 
           onClose={() => setProfileOpen(false)} 
+          onGoHome={() => {
+            setCurrentTab('home');
+            sessionStorage.setItem('dt_currentTab', 'home');
+            setProfileOpen(false);
+          }}
           onPlayGame={() => {
             setCurrentTab('games');
             sessionStorage.setItem('dt_currentTab', 'games');

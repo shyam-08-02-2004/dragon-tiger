@@ -2,7 +2,7 @@ import React from 'react';
 import './Sidebar.css';
 import { FaWallet, FaGift, FaHeadset, FaSignOutAlt } from 'react-icons/fa';
 import type { UserAccount } from './Auth';
-import vipAvatar from '../assets/vip-girl.png';
+import vipAvatar from '../assets/vip-man.png';
 
 interface SidebarProps {
   user: UserAccount | null;

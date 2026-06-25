@@ -1,62 +1,43 @@
-.home-tab-container {
-  position: relative;
+.home-main-container {
   width: 100%;
-  min-height: 100%;
+  height: 100%;
+  background-color: #080808; /* Deep casino black */
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
-.home-tab-bg {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-size: cover;
-  background-position: center;
-  z-index: 0;
-}
-
-.home-tab-overlay {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%);
-  z-index: 1;
-}
-
-.home-tab-content {
-  position: relative;
-  z-index: 2;
-  padding: 20px;
+.home-scroll-content {
+  padding: 16px;
+  padding-top: 90px; /* Space for the absolute header */
+  padding-bottom: 90px; /* Space for the bottom nav */
   display: flex;
   flex-direction: column;
-  gap: 25px;
-  width: 100%;
+  gap: 20px;
   max-width: 600px;
   margin: 0 auto;
+  width: 100%;
 }
 
 /* ============================
-   PROFILE CARD
+   1. WELCOME BANNER
    ============================ */
-.home-profile-card {
-  background: linear-gradient(145deg, rgba(20, 15, 10, 0.9), rgba(10, 5, 5, 0.95));
-  border: 1px solid rgba(212, 175, 55, 0.5);
-  border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(212, 175, 55, 0.1);
-  backdrop-filter: blur(15px);
+.home-welcome-banner {
+  background: linear-gradient(135deg, rgba(25, 10, 40, 0.9), rgba(10, 5, 20, 0.95));
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 16px;
+  padding: 20px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 25px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(106, 13, 173, 0.3);
   position: relative;
   overflow: hidden;
-  transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.home-profile-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 45px rgba(212, 175, 55, 0.2), inset 0 0 25px rgba(212, 175, 55, 0.2);
-}
-
-.home-profile-card::before {
+/* Shine effect */
+.home-welcome-banner::before {
   content: '';
   position: absolute;
   top: 0; left: -100%;
@@ -66,203 +47,307 @@
   animation: shineSweep 5s infinite;
 }
 
-.hpc-left {
+@keyframes shineSweep {
+  0% { left: -100%; }
+  20% { left: 200%; }
+  100% { left: 200%; }
+}
+
+.hwb-left {
   display: flex;
   flex-direction: column;
-  flex: 1;
-  gap: 8px;
+  gap: 6px;
+  z-index: 2;
 }
 
-.hpc-title {
+.hwb-subtitle {
   color: #D4AF37;
-  font-family: 'Cinzel', serif;
-  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
   letter-spacing: 2px;
-  margin: 0;
   text-transform: uppercase;
-  opacity: 0.9;
 }
 
-.hpc-name-row {
-  display: flex;
-  align-items: center;
-}
-
-.hpc-username {
-  color: white;
-  font-size: 24px;
+.hwb-title {
+  color: #FFF;
+  font-family: 'Cinzel', serif;
+  font-size: 26px;
   font-weight: 900;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
-  letter-spacing: 1px;
+  margin: 0;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.8);
 }
 
-.hpc-badges {
-  display: flex;
+.hwb-badge {
+  display: inline-flex;
   align-items: center;
-  gap: 15px;
-  margin-top: 5px;
-}
-
-.hpc-vip-badge {
-  background: linear-gradient(to right, #DAA520, #F8E287);
-  color: #000;
-  font-size: 12px;
-  font-weight: 800;
-  padding: 3px 8px;
-  border-radius: 12px;
-  text-transform: uppercase;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-  animation: pulseGold 2s infinite;
-}
-
-.hpc-view-profile {
-  font-size: 12px;
-  color: #aaa;
-  font-weight: bold;
-  letter-spacing: 0.5px;
-  transition: color 0.2s;
-}
-
-.home-profile-card:hover .hpc-view-profile {
+  gap: 6px;
   color: #D4AF37;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 4px;
 }
 
-.hpc-right {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.hpc-avatar-wrapper {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  padding: 3px;
-  background: linear-gradient(135deg, #FFD700, #D4AF37, #AA7B18);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+.hwb-right {
   position: relative;
+  width: 100px;
+  height: 80px;
+  z-index: 1;
 }
 
-.hpc-avatar-img {
-  width: 100%;
-  height: 100%;
+.hwb-profile-img {
+  position: absolute;
+  right: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 75px;
+  height: 75px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #000;
+  border: 3px solid #D4AF37;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.8), 0 0 15px rgba(212,175,55,0.4);
 }
 
 /* ============================
-   VIP LOUNGE CARD
+   2. QUICK ACTIONS GRID
    ============================ */
-.home-vip-card {
-  background: linear-gradient(145deg, rgba(20, 5, 30, 0.8), rgba(10, 0, 15, 0.9));
-  border: 1px solid rgba(138, 43, 226, 0.4);
-  border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(138, 43, 226, 0.1);
-  backdrop-filter: blur(15px);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 0 0 30px;
-  position: relative;
-  overflow: hidden;
-  min-height: 200px;
+.home-quick-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
 }
 
-.home-vip-card::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(138, 43, 226, 0.8), transparent);
-}
-
-.hvc-left {
+.hqa-btn {
+  background: linear-gradient(180deg, #1A1A1A, #121212);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 14px;
+  padding: 16px 8px;
   display: flex;
   flex-direction: column;
-  z-index: 2;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.6);
 }
 
-.hvc-title {
+.hqa-btn:active {
+  transform: scale(0.95);
+}
+
+.hqa-btn:hover {
+  border-color: rgba(212, 175, 55, 0.6);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.15);
+  background: linear-gradient(180deg, #222, #151515);
+}
+
+.hqa-icon-wrapper {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: rgba(212, 175, 55, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.hqa-icon {
+  font-size: 22px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+.hqa-label {
+  color: #FFF;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.hqa-subtext {
+  color: #888;
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  font-weight: 500;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* ============================
+   3. VIP LOUNGE CARD
+   ============================ */
+.home-vip-lounge {
+  position: relative;
+  background: #121212;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+  margin-top: 10px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.home-vip-lounge:active {
+  transform: scale(0.98);
+}
+
+.hvl-bg-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at top right, rgba(106, 13, 173, 0.2), transparent 60%);
+  z-index: 1;
+}
+
+.hvl-content {
+  position: relative;
+  z-index: 2;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.hvl-title {
   color: #D4AF37;
   font-family: 'Cinzel', serif;
   font-size: 24px;
   letter-spacing: 3px;
-  margin: 0 0 10px 0;
+  margin: 0 0 12px 0;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
 }
 
-.hvc-subtitle {
-  color: #aaa;
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  margin: 0 0 20px 0;
+.hvl-badges {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.hvl-level {
+  background: rgba(106, 13, 173, 0.4);
+  border: 1px solid #6A0DAD;
+  color: #FFF;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
   letter-spacing: 1px;
 }
 
-.hvc-ornament {
+.hvl-elite {
   color: #D4AF37;
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
 }
 
-.hvc-right {
-  width: 180px;
-  height: 100%;
+.hvl-benefits {
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  position: relative;
-  z-index: 1;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 24px;
+  padding: 0 10px;
 }
 
-.hvc-chair-img {
-  width: 150%;
-  height: auto;
-  object-fit: cover;
-  transform: translateY(10px) translateX(20px);
-  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.9));
+.hvl-benefit-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.hvl-b-icon {
+  font-size: 18px;
+}
+
+.hvl-b-text {
+  color: #aaa;
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+.hvl-btn {
+  width: 100%;
+  background: linear-gradient(90deg, #AA7B18, #F8E287, #AA7B18);
+  background-size: 200% auto;
+  color: #000;
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  letter-spacing: 1.5px;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+  cursor: pointer;
+  animation: shimmerBtn 3s infinite linear;
+}
+
+@keyframes shimmerBtn {
+  to { background-position: 200% center; }
 }
 
 /* ============================
-   RESPONSIVE DESIGN
+   RESPONSIVE
    ============================ */
 @media (max-width: 480px) {
-  .hwc-amount {
-    font-size: 28px;
+  .home-scroll-content {
+    padding: 12px;
+    padding-top: 85px;
+    padding-bottom: 90px;
+    gap: 16px;
   }
-  .hwc-right {
-    width: 90px;
-    height: 90px;
+  
+  .hwb-title {
+    font-size: 22px;
   }
-  .hvc-title {
+  .hwb-profile-img {
+    width: 60px;
+    height: 60px;
+    right: 0px;
+  }
+  
+  .home-quick-actions {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .hqa-btn {
+    padding: 12px 4px;
+  }
+  
+  .hqa-icon-wrapper {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .hqa-icon {
+    font-size: 18px;
+  }
+  
+  .hqa-label {
+    font-size: 9px;
+  }
+  
+  .hqa-subtext {
+    font-size: 8px;
+  }
+  
+  .hvl-title {
     font-size: 20px;
   }
-  .hvc-right {
-    width: 140px;
+  
+  .hvl-content {
+    padding: 16px;
   }
-}
-
-.hvc-games-text {
-  margin-top: 8px;
-  font-size: 14px;
-  font-weight: 900;
-  color: #FFD700;
-  background: linear-gradient(90deg, #FFD700, #FFF, #FFD700);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: 2px;
-  animation: shimmer 2s infinite linear;
-  background-size: 200% auto;
-}
-@keyframes shimmer {
-  to { background-position: 200% center; }
-}
-.home-vip-card {
-  transition: transform 0.2s;
-}
-.home-vip-card:hover {
-  transform: scale(1.02);
+  
+  .hvl-benefits {
+    padding: 0;
+  }
 }
 

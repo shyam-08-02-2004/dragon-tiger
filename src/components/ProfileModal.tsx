@@ -11,6 +11,7 @@ interface ProfileModalProps {
   onShowRefer?: () => void;
   onShowSupport?: () => void;
   onShowHistory?: () => void;
+  onGoHome?: () => void;
 }
 
 const ProfileModal: React.FC<ProfileModalProps> = ({ 
@@ -21,7 +22,8 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   onShowWallet,
   onShowRefer,
   onShowSupport,
-  onShowHistory
+  onShowHistory,
+  onGoHome
 }) => {
   if (!user) return null;
 
@@ -75,44 +77,22 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
         {/* Main Cards Grid */}
         <div className="up-cards-grid">
           
-          {/* Wallet Card */}
-          <div className="up-card wallet" onClick={onShowWallet}>
-            <div className="up-card-icon">💰</div>
-            <div className="up-card-content">
-              <h3 className="up-card-title">Wallet & Banking</h3>
-              <p className="up-card-subtitle">Manage balance & transactions</p>
-            </div>
-            <div className="up-card-arrow">›</div>
-          </div>
-
-          {/* Refer & Earn Card */}
-          <div className="up-card refer" onClick={onShowRefer}>
-            <div className="up-card-icon">🎁</div>
-            <div className="up-card-content">
-              <h3 className="up-card-title">Refer & Earn</h3>
-              <p className="up-card-subtitle">Invite friends, earn rewards</p>
-            </div>
-            <div className="up-card-arrow">›</div>
-          </div>
-
-          {/* Support Card */}
-          <div className="up-card support" onClick={onShowSupport}>
-            <div className="up-card-icon">🎧</div>
-            <div className="up-card-content">
-              <h3 className="up-card-title">Live Support</h3>
-              <p className="up-card-subtitle">24/7 VIP assistance</p>
-            </div>
-            <div className="up-card-arrow">›</div>
+          <div className="luxury-tiger-banner" onClick={onPlayGame || onClose} style={{ cursor: 'pointer' }}>
+            <img src="./assets/luxury_casino_banner.png" alt="Luxury Casino" className="tiger-banner-img" />
           </div>
 
           {onLogout && (
-            <div className="up-card logout" onClick={() => onLogout()}>
-              <div className="up-card-icon">🚪</div>
-              <div className="up-card-content">
-                <h3 className="up-card-title" style={{color: '#EF4444'}}>Secure Logout</h3>
-                <p className="up-card-subtitle">Sign out of your account</p>
+            <button className="premium-logout-btn" onClick={() => onLogout()}>
+              <div className="logout-icon-wrapper">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
               </div>
-            </div>
+              <span className="logout-text">SECURE LOGOUT</span>
+              <span className="logout-shield">🛡️</span>
+            </button>
           )}
 
         </div>
@@ -120,13 +100,9 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 
       {/* Bottom Navigation */}
       <div className="up-bottom-nav">
-        <button className="up-nav-item" onClick={onClose}>
+        <button className="up-nav-item" onClick={onGoHome || onClose}>
           <span className="up-nav-icon">🏠</span>
           <span className="up-nav-text">Home</span>
-        </button>
-        <button className="up-nav-item" onClick={onPlayGame || onClose}>
-          <span className="up-nav-icon">🎮</span>
-          <span className="up-nav-text">Games</span>
         </button>
         <button className="up-nav-item active">
           <span className="up-nav-icon">👤</span>

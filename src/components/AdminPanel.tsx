@@ -44,7 +44,8 @@ const normalizeLiveBets = (data: any): LiveBets => {
 const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [users, setUsers] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'game' | 'transactions' | 'support'>(() => (sessionStorage.getItem('dt_adminTab') as any) || 'dashboard');
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'game' | 'transactions' | 'support' | 'notifications'>(() => (sessionStorage.getItem('dt_adminTab') as any) || 'dashboard');
   const [simPhase, setSimPhase] = useState<'betting' | 'dealing' | 'result'>('betting');
   const [simTimer, setSimTimer] = useState<number>(15);
   const [muted, setMuted] = useState<boolean>(() => localStorage.getItem('dt_admin_muted') === 'true');
@@ -77,7 +78,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [fullScreenMedia, setFullScreenMedia] = useState<{ url: string; type: string } | null>(null);
 
   // State Setters with sessionStorage wrappers
-  const handleTabChange = (tab: 'dashboard' | 'users' | 'game' | 'transactions' | 'support') => {
+  const handleTabChange = (tab: 'dashboard' | 'users' | 'game' | 'transactions' | 'support' | 'blocked') => {
     setActiveTab(tab); sessionStorage.setItem('dt_adminTab', tab);
   };
   const handleUserHistory = (val: string | null) => {
@@ -109,11 +110,38 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
       .catch(console.error);
   };
 
+  // Block/Unblock handlers
+  const handleBlockUser = async (id: string) => {
+    try {
+      const res = await fetch(`/api/admin/users/${id}/block`, { method: 'PUT' });
+      if (res.ok) fetchUsers();
+    } catch (e) { console.error(e); }
+  };
+  const handleUnblockUser = async (id: string) => {
+    try {
+      const res = await fetch(`/api/admin/users/${id}/unblock`, { method: 'PUT' });
+      if (res.ok) fetchUsers();
+    } catch (e) { console.error(e); }
+  };
+
   // Initial data load and periodic refresh
   useEffect(() => {
     fetchUsers();
     const interval = setInterval(fetchUsers, 15000); // refresh every 15s
     return () => clearInterval(interval);
+  }, []);
+
+  // Fetch notifications on mount and refresh every 20s
+  useEffect(() => {
+    const fetchNotifications = () => {
+      fetch('/api/admin/notifications?t=' + Date.now())
+        .then(r => r.json())
+        .then(data => { if (Array.isArray(data)) setNotifications(data); })
+        .catch(console.error);
+    };
+    fetchNotifications();
+    const intv = setInterval(fetchNotifications, 20000);
+    return () => clearInterval(intv);
   }, []);
 
   useEffect(() => {
@@ -148,7 +176,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     }
   }, [selectedUserHistory, userHistoryTab]);
 
-  // â”€â”€ Live bet polling every second â”€â”€
+  // ── Live bet polling every second ──
   useEffect(() => {
     const pollBets = () => {
       const global = getGlobalGameState();
@@ -180,7 +208,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     return () => clearInterval(betPollId);
   }, []);
 
-  // â”€â”€ Support Chat Polling â”€â”€
+  // ── Support Chat Polling ──
   useEffect(() => {
     if (activeTab !== 'support' || !selectedSupportUser) return;
     
@@ -285,7 +313,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     setEditingChatText('');
   };
 
-  // â”€â”€ Continuous game loop for admin (always running) â”€â”€
+  // ── Continuous game loop for admin (always running) ──
   useEffect(() => {
     simTimerRef.current = setInterval(() => {
       const global = getGlobalGameState();
@@ -345,7 +373,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     return () => { if (simTimerRef.current) clearInterval(simTimerRef.current); };
   }, []);
 
-  // â”€â”€ Set outcome for ANY round â”€â”€
+  // ── Set outcome for ANY round ──
   const setRoundOutcome = async (roundId: number, outcome: string) => {
     try {
       const res = await fetch('/api/admin/round-outcomes', {
@@ -367,7 +395,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     } catch(e) { console.error(e); }
   };
 
-  // â”€â”€ Remove outcome for a round â”€â”€
+  // ── Remove outcome for a round ──
   const removeRoundOutcome = async (roundId: number) => {
     try {
       const res = await fetch(`/api/admin/round-outcomes/${roundId}`, { method: 'DELETE' });
@@ -475,7 +503,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
           <h2>CASINO ADMIN</h2>
         </div>
 
-        {/* â”€â”€ Live Round Badge in sidebar â”€â”€ */}
+        {/* ── Live Round Badge in sidebar ── */}
         <div style={{
           margin: '10px 16px',
           padding: '12px',
@@ -575,42 +603,47 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                 {[...users].reverse().map((user: any) => {
                 if (user.id === 'babu') return null;
                 return (
-                  <div key={user.id} className={`admin-user-card premium-user-card ${user.hasDeposited ? 'vip-user' : ''}`}>
-                    <div className="user-card-top" style={{ padding: '15px', borderBottom: '1px solid rgba(212,175,55,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div className="user-card-avatar" style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'linear-gradient(135deg, rgba(212,175,55,0.3), rgba(0,0,0,0.8))', border: '2px solid #D4AF37', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>👤</div>
-                        <div className="user-card-info">
-                          <div className="user-card-phone" style={{ fontSize: '16px', fontWeight: 'bold', color: '#fff' }}>{user.id}</div>
-                          <div className="user-card-username" style={{ fontSize: '12px', color: '#aaa' }}>{user.username}</div>
+                  <div key={user.id} className={`admin-user-card premium-user-card ${user.hasDeposited ? 'vip-user' : ''} ${user.blocked ? 'blocked-user' : ''}`}>
+                      <div className="user-card-top" style={{ padding: '15px', borderBottom: '1px solid rgba(212,175,55,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div className="user-card-avatar" style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'linear-gradient(135deg, rgba(212,175,55,0.3), rgba(0,0,0,0.8))', border: '2px solid #D4AF37', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>👤</div>
+                          <div className="user-card-info" style={{ minWidth: 0, flex: 1 }}>
+                            <div className="user-card-phone" style={{ fontSize: '16px', fontWeight: 'bold', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.id}</div>
+                            <div className="user-card-username" style={{ fontSize: '12px', color: '#aaa', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.username}</div>
+                          </div>
                         </div>
+                        <div className={`user-card-badge ${user.hasDeposited ? 'active' : 'inactive'}`}>{user.hasDeposited ? 'ACTIVE' : 'NEW'}</div>
                       </div>
-                      <div className={`user-card-badge ${user.hasDeposited ? 'active' : 'inactive'}`}>
-                        {user.hasDeposited ? 'ACTIVE' : 'NEW'}
+                      <div className="user-card-actions" style={{ marginTop: '10px', display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                        {user.blocked ? (
+                          <button onClick={() => handleUnblockUser(user.id)} className="unblock-btn" style={{ background: '#2ecc71', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer' }}>Unblock</button>
+                        ) : (
+                          <button onClick={() => handleBlockUser(user.id)} className="block-btn" style={{ background: '#e74c3c', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer' }}>Block</button>
+                        )}
                       </div>
-                    </div>
-                    <div className="user-card-middle">
-                      <div className="user-balance-box">
-                        <div className="balance-label">CURRENT BALANCE</div>
+                      <div className="user-card-middle" style={{ display: 'flex', flexDirection: 'column', gap: '10px', padding: '12px' }}>
+                      <div className="user-balance-box" style={{ background: 'rgba(0,0,0,0.4)', borderRadius: '12px', padding: '15px', border: '1px dashed rgba(212,175,55,0.3)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div className="balance-label" style={{ fontSize: '11px', color: '#d4af37', fontWeight: 'bold', marginBottom: '8px' }}>CURRENT BALANCE</div>
                         {editBalanceUser === user.id ? (
-                          <div className="edit-balance-group" style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+                          <div className="edit-balance-group" style={{ display: 'flex', gap: '5px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
                             <span className="currency-symbol" style={{ color: '#d4af37', fontSize: '20px' }}>₹</span>
-                            <input type="number" value={newBalance} onChange={(e) => setNewBalance(e.target.value)} className="balance-input" style={{ width: '100px', background: 'rgba(0,0,0,0.5)', border: '1px solid #d4af37', color: '#fff', padding: '5px', borderRadius: '5px' }} autoFocus />
+                            <input type="number" value={newBalance} onChange={(e) => setNewBalance(e.target.value)} className="balance-input" style={{ width: '90px', background: 'rgba(0,0,0,0.5)', border: '1px solid #d4af37', color: '#fff', padding: '5px', borderRadius: '5px' }} autoFocus />
                             <button className="save-btn" onClick={() => handleUpdateBalance(user.id)} style={{ background: '#2ecc71', border: 'none', color: '#fff', borderRadius: '5px', padding: '5px 10px', cursor: 'pointer' }}>✓</button>
                             <button className="cancel-btn" onClick={() => setEditBalanceUser(null)} style={{ background: '#e74c3c', border: 'none', color: '#fff', borderRadius: '5px', padding: '5px 10px', cursor: 'pointer' }}>✕</button>
                           </div>
                         ) : (
-                          <div className="balance-amount">₹{user.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>
+                          <div className="balance-amount" style={{ fontSize: '24px', fontWeight: 'bold', color: '#fff' }}>₹{user.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>
                         )}
                       </div>
-                      <div className="user-password-box">
-                        <span className="password-label">PASSWORD</span>
-                        <span className="password-mask">{user.password}</span>
+                      <div className="user-password-box" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.3)', padding: '12px 15px', borderRadius: '10px' }}>
+                        <span className="password-label" style={{ fontSize: '11px', color: '#d4af37', fontWeight: 'bold' }}>PASSWORD</span>
+                        <span className="password-mask" style={{ fontFamily: 'monospace', color: '#ccc', background: 'rgba(255,255,255,0.1)', padding: '4px 8px', borderRadius: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1, textAlign: 'right', marginLeft: '10px' }}>{user.password}</span>
                       </div>
                     </div>
-                    <div className="user-card-bottom" style={{ display: 'flex', gap: '10px', padding: '15px 20px', background: 'rgba(0,0,0,0.2)', justifyContent: 'center' }}>
-                       <button className="action-btn edit" onClick={() => { setEditBalanceUser(user.id); setNewBalance(user.balance.toString()); }} title="Edit Balance" style={{ flex: 1, background: 'rgba(212,175,55,0.1)', border: '1px solid rgba(212,175,55,0.3)', color: '#d4af37', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>💰 Edit</button>
-                       <button className="btn-secondary" onClick={() => handleUserHistory(user.id)} style={{ flex: 1, background: 'rgba(52,152,219,0.1)', border: '1px solid rgba(52,152,219,0.3)', color: '#3498db', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>📜 Hist</button>
-                       <button className="action-btn delete" onClick={() => handleDeleteUser(user.id)} title="Delete User" style={{ flex: 1, background: 'rgba(231,76,60,0.1)', border: '1px solid rgba(231,76,60,0.3)', color: '#e74c3c', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>🗑️ Del</button>
+                    <div className="user-card-bottom" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', padding: '12px', background: 'rgba(0,0,0,0.3)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                       <button onClick={() => { setEditBalanceUser(user.id); setNewBalance(user.balance.toString()); }} title="Edit Balance" style={{ flex: '1 1 30%', minWidth: '70px', padding: '10px', borderRadius: '8px', border: '1px solid rgba(212,175,55,0.5)', background: 'rgba(212,175,55,0.15)', color: '#d4af37', fontWeight: 'bold', cursor: 'pointer', height: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>💰 Edit</button>
+                       <button onClick={() => handleUserHistory(user.id)} style={{ flex: '1 1 30%', minWidth: '70px', padding: '10px', borderRadius: '8px', border: '1px solid rgba(52,152,219,0.5)', background: 'rgba(52,152,219,0.15)', color: '#3498db', fontWeight: 'bold', cursor: 'pointer', height: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>📜 Hist</button>
+                       <button onClick={() => handleDeleteUser(user.id)} title="Delete User" style={{ flex: '1 1 30%', minWidth: '70px', padding: '10px', borderRadius: '8px', border: '1px solid rgba(231,76,60,0.5)', background: 'rgba(231,76,60,0.15)', color: '#e74c3c', fontWeight: 'bold', cursor: 'pointer', height: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>🗑️ Del</button>
                     </div>
                   </div>
                 );
@@ -853,38 +886,38 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
               </div>
               <div className="admin-tx-grid" style={{ padding: '15px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '15px' }}>
                 {transactions.slice().map((tx) => (
-                  <div key={tx.id} className={`admin-tx-card ${tx.type}`}>
-                    <div className="tx-card-header">
-                      <div className="tx-user-info">
-                        <div className="tx-avatar" style={{ background: tx.type === 'deposit' ? 'linear-gradient(135deg, #2ecc71, #27ae60)' : 'linear-gradient(135deg, #f1c40f, #d4af37)' }}>
+                  <div key={tx.id} className={`admin-tx-card ${tx.type}`} style={{ borderRadius: '12px', marginBottom: '10px' }}>
+                    <div className="tx-card-header" style={{ padding: '10px 12px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div className="tx-user-info" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <div className="tx-avatar" style={{ width: '32px', height: '32px', fontSize: '14px', background: tx.type === 'deposit' ? 'linear-gradient(135deg, #2ecc71, #27ae60)' : 'linear-gradient(135deg, #f1c40f, #d4af37)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontWeight: 'bold', color: '#fff' }}>
                           {tx.username.charAt(0).toUpperCase()}
                         </div>
-                        <div>
-                          <div className="tx-username">{tx.username}</div>
-                          <div className="tx-time">{new Date(tx.timestamp).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}</div>
+                        <div style={{ minWidth: 0 }}>
+                          <div className="tx-username" style={{ fontSize: '14px', color: '#D4AF37', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{tx.username}</div>
+                          <div className="tx-time" style={{ fontSize: '10px', color: '#aaa' }}>{new Date(tx.timestamp).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}</div>
                         </div>
                       </div>
-                      <div className={`tx-badge ${tx.status}`}>{tx.status.toUpperCase()}</div>
+                      <div className={`tx-badge ${tx.status}`} style={{ fontSize: '10px', padding: '4px 8px' }}>{tx.status.toUpperCase()}</div>
                     </div>
-                    <div className="tx-card-body">
-                      <div className="tx-amount-section">
-                        <div className="tx-type-label" style={{ color: tx.type === 'deposit' ? '#2ecc71' : '#f1c40f' }}>{tx.type.toUpperCase()}</div>
-                        <div className="tx-amount">₹{tx.amount}</div>
+                    <div className="tx-card-body" style={{ padding: '12px 15px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div className="tx-amount-section" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div className="tx-type-label" style={{ color: tx.type === 'deposit' ? '#2ecc71' : '#f1c40f', fontSize: '12px', fontWeight: 'bold' }}>{tx.type.toUpperCase()}</div>
+                        <div className="tx-amount" style={{ fontSize: '20px', fontWeight: 'bold', color: '#fff' }}>₹{tx.amount}</div>
                       </div>
-                      <div className="tx-details">
-                        {tx.utr && <div className="tx-detail-row"><span>UTR:</span> <span style={{ color: '#fff' }}>{tx.utr}</span></div>}
-                        {tx.upiId && <div className="tx-detail-row"><span>UPI:</span> <span style={{ color: '#fff' }}>{tx.upiId}</span></div>}
+                      <div className="tx-details" style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '11px', color: '#aaa', background: 'rgba(0,0,0,0.2)', padding: '8px', borderRadius: '6px' }}>
+                        {tx.utr && <div className="tx-detail-row" style={{ display: 'flex', justifyContent: 'space-between' }}><span>UTR:</span> <span style={{ color: '#fff', wordBreak: 'break-all', textAlign: 'right', marginLeft: '10px' }}>{tx.utr}</span></div>}
+                        {tx.upiId && <div className="tx-detail-row" style={{ display: 'flex', justifyContent: 'space-between' }}><span>UPI:</span> <span style={{ color: '#fff', wordBreak: 'break-all', textAlign: 'right', marginLeft: '10px' }}>{tx.upiId}</span></div>}
                       </div>
                     </div>
                     {tx.status === 'pending' ? (
-                      <div className="tx-card-actions">
-                        <button className="tx-action-btn approve" onClick={() => handleTransactionAction(tx.id, 'approve')}>✅ Approve</button>
-                        <button className="tx-action-btn reject" onClick={() => handleTransactionAction(tx.id, 'reject')}>❌ Reject</button>
-                        <button className="tx-action-btn delete" onClick={() => handleDeleteTransaction(tx.id)}>🗑️</button>
+                      <div className="tx-card-actions" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', padding: '10px 12px', background: 'rgba(0,0,0,0.3)', borderTop: '1px solid rgba(255,255,255,0.05)', justifyContent: 'center' }}>
+                        <button className="tx-action-btn approve" onClick={() => handleTransactionAction(tx.id, 'approve')} style={{ flex: '1 1 40%', padding: '8px', fontSize: '12px', borderRadius: '6px', background: 'rgba(46,204,113,0.15)', color: '#2ecc71', border: '1px solid rgba(46,204,113,0.4)', fontWeight: 'bold', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>✅ Approve</button>
+                        <button className="tx-action-btn reject" onClick={() => handleTransactionAction(tx.id, 'reject')} style={{ flex: '1 1 40%', padding: '8px', fontSize: '12px', borderRadius: '6px', background: 'rgba(231,76,60,0.15)', color: '#e74c3c', border: '1px solid rgba(231,76,60,0.4)', fontWeight: 'bold', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>❌ Reject</button>
+                        <button className="tx-action-btn delete" onClick={() => handleDeleteTransaction(tx.id)} style={{ flex: '0 0 auto', width: 'auto', padding: '8px 12px', fontSize: '12px', borderRadius: '6px', background: 'rgba(150,150,150,0.15)', color: '#fff', border: '1px solid rgba(150,150,150,0.4)', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>🗑️</button>
                       </div>
                     ) : (
-                      <div className="tx-card-actions">
-                         <button className="tx-action-btn delete" onClick={() => handleDeleteTransaction(tx.id)} style={{ width: '100%' }}>🗑️ Delete Transaction</button>
+                      <div className="tx-card-actions" style={{ padding: '10px 12px', background: 'rgba(0,0,0,0.3)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                         <button className="tx-action-btn delete" onClick={() => handleDeleteTransaction(tx.id)} style={{ width: '100%', padding: '8px', fontSize: '12px', borderRadius: '6px', background: 'rgba(231,76,60,0.15)', color: '#e74c3c', border: '1px solid rgba(231,76,60,0.4)', fontWeight: 'bold', cursor: 'pointer' }}>🗑️ Delete Transaction</button>
                       </div>
                     )}
                   </div>
@@ -892,6 +925,29 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                 {transactions.length === 0 && (
                   <div style={{ textAlign: 'center', padding: '40px', color: '#888' }}>No transactions found.</div>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* ── NOTIFICATIONS TAB ── */}
+          {activeTab === 'notifications' && (
+            <div className="admin-notif-layout premium-dashboard-layout">
+              <div className="admin-chat-header-premium" style={{ position: 'sticky', top: 0, zIndex: 100, marginBottom: '15px' }}>
+                <button className="premium-back-btn" onClick={() => handleTabChange('dashboard')}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                  <span>Back</span>
+                </button>
+                <div className="chat-username" style={{ fontSize: '18px', color: '#D4AF37' }}>Notifications</div>
+                <div style={{ width: '80px' }}>{notifications.length > 0 && <span style={{ background: '#2ecc71', color: '#fff', borderRadius: '12px', padding: '4px 8px' }}>{notifications.length}</span>}</div>
+              </div>
+              <div className="admin-notif-list" style={{ padding: '15px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {notifications.map((n, i) => (
+                  <div key={i} className="admin-notif-item" style={{ background: 'rgba(15,20,15,0.6)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,196,0,0.15)' }}>
+                    <div style={{ fontSize: '14px', color: '#fff' }}>{n.message}</div>
+                    <div style={{ fontSize: '12px', color: '#aaa', marginTop: '4px' }}>{new Date(n.timestamp).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}</div>
+                  </div>
+                ))}
+                {notifications.length === 0 && <div style={{ textAlign: 'center', color: '#888', padding: '40px' }}>No notifications</div>}
               </div>
             </div>
           )}
@@ -964,10 +1020,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                     </button>
                   </div>
                   
-                  <div className="admin-chat-messages">
+                  <div className="admin-chat-messages" onClick={() => setActiveAdminMenuMsgId(null)}>
                     {supportMessages.map((msg, i) => (
                       <div key={msg.id || i} style={{ display: 'flex', justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start' }}>
-                        <div className={`premium-chat-bubble ${msg.sender}`}>
+                        <div 
+                          className={`premium-chat-bubble ${msg.sender}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveAdminMenuMsgId(curr => curr === msg.id ? null : msg.id);
+                          }}
+                        >
                           {editingChatId === msg.id ? (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                               <input 
@@ -1002,16 +1064,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                               <div className="admin-chat-meta" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginTop: '6px', justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start' }}>
                                 {new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
                               </div>
-                              {msg.sender === 'admin' && (
-                                <div className="chat-hover-actions">
-                                  <button className="action-hover-btn edit-btn" onClick={() => { setEditingChatId(msg.id); setEditingChatText(msg.message); }} title="Edit">
-                                    ✏️
-                                  </button>
-                                  <button className="action-hover-btn delete-btn" onClick={() => handleAdminDeleteMessage(msg.id)} title="Delete">
-                                    🗑️
-                                  </button>
-                                </div>
-                              )}
+                              <div className={`chat-hover-actions ${activeAdminMenuMsgId === msg.id ? 'active' : ''}`}>
+                                <button className="action-hover-btn edit-btn" onClick={(e) => { e.stopPropagation(); setEditingChatId(msg.id); setEditingChatText(msg.message); setActiveAdminMenuMsgId(null); }} title="Edit">
+                                  ✏️
+                                </button>
+                                <button className="action-hover-btn delete-btn" onClick={(e) => { e.stopPropagation(); handleAdminDeleteMessage(msg.id); setActiveAdminMenuMsgId(null); }} title="Delete">
+                                  🗑️
+                                </button>
+                              </div>
                             </div>
                           )}
                         </div>

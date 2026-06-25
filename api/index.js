@@ -40,6 +40,9 @@ app.post('/api/auth/login', async (req, res) => {
   }
   
   const user = await User.findOne({ id });
+  if (user && user.blocked) {
+    return res.status(403).json({ error: 'Account is blocked by admin.' });
+  }
   if (user && user.password === password) {
     res.json(user);
   } else {
@@ -144,6 +147,20 @@ app.get('/api/admin/users', async (req, res) => {
 app.delete('/api/admin/users/:id', async (req, res) => {
   await User.findOneAndDelete({ id: req.params.id });
   res.json({ success: true });
+});
+
+app.put('/api/admin/users/:id/block', async (req, res) => {
+  const { id } = req.params;
+  const user = await User.findOneAndUpdate({ id }, { blocked: true }, { new: true });
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  res.json({ success: true, user });
+});
+
+app.put('/api/admin/users/:id/unblock', async (req, res) => {
+  const { id } = req.params;
+  const user = await User.findOneAndUpdate({ id }, { blocked: false }, { new: true });
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  res.json({ success: true, user });
 });
 
 app.get('/api/admin/transactions', async (req, res) => {

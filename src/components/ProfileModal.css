@@ -397,3 +397,131 @@
   font-weight: 600;
   letter-spacing: 0.5px;
 }
+
+/* Luxury Tiger Banner */
+.luxury-tiger-banner {
+  width: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border: 2px solid transparent;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(212, 175, 55, 0.2), 0 0 15px rgba(212, 175, 55, 0.5);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at center, rgba(30, 25, 10, 0.8), rgba(5, 5, 8, 1));
+  background-clip: padding-box;
+  animation: borderGlow 3s infinite alternate ease-in-out;
+}
+
+.luxury-tiger-banner::after {
+  content: '';
+  position: absolute;
+  top: -2px; left: -2px; right: -2px; bottom: -2px;
+  border-radius: 26px;
+  background: linear-gradient(45deg, #d4af37, #f3e5ab, #d4af37, #aa7700);
+  z-index: -1;
+  background-size: 300% 300%;
+  animation: shineBorder 4s infinite linear;
+}
+
+@keyframes borderGlow {
+  0% { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(212, 175, 55, 0.2), 0 0 10px rgba(212, 175, 55, 0.3); }
+  100% { box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), inset 0 0 30px rgba(212, 175, 55, 0.4), 0 0 25px rgba(212, 175, 55, 0.8); }
+}
+
+@keyframes shineBorder {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.tiger-banner-img {
+  width: 100%;
+  height: auto;
+  max-height: 220px;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 22px;
+  animation: tigerBreathe 4s infinite alternate ease-in-out;
+  display: block;
+}
+
+@keyframes tigerBreathe {
+  0% { transform: scale(1); filter: brightness(1); }
+  100% { transform: scale(1.05); filter: brightness(1.2) drop-shadow(0 0 10px rgba(212,175,55,0.4)); }
+}
+
+/* Premium Secure Logout Button */
+.premium-logout-btn {
+  width: 100%;
+  margin-top: 40px;
+  background: linear-gradient(135deg, #2a0808 0%, #150000 100%);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(239, 68, 68, 0.15), inset 0 0 20px rgba(239, 68, 68, 0.05);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-logout-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%; width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.2), transparent);
+  transform: skewX(-20deg);
+  transition: all 0.5s ease;
+}
+
+.premium-logout-btn:hover {
+  transform: translateY(-3px);
+  border-color: rgba(239, 68, 68, 0.8);
+  box-shadow: 0 15px 35px rgba(239, 68, 68, 0.3), inset 0 0 20px rgba(239, 68, 68, 0.2);
+}
+
+.premium-logout-btn:hover::before {
+  left: 150%;
+  transition: all 0.7s ease;
+}
+
+.premium-logout-btn:active {
+  transform: translateY(1px);
+}
+
+.logout-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 12px;
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+}
+
+.logout-text {
+  flex: 1;
+  text-align: left;
+  margin-left: 15px;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #ef4444;
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+  font-family: 'Inter', sans-serif;
+}
+
+.logout-shield {
+  font-size: 22px;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.6));
+}

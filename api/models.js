@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
   totalReferrals: { type: Number, default: 0 },
   referralEarnings: { type: Number, default: 0 },
   referredBy: { type: String, default: null }, // ID of the user who referred them
+  blocked: { type: Boolean, default: false }, // admin block flag
   createdAt: { type: Date, default: Date.now }
 });
 

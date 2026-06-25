@@ -67,6 +67,21 @@ body {
   position: relative;
   overflow: hidden;
 }
+.premium-round-box {
+  animation: luxuryPulse 3s infinite ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-round-box::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  background-size: 200% 100%;
+  animation: goldShimmer 4s infinite linear;
+  pointer-events: none;
+}
 .global-notification-container {
   position: fixed;
   top: 20px;
@@ -126,4 +141,61 @@ body {
 .vip-unified-wrapper.size-sm .vip-unified-ring {
   width: 36px;
   height: 36px;
+}
+
+@keyframes luxuryPulse {
+  0% { transform: scale(1); box-shadow: 0 0 10px rgba(212,175,55,0.3), inset 0 0 5px rgba(212,175,55,0.1); }
+  50% { transform: scale(1.02); box-shadow: 0 0 25px rgba(212,175,55,0.6), inset 0 0 15px rgba(212,175,55,0.3); border-color: rgba(255,215,0,0.8); }
+  100% { transform: scale(1); box-shadow: 0 0 10px rgba(212,175,55,0.3), inset 0 0 5px rgba(212,175,55,0.1); }
+}
+
+@keyframes goldShimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Global Chat Action Buttons */
+.chat-hover-actions {
+  position: absolute;
+  bottom: -35px;
+  right: 10px;
+  display: flex;
+  gap: 5px;
+  background: rgba(10, 10, 15, 0.95);
+  padding: 4px;
+  border-radius: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  z-index: 50;
+  transform: translateY(-5px);
+  backdrop-filter: blur(5px);
+}
+
+.hc-message:hover .chat-hover-actions,
+.premium-chat-bubble:hover .chat-hover-actions,
+.chat-hover-actions.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.action-hover-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 6px;
+  border-radius: 4px;
+  transition: transform 0.2s, background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-hover-btn:hover {
+  transform: scale(1.15);
+  background: rgba(255, 255, 255, 0.1);
 }

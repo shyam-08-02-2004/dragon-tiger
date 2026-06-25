@@ -3458,18 +3458,39 @@ html, body {
 .premium-user-card {
   background: linear-gradient(180deg, rgba(30, 25, 10, 0.9), rgba(5, 5, 8, 0.95)) !important;
   border: 1px solid rgba(212, 175, 55, 0.3) !important;
-  border-radius: 16px !important;
-  overflow: hidden;
+  border-radius: 12px !important;
   box-shadow: 0 5px 20px rgba(0,0,0,0.5) !important;
   margin-bottom: 5px;
+  position: relative;
+  display: flex !important;
+  flex-direction: column !important;
+  height: auto !important;
+  min-height: min-content !important;
+}
+
+.premium-user-card .user-card-top {
+  padding: 12px 15px !important;
 }
 
 .premium-user-card .user-card-middle {
-  padding: 15px 20px !important;
-  background: rgba(0,0,0,0.4) !important;
+  padding: 10px 15px !important;
+  background: rgba(0,0,0,0.2) !important;
   display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+
+.premium-user-card .user-balance-box {
+  margin-bottom: 0 !important;
+  padding: 12px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.premium-user-card .user-password-box {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 10px 15px !important;
 }
 
 .premium-user-card .user-balance-box .balance-label,
@@ -3481,7 +3502,7 @@ html, body {
 }
 
 .premium-user-card .balance-amount {
-  font-size: 22px !important;
+  font-size: 24px !important;
   font-weight: 900 !important;
   color: #fff !important;
 }
@@ -3493,6 +3514,41 @@ html, body {
   padding: 4px 8px;
   border-radius: 4px;
   color: #ccc;
+}
+
+.premium-user-card .user-card-bottom {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  padding: 12px 10px !important;
+  background: rgba(0,0,0,0.4) !important;
+  gap: 8px !important;
+  justify-content: center !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.premium-user-card .user-card-bottom button {
+  flex: 1 1 30% !important;
+  min-width: fit-content !important;
+  padding: 10px 8px !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: bold !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  cursor: pointer !important;
+  height: auto !important;
+  transition: all 0.2s ease !important;
+}
+
+.premium-user-card .user-card-bottom button:nth-child(1) { background: rgba(212,175,55,0.15) !important; border: 1px solid rgba(212,175,55,0.4) !important; color: #d4af37 !important; }
+.premium-user-card .user-card-bottom button:nth-child(2) { background: rgba(52,152,219,0.15) !important; border: 1px solid rgba(52,152,219,0.4) !important; color: #3498db !important; }
+.premium-user-card .user-card-bottom button:nth-child(3) { background: rgba(231,76,60,0.15) !important; border: 1px solid rgba(231,76,60,0.4) !important; color: #e74c3c !important; }
+
+.premium-user-card .user-card-bottom button:hover {
+  transform: translateY(-2px) !important;
+  filter: brightness(1.2) !important;
 }
 
 
@@ -3556,12 +3612,12 @@ html, body {
 .tx-card-header {
   background: rgba(0, 0, 0, 0.4) !important;
   border-bottom: 1px solid rgba(212, 175, 55, 0.1) !important;
-  padding: 16px 20px !important;
+  padding: 10px 15px !important;
 }
 
 .tx-username {
   font-family: 'Cinzel', serif !important;
-  font-size: 18px !important;
+  font-size: 14px !important;
   color: #D4AF37 !important;
   font-weight: bold;
   letter-spacing: 1px;
@@ -3569,7 +3625,7 @@ html, body {
 
 .tx-time {
   color: #aaa !important;
-  font-size: 12px !important;
+  font-size: 10px !important;
 }
 
 .tx-avatar {
@@ -3579,7 +3635,7 @@ html, body {
 }
 
 .tx-amount {
-  font-size: 28px !important;
+  font-size: 20px !important;
   font-weight: 900 !important;
   color: #fff !important;
   text-shadow: 0 2px 10px rgba(255,255,255,0.3) !important;
@@ -3588,19 +3644,29 @@ html, body {
 
 .tx-card-actions {
   background: rgba(0,0,0,0.3) !important;
-  padding: 15px !important;
+  padding: 12px 10px !important;
   border-top: 1px solid rgba(255,255,255,0.05) !important;
-  gap: 12px !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  justify-content: center !important;
 }
 
 .tx-action-btn {
-  border-radius: 12px !important;
+  flex: 1 1 40% !important;
+  min-width: fit-content !important;
+  font-size: 11px !important;
+  padding: 8px !important;
+  height: auto !important;
+  border-radius: 8px !important;
   font-weight: bold !important;
   text-transform: uppercase !important;
   letter-spacing: 1px !important;
-  padding: 12px !important;
   transition: all 0.3s ease !important;
   box-shadow: 0 4px 15px rgba(0,0,0,0.4) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .tx-action-btn.approve {
@@ -3651,4 +3717,57 @@ html, body {
 
 
 .admin-tx-card { flex-shrink: 0 !important; }
+
+/* Admin Chat Image Responsiveness */
+.admin-chat-media-container {
+  position: relative;
+  max-width: 250px;
+  max-height: 250px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-chat-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  max-height: 250px;
+  border-radius: 8px;
+  transition: transform 0.3s;
+}
+
+.admin-chat-media-container:hover .admin-chat-image {
+  transform: scale(1.02);
+}
+
+.media-overlay-hint {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  font-size: 10px;
+  text-align: center;
+  padding: 4px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.admin-chat-media-container:hover .media-overlay-hint {
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .admin-chat-media-container {
+    max-width: 200px;
+    max-height: 200px;
+  }
+}
 

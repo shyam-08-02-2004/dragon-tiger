@@ -32,8 +32,7 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ card, side, isRevealing, isWi
             </div>
           </>
         ) : (
-          <div className="card-back-design">
-            <div className="card-back-center">🂠</div>
+          <div className="card-back-design" style={{backgroundImage: 'url("./assets/luxury_card_back.png")'}}>
           </div>
         )}
       </div>
