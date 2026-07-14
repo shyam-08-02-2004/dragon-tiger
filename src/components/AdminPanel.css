@@ -1734,6 +1734,20 @@ html, body {
   box-shadow: 0 0 10px #f1c40f;
 }
 
+.admin-user-card.blocked-user {
+  background: linear-gradient(135deg, rgba(30, 10, 10, 0.9), rgba(15, 15, 20, 0.95));
+  border: 1px solid rgba(231, 76, 60, 0.4);
+}
+
+.admin-user-card.blocked-user::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #e74c3c, #c0392b, #e74c3c);
+  box-shadow: 0 0 10px #e74c3c;
+}
+
 .user-card-top {
   display: flex;
   justify-content: space-between;

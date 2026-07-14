@@ -615,11 +615,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                             <div className="user-card-username" style={{ fontSize: '12px', color: '#aaa', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.username}</div>
                           </div>
                         </div>
-                        <div className={`user-card-badge ${user.hasDeposited ? 'active' : 'inactive'}`}>{user.hasDeposited ? 'ACTIVE' : 'NEW'}</div>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          {user.blocked && <div className="user-card-badge blocked" style={{ background: '#e74c3c', color: '#fff', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold' }}>BLOCKED</div>}
+                          <div className={`user-card-badge ${user.hasDeposited ? 'active' : 'inactive'}`}>{user.hasDeposited ? 'ACTIVE' : 'NEW'}</div>
+                        </div>
                       </div>
-                      <div className="user-card-actions" style={{ marginTop: '10px', display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                        {user.blocked && (
-                          <button onClick={() => handleUnblockUser(user.id)} className="unblock-btn" style={{ background: '#2ecc71', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer' }}>Unblock</button>
+                      <div className="user-card-actions" style={{ padding: '0 12px', marginTop: '10px', display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                        {user.blocked ? (
+                          <button onClick={() => handleUnblockUser(user.id)} className="unblock-btn" style={{ flex: 1, background: '#2ecc71', color: '#fff', border: 'none', borderRadius: '6px', padding: '8px 12px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>🔓 Unblock Account</button>
+                        ) : (
+                          <button onClick={() => handleBlockUser(user.id)} className="block-btn" style={{ flex: 1, background: '#e74c3c', color: '#fff', border: 'none', borderRadius: '6px', padding: '8px 12px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>🚫 Block Account</button>
                         )}
                       </div>
                       <div className="user-card-middle" style={{ display: 'flex', flexDirection: 'column', gap: '10px', padding: '12px' }}>
