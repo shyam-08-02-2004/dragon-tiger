@@ -464,12 +464,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
       setUsers(prev => prev.map(u => u.id === id ? { ...u, balance: amount } : u));
       // Refresh from server to ensure consistency
       fetchUsers();
-      // Update session storage for this user if present
-      const savedStr = sessionStorage.getItem('dragonTigerCurrentUser');
+      // Update local storage for this user if present
+      const savedStr = localStorage.getItem('dragonTigerCurrentUser');
       if (savedStr) {
         const saved = JSON.parse(savedStr);
         if (saved.id === id) {
-          sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify({ ...saved, balance: amount }));
+          localStorage.setItem('dragonTigerCurrentUser', JSON.stringify({ ...saved, balance: amount }));
         }
       }
       // Update localStorage cache for the user

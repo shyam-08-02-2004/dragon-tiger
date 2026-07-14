@@ -66,11 +66,31 @@ const App: React.FC = () => {
     return (sessionStorage.getItem('dt_currentTab') as 'home' | 'games') || 'home';
   });
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return !!sessionStorage.getItem('dragonTigerCurrentUser');
+    const saved = localStorage.getItem('dragonTigerCurrentUser');
+    const lastActiveStr = localStorage.getItem('dt_lastActiveTime');
+    if (saved && lastActiveStr) {
+      const elapsed = Date.now() - Number(lastActiveStr);
+      if (elapsed > 10 * 60 * 1000) {
+        localStorage.removeItem('dragonTigerCurrentUser');
+        localStorage.removeItem('dt_lastActiveTime');
+        return false;
+      }
+      localStorage.setItem('dt_lastActiveTime', Date.now().toString());
+      return true;
+    }
+    return false;
   });
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
-    const saved = sessionStorage.getItem('dragonTigerCurrentUser');
-    return saved ? JSON.parse(saved) : null;
+    const saved = localStorage.getItem('dragonTigerCurrentUser');
+    const lastActiveStr = localStorage.getItem('dt_lastActiveTime');
+    if (saved && lastActiveStr) {
+      const elapsed = Date.now() - Number(lastActiveStr);
+      if (elapsed > 10 * 60 * 1000) {
+        return null;
+      }
+      return JSON.parse(saved);
+    }
+    return null;
   });
 
   const getMuteStorageKey = (user: UserAccount | null) => {
@@ -146,7 +166,7 @@ const App: React.FC = () => {
   const [isTimeSynced, setIsTimeSynced] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [state, setState] = useState<GameState>(() => {
-    const saved = sessionStorage.getItem('dragonTigerCurrentUser');
+    const saved = localStorage.getItem('dragonTigerCurrentUser');
     let startingBalance = initialState.balance;
     if (saved) {
       try { startingBalance = JSON.parse(saved).balance; } catch(e){}
@@ -248,7 +268,8 @@ const App: React.FC = () => {
 
 
   const handleLogin = (user: UserAccount) => {
-    sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify(user));
+    localStorage.setItem('dragonTigerCurrentUser', JSON.stringify(user));
+    localStorage.setItem('dt_lastActiveTime', Date.now().toString());
     setCurrentUser(user);
     // Voice welcome
     voiceEnabled && speak(`Welcome ${user.username}`, muted);
@@ -257,7 +278,8 @@ const App: React.FC = () => {
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem('dragonTigerCurrentUser');
+    localStorage.removeItem('dragonTigerCurrentUser');
+    localStorage.removeItem('dt_lastActiveTime');
     setIsAuthenticated(false);
     setCurrentUser(null);
   };
@@ -278,12 +300,12 @@ const App: React.FC = () => {
               setCurrentUser(prev => prev ? { ...prev, balance: Number(user.balance), hasDeposited: user.hasDeposited } : null);
               setState(prev => prev.balance !== Number(user.balance) ? { ...prev, balance: Number(user.balance) } : prev);
 
-              const savedStr = sessionStorage.getItem('dragonTigerCurrentUser');
+              const savedStr = localStorage.getItem('dragonTigerCurrentUser');
               if (savedStr) {
                 try {
                   const saved = JSON.parse(savedStr);
                   if (saved.balance !== Number(user.balance) || saved.hasDeposited !== user.hasDeposited) {
-                    sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify({ ...saved, balance: Number(user.balance), hasDeposited: user.hasDeposited }));
+                    localStorage.setItem('dragonTigerCurrentUser', JSON.stringify({ ...saved, balance: Number(user.balance), hasDeposited: user.hasDeposited }));
                   }
                 } catch (e) {}
               }
@@ -297,6 +319,37 @@ const App: React.FC = () => {
       return () => clearInterval(interval);
     }
   }, [isAuthenticated, currentUser?.id]);
+
+  // Inactivity auto-logout timer and active listeners
+  useEffect(() => {
+    if (!isAuthenticated || !currentUser || currentUser.username === 'babu') return;
+
+    let timeoutId: any;
+
+    const resetTimer = () => {
+      // Update local storage active timestamp
+      localStorage.setItem('dt_lastActiveTime', Date.now().toString());
+
+      // Reset the 10-minute automatic logout timeout
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        handleLogout();
+        alert('You have been logged out due to 10 minutes of inactivity.');
+      }, 10 * 60 * 1000); // 10 minutes
+    };
+
+    // Listen to user interactions to reset timer
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+    events.forEach(event => window.addEventListener(event, resetTimer));
+
+    // Initialize timer
+    resetTimer();
+
+    return () => {
+      clearTimeout(timeoutId);
+      events.forEach(event => window.removeEventListener(event, resetTimer));
+    };
+  }, [isAuthenticated, currentUser]);
 
   // Sync balance to localStorage
   useEffect(() => {
@@ -474,12 +527,12 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
       console.error('Failed to sync balance to server', e);
     }
     setCurrentUser(prev => prev ? { ...prev, balance: newBalance } : prev);
-    // Update sessionStorage immediately so refresh doesn't show stale balance
-    const savedStr = sessionStorage.getItem('dragonTigerCurrentUser');
+    // Update localStorage immediately so refresh doesn't show stale balance
+    const savedStr = localStorage.getItem('dragonTigerCurrentUser');
     if (savedStr) {
       try {
         const saved = JSON.parse(savedStr);
-        sessionStorage.setItem('dragonTigerCurrentUser', JSON.stringify({ ...saved, balance: newBalance }));
+        localStorage.setItem('dragonTigerCurrentUser', JSON.stringify({ ...saved, balance: newBalance }));
       } catch (e) {}
     }
     const usersStr = localStorage.getItem('dragonTigerUsers') || '{}';

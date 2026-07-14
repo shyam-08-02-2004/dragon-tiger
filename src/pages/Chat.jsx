@@ -8,10 +8,10 @@ const ChatPage = () => {
   const [typing, setTyping] = useState({}); // {userId: true}
   const socketRef = useRef(null);
 
-  // Retrieve current user info from session storage (set during login)
+  // Retrieve current user info from local storage (set during login)
   const currentUser = React.useMemo(() => {
     try {
-      return JSON.parse(sessionStorage.getItem('dragonTigerCurrentUser')) || null;
+      return JSON.parse(localStorage.getItem('dragonTigerCurrentUser')) || null;
     } catch {
       return null;
     }
