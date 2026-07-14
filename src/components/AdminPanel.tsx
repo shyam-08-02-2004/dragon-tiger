@@ -43,6 +43,7 @@ const normalizeLiveBets = (data: any): LiveBets => {
 
 const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [users, setUsers] = useState<any[]>([]);
+  const [updatingUsers, setUpdatingUsers] = useState<Record<string, boolean>>({});
   const [transactions, setTransactions] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'game' | 'transactions' | 'support' | 'notifications' | 'blocked'>(() => (sessionStorage.getItem('dt_adminTab') as any) || 'dashboard');
@@ -112,26 +113,32 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
   // Block/Unblock handlers
   const handleBlockUser = async (id: string) => {
-    // Optimistic UI update
-    setUsers(prev => prev.map((u: any) => u.id === id ? { ...u, blocked: true } : u));
+    setUpdatingUsers(prev => ({ ...prev, [id]: true }));
     try {
       const res = await fetch(`/api/admin/users/${id}/block`, { method: 'PUT' });
-      if (!res.ok) fetchUsers(); // Rollback if server returns error
+      if (res.ok) {
+        setUsers(prev => prev.map((u: any) => u.id === id ? { ...u, blocked: true } : u));
+      }
     } catch (e) {
       console.error(e);
-      fetchUsers(); // Rollback on connection error
+    } finally {
+      setUpdatingUsers(prev => ({ ...prev, [id]: false }));
+      fetchUsers();
     }
   };
   
   const handleUnblockUser = async (id: string) => {
-    // Optimistic UI update
-    setUsers(prev => prev.map((u: any) => u.id === id ? { ...u, blocked: false } : u));
+    setUpdatingUsers(prev => ({ ...prev, [id]: true }));
     try {
       const res = await fetch(`/api/admin/users/${id}/unblock`, { method: 'PUT' });
-      if (!res.ok) fetchUsers(); // Rollback if server returns error
+      if (res.ok) {
+        setUsers(prev => prev.map((u: any) => u.id === id ? { ...u, blocked: false } : u));
+      }
     } catch (e) {
       console.error(e);
-      fetchUsers(); // Rollback on connection error
+    } finally {
+      setUpdatingUsers(prev => ({ ...prev, [id]: false }));
+      fetchUsers();
     }
   };
 
@@ -632,7 +639,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                         </div>
                       </div>
                       <div className="user-card-actions" style={{ padding: '0 12px', marginTop: '10px', display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                        {user.blocked ? (
+                        {updatingUsers[user.id] ? (
+                          <button disabled className="updating-btn" style={{ flex: 1, background: '#7f8c8d', color: '#fff', border: 'none', borderRadius: '6px', padding: '8px 12px', fontWeight: 'bold', cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>⏳ Processing...</button>
+                        ) : user.blocked ? (
                           <button onClick={() => handleUnblockUser(user.id)} className="unblock-btn" style={{ flex: 1, background: '#2ecc71', color: '#fff', border: 'none', borderRadius: '6px', padding: '8px 12px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>🔓 Unblock Account</button>
                         ) : (
                           <button onClick={() => handleBlockUser(user.id)} className="block-btn" style={{ flex: 1, background: '#e74c3c', color: '#fff', border: 'none', borderRadius: '6px', padding: '8px 12px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>🚫 Block Account</button>
