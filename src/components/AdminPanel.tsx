@@ -119,7 +119,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     }
     setUpdatingUsers(prev => ({ ...prev, [id]: true }));
     try {
-      const res = await fetch(`/api/admin/users/${id}/block`, { method: 'PUT' });
+      const res = await fetch(`/api/admin/users/${id}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ blocked: true })
+      });
       if (res.ok) {
         setUsers(prev => prev.map((u: any) => u.id === id ? { ...u, blocked: true } : u));
       } else {
@@ -143,7 +147,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     }
     setUpdatingUsers(prev => ({ ...prev, [id]: true }));
     try {
-      const res = await fetch(`/api/admin/users/${id}/unblock`, { method: 'PUT' });
+      const res = await fetch(`/api/admin/users/${id}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ blocked: false })
+      });
       if (res.ok) {
         setUsers(prev => prev.map((u: any) => u.id === id ? { ...u, blocked: false } : u));
       } else {

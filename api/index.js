@@ -149,18 +149,20 @@ app.delete('/api/admin/users/:id', async (req, res) => {
   res.json({ success: true });
 });
 
-app.put('/api/admin/users/:id/block', async (req, res) => {
+app.put('/api/admin/users/:id/status', async (req, res) => {
   const { id } = req.params;
-  const user = await User.findOneAndUpdate({ id }, { blocked: true }, { new: true });
-  if (!user) return res.status(404).json({ error: 'User not found' });
-  res.json({ success: true, user });
-});
-
-app.put('/api/admin/users/:id/unblock', async (req, res) => {
-  const { id } = req.params;
-  const user = await User.findOneAndUpdate({ id }, { blocked: false }, { new: true });
-  if (!user) return res.status(404).json({ error: 'User not found' });
-  res.json({ success: true, user });
+  const { blocked } = req.body;
+  if (typeof blocked !== 'boolean') {
+    return res.status(400).json({ error: 'Invalid block status value' });
+  }
+  try {
+    const user = await User.findOneAndUpdate({ id }, { blocked }, { new: true });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json({ success: true, user });
+  } catch (err) {
+    console.error('Status update error:', err);
+    res.status(500).json({ error: 'Database update failed' });
+  }
 });
 
 app.get('/api/admin/transactions', async (req, res) => {
