@@ -161,7 +161,7 @@ app.put('/api/admin/users/:id/status', async (req, res) => {
     res.json({ success: true, user });
   } catch (err) {
     console.error('Status update error:', err);
-    res.status(500).json({ error: 'Database update failed' });
+    res.status(500).json({ error: `Database update failed: ${err.message}` });
   }
 });
 
