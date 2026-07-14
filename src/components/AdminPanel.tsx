@@ -112,16 +112,27 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
   // Block/Unblock handlers
   const handleBlockUser = async (id: string) => {
+    // Optimistic UI update
+    setUsers(prev => prev.map((u: any) => u.id === id ? { ...u, blocked: true } : u));
     try {
       const res = await fetch(`/api/admin/users/${id}/block`, { method: 'PUT' });
-      if (res.ok) fetchUsers();
-    } catch (e) { console.error(e); }
+      if (!res.ok) fetchUsers(); // Rollback if server returns error
+    } catch (e) {
+      console.error(e);
+      fetchUsers(); // Rollback on connection error
+    }
   };
+  
   const handleUnblockUser = async (id: string) => {
+    // Optimistic UI update
+    setUsers(prev => prev.map((u: any) => u.id === id ? { ...u, blocked: false } : u));
     try {
       const res = await fetch(`/api/admin/users/${id}/unblock`, { method: 'PUT' });
-      if (res.ok) fetchUsers();
-    } catch (e) { console.error(e); }
+      if (!res.ok) fetchUsers(); // Rollback if server returns error
+    } catch (e) {
+      console.error(e);
+      fetchUsers(); // Rollback on connection error
+    }
   };
 
   // Initial data load and periodic refresh
