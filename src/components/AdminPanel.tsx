@@ -118,12 +118,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
       const res = await fetch(`/api/admin/users/${id}/block`, { method: 'PUT' });
       if (res.ok) {
         setUsers(prev => prev.map((u: any) => u.id === id ? { ...u, blocked: true } : u));
+      } else {
+        fetchUsers();
       }
     } catch (e) {
       console.error(e);
+      fetchUsers();
     } finally {
       setUpdatingUsers(prev => ({ ...prev, [id]: false }));
-      fetchUsers();
     }
   };
   
@@ -133,12 +135,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
       const res = await fetch(`/api/admin/users/${id}/unblock`, { method: 'PUT' });
       if (res.ok) {
         setUsers(prev => prev.map((u: any) => u.id === id ? { ...u, blocked: false } : u));
+      } else {
+        fetchUsers();
       }
     } catch (e) {
       console.error(e);
+      fetchUsers();
     } finally {
       setUpdatingUsers(prev => ({ ...prev, [id]: false }));
-      fetchUsers();
     }
   };
 
