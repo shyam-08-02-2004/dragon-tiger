@@ -113,16 +113,23 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
   // Block/Unblock handlers
   const handleBlockUser = async (id: string) => {
+    if (!id) {
+      alert('Error: Missing user ID');
+      return;
+    }
     setUpdatingUsers(prev => ({ ...prev, [id]: true }));
     try {
       const res = await fetch(`/api/admin/users/${id}/block`, { method: 'PUT' });
       if (res.ok) {
         setUsers(prev => prev.map((u: any) => u.id === id ? { ...u, blocked: true } : u));
       } else {
+        const errData = await res.json().catch(() => ({}));
+        alert(`Failed to block user: ${errData.error || 'Server error'}`);
         fetchUsers();
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      alert(`Connection error: ${e.message || 'Unknown network error'}`);
       fetchUsers();
     } finally {
       setUpdatingUsers(prev => ({ ...prev, [id]: false }));
@@ -130,16 +137,23 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   };
   
   const handleUnblockUser = async (id: string) => {
+    if (!id) {
+      alert('Error: Missing user ID');
+      return;
+    }
     setUpdatingUsers(prev => ({ ...prev, [id]: true }));
     try {
       const res = await fetch(`/api/admin/users/${id}/unblock`, { method: 'PUT' });
       if (res.ok) {
         setUsers(prev => prev.map((u: any) => u.id === id ? { ...u, blocked: false } : u));
       } else {
+        const errData = await res.json().catch(() => ({}));
+        alert(`Failed to unblock user: ${errData.error || 'Server error'}`);
         fetchUsers();
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      alert(`Connection error: ${e.message || 'Unknown network error'}`);
       fetchUsers();
     } finally {
       setUpdatingUsers(prev => ({ ...prev, [id]: false }));
