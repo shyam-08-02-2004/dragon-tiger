@@ -149,7 +149,7 @@ app.delete('/api/admin/users/:id', async (req, res) => {
   res.json({ success: true });
 });
 
-app.put('/api/admin/users/:id/status', async (req, res) => {
+app.post('/api/admin/users/:id/status', async (req, res) => {
   const { id } = req.params;
   const { blocked } = req.body;
   if (typeof blocked !== 'boolean') {

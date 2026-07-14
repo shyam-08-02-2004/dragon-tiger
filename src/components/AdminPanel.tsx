@@ -120,7 +120,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     setUpdatingUsers(prev => ({ ...prev, [id]: true }));
     try {
       const res = await fetch(`/api/admin/users/${id}/status`, {
-        method: 'PUT',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ blocked: true })
       });
@@ -148,7 +148,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     setUpdatingUsers(prev => ({ ...prev, [id]: true }));
     try {
       const res = await fetch(`/api/admin/users/${id}/status`, {
-        method: 'PUT',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ blocked: false })
       });
