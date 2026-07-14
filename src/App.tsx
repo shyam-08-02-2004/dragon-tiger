@@ -271,11 +271,6 @@ const App: React.FC = () => {
         fetch(`/api/users/${currentUser.id}`)
           .then(res => res.json())
           .then(user => {
-            if (user.blocked) {
-              handleLogout();
-              alert('Your account has been blocked by the admin.');
-              return;
-            }
             if (user.balance !== undefined) {
                       // Also respect recent UI updates (15s debounce)
                       if (Date.now() - lastLocalBalanceUpdate.current < 15000) return;

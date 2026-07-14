@@ -650,7 +650,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                 {[...users].reverse().map((user: any) => {
                 if (user.id === 'babu') return null;
                 return (
-                  <div key={user.id} className={`admin-user-card premium-user-card ${user.hasDeposited ? 'vip-user' : ''} ${user.blocked ? 'blocked-user' : ''}`}>
+                  <div key={user.id} className={`admin-user-card premium-user-card ${user.hasDeposited ? 'vip-user' : ''}`}>
                       <div className="user-card-top" style={{ padding: '15px', borderBottom: '1px solid rgba(212,175,55,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                           <div className="user-card-avatar" style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'linear-gradient(135deg, rgba(212,175,55,0.3), rgba(0,0,0,0.8))', border: '2px solid #D4AF37', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>👤</div>
@@ -660,18 +660,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                           </div>
                         </div>
                         <div style={{ display: 'flex', gap: '6px' }}>
-                          {user.blocked && <div className="user-card-badge blocked" style={{ background: '#e74c3c', color: '#fff', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold' }}>BLOCKED</div>}
                           <div className={`user-card-badge ${user.hasDeposited ? 'active' : 'inactive'}`}>{user.hasDeposited ? 'ACTIVE' : 'NEW'}</div>
                         </div>
-                      </div>
-                      <div className="user-card-actions" style={{ padding: '0 12px', marginTop: '10px', display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                        {updatingUsers[user.id] ? (
-                          <button disabled className="updating-btn" style={{ flex: 1, background: '#7f8c8d', color: '#fff', border: 'none', borderRadius: '6px', padding: '8px 12px', fontWeight: 'bold', cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>⏳ Processing...</button>
-                        ) : user.blocked ? (
-                          <button onClick={() => handleUnblockUser(user.id)} className="unblock-btn" style={{ flex: 1, background: '#2ecc71', color: '#fff', border: 'none', borderRadius: '6px', padding: '8px 12px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>🔓 Unblock Account</button>
-                        ) : (
-                          <button onClick={() => handleBlockUser(user.id)} className="block-btn" style={{ flex: 1, background: '#e74c3c', color: '#fff', border: 'none', borderRadius: '6px', padding: '8px 12px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>🚫 Block Account</button>
-                        )}
                       </div>
                       <div className="user-card-middle" style={{ display: 'flex', flexDirection: 'column', gap: '10px', padding: '12px' }}>
                       <div className="user-balance-box" style={{ background: 'rgba(0,0,0,0.4)', borderRadius: '12px', padding: '15px', border: '1px dashed rgba(212,175,55,0.3)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

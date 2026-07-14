@@ -149,21 +149,6 @@ app.delete('/api/admin/users/:id', async (req, res) => {
   res.json({ success: true });
 });
 
-app.post('/api/admin/users/:id/status', async (req, res) => {
-  const { id } = req.params;
-  const { blocked } = req.body;
-  if (typeof blocked !== 'boolean') {
-    return res.status(400).json({ error: 'Invalid block status value' });
-  }
-  try {
-    const user = await User.findOneAndUpdate({ id }, { blocked }, { new: true });
-    if (!user) return res.status(404).json({ error: 'User not found' });
-    res.json({ success: true, user });
-  } catch (err) {
-    console.error('Status update error:', err);
-    res.status(500).json({ error: `Database update failed: ${err.message}` });
-  }
-});
 
 app.get('/api/admin/transactions', async (req, res) => {
   const transactions = await Transaction.find({}).sort({ timestamp: -1 });
