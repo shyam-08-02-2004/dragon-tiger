@@ -226,9 +226,8 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
               ) : (
                 filteredBets.slice(0, visibleCount).map((b) => {
                   const isWin = b.winAmount > 0;
-                  const isPending = b.winAmount === 0 && b.betAmount > 0; // if status is somehow pending
-                  const statusLabel = isWin ? '🟢 Won' : isPending ? '🟡 Pending' : '🔴 Lost';
-                  const glowClass = isWin ? 'glow-green' : isPending ? 'glow-gold' : 'glow-red';
+                  const statusLabel = isWin ? '🟢 Won' : '🔴 Lost';
+                  const glowClass = isWin ? 'glow-green' : 'glow-red';
                   
                   // Compute the round outcome
                   let winner: GameResult | null = null;
@@ -274,7 +273,7 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
                         <div className="gh-bet-detail">
                           <span className="lbl">Round Winner</span>
                           <span className="val" style={{ textTransform: 'capitalize' }}>
-                            {winnerData ? `${winnerData.icon} ${winnerData.label}` : 'Pending'}
+                            {winnerData ? `${winnerData.icon} ${winnerData.label}` : 'Lost'}
                           </span>
                         </div>
                         <div className="gh-bet-detail">
