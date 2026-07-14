@@ -115,6 +115,7 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
   });
 
   const filteredBets = betHistory.filter(b => {
+    if (b.betAmount <= 0) return false;
     if (searchQuery && !String(b.roundNumber).includes(searchQuery)) return false;
     const isWin = b.winAmount > 0;
     if (winLossFilter === 'win' && !isWin) return false;
@@ -229,6 +230,25 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
                   const statusLabel = isWin ? '🟢 Won' : isPending ? '🟡 Pending' : '🔴 Lost';
                   const glowClass = isWin ? 'glow-green' : isPending ? 'glow-gold' : 'glow-red';
                   
+                  // Compute the round outcome
+                  let winner: GameResult | null = null;
+                  const cached = pastRounds.find(r => r.round === b.roundNumber && (!b.roundId || r.rawRoundId === b.roundId));
+                  if (cached) {
+                    winner = cached.winner;
+                  } else if (b.roundId) {
+                    const serverResult = serverHistory.find(h => Number(h.roundId) === b.roundId);
+                    if (serverResult) winner = serverResult.result as GameResult;
+                    else {
+                      const adminOutcome = adminOutcomes.find(a => Number(a.roundId) === b.roundNumber);
+                      if (adminOutcome && adminOutcome.outcome !== 'none') winner = adminOutcome.outcome as GameResult;
+                      else {
+                        const { dragonCard, tigerCard } = getDeterministicCards(b.roundNumber, b.roundId);
+                        winner = determineResult(dragonCard, tigerCard);
+                      }
+                    }
+                  }
+                  const winnerData = winner ? winnerInfo(winner) : null;
+
                   return (
                     <div key={b._id || Math.random()} className={`gh-bet-card ${glowClass}`}>
                       <div className="gh-card-header">
@@ -241,15 +261,21 @@ const GameHistory: React.FC<GameHistoryProps> = ({ currentRound, rawRoundId, isO
                         <div className="gh-bet-detail">
                           <span className="lbl">Bet Side</span>
                           <span className="val" style={{ textTransform: 'capitalize' }}>
-                            {b.betSide.toLowerCase().includes('dragon') ? '🐉 ' : ''}
-                            {b.betSide.toLowerCase().includes('tiger') ? '🐅 ' : ''}
-                            {b.betSide.toLowerCase().includes('tie') ? '🟢 ' : ''}
-                            {b.betSide}
+                            {b.betSide && b.betSide.toLowerCase().includes('dragon') ? '🐉 ' : ''}
+                            {b.betSide && b.betSide.toLowerCase().includes('tiger') ? '🐅 ' : ''}
+                            {b.betSide && b.betSide.toLowerCase().includes('tie') ? '🟢 ' : ''}
+                            {b.betSide || 'N/A'}
                           </span>
                         </div>
                         <div className="gh-bet-detail">
                           <span className="lbl">Bet Amount</span>
                           <span className="val">₹{b.betAmount}</span>
+                        </div>
+                        <div className="gh-bet-detail">
+                          <span className="lbl">Round Winner</span>
+                          <span className="val" style={{ textTransform: 'capitalize' }}>
+                            {winnerData ? `${winnerData.icon} ${winnerData.label}` : 'Pending'}
+                          </span>
                         </div>
                         <div className="gh-bet-detail">
                           <span className="lbl">Result</span>

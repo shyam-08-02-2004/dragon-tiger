@@ -78,7 +78,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   const [fullScreenMedia, setFullScreenMedia] = useState<{ url: string; type: string } | null>(null);
 
   // State Setters with sessionStorage wrappers
-  const handleTabChange = (tab: 'dashboard' | 'users' | 'game' | 'transactions' | 'support' | 'blocked') => {
+  const handleTabChange = (tab: 'dashboard' | 'users' | 'game' | 'transactions' | 'support' | 'notifications' | 'blocked') => {
     setActiveTab(tab); sessionStorage.setItem('dt_adminTab', tab);
   };
   const handleUserHistory = (val: string | null) => {
@@ -492,6 +492,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     } catch(e) { console.error(e); }
   };
 
+
+
   const phaseColor = simPhase === 'betting' ? '#f39c12' : simPhase === 'dealing' ? '#3498db' : '#2ecc71';
   const phaseLabel = simPhase === 'betting' ? `🎯 Betting Open (${simTimer}s)` : simPhase === 'dealing' ? '🃏 Dealing Cards...' : '🏆 Round Over';
 
@@ -522,6 +524,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
           <button className={`admin-nav-btn ${activeTab === 'game' ? 'active' : ''}`} onClick={() => handleTabChange('game')}>🎲 Game Control</button>
           <button className={`admin-nav-btn ${activeTab === 'transactions' ? 'active' : ''}`} onClick={() => handleTabChange('transactions')}>💳 Transactions</button>
           <button className={`admin-nav-btn ${activeTab === 'support' ? 'active' : ''}`} onClick={() => handleTabChange('support')}>💬 Support</button>
+          <button className={`admin-nav-btn ${activeTab === 'notifications' ? 'active' : ''}`} onClick={() => handleTabChange('notifications')}>🔔 Notifications</button>
         </nav>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: 'auto' }}>
@@ -531,7 +534,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
       <main className="admin-main">
         <header className="admin-header">
-          <h1>{activeTab === 'users' ? 'User Management' : activeTab === 'game' ? 'Game Control Room' : activeTab === 'transactions' ? 'Transactions' : 'Support Center'}</h1>
+          <h1>{activeTab === 'users' ? 'User Management' : activeTab === 'game' ? 'Game Control Room' : activeTab === 'transactions' ? 'Transactions' : activeTab === 'notifications' ? 'Notifications' : 'Support Center'}</h1>
           <div className="admin-badge">Admin Privileges Active (v1.1)</div>
           <button onClick={() => setMuted(!muted)} className="mute-btn" style={{ marginLeft: '12px', background: 'transparent', border: 'none', color: '#fff', fontSize: '18px', cursor: 'pointer' }}>{muted ? '🔇' : '🔊'}</button>
         </header>
@@ -615,10 +618,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                         <div className={`user-card-badge ${user.hasDeposited ? 'active' : 'inactive'}`}>{user.hasDeposited ? 'ACTIVE' : 'NEW'}</div>
                       </div>
                       <div className="user-card-actions" style={{ marginTop: '10px', display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                        {user.blocked ? (
+                        {user.blocked && (
                           <button onClick={() => handleUnblockUser(user.id)} className="unblock-btn" style={{ background: '#2ecc71', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer' }}>Unblock</button>
-                        ) : (
-                          <button onClick={() => handleBlockUser(user.id)} className="block-btn" style={{ background: '#e74c3c', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer' }}>Block</button>
                         )}
                       </div>
                       <div className="user-card-middle" style={{ display: 'flex', flexDirection: 'column', gap: '10px', padding: '12px' }}>
@@ -655,6 +656,30 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
             </div>
           )}
 
+{activeTab === 'notifications' && (
+  <div className="admin-notifications-layout premium-dashboard-layout">
+    <div className="admin-chat-header-premium" style={{ position: 'sticky', top: 0, zIndex: 100, marginBottom: '15px' }}>
+      <button className="premium-back-btn" onClick={() => handleTabChange('dashboard')}>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        <span>Back</span>
+      </button>
+      <div className="chat-username" style={{ fontSize: '18px', color: '#D4AF37' }}>Notifications</div>
+      <div style={{ width: '80px' }}></div>
+    </div>
+    <div className="admin-user-grid" style={{ padding: '5px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '15px' }}>
+      {notifications.length === 0 ? (
+        <div style={{ padding: '40px', textAlign: 'center', color: '#888' }}>No notifications.</div>
+      ) : (
+        notifications.map((n: any) => (
+          <div key={n.id} className="admin-notif-card" style={{ background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,196,0,0.2)' }}>
+            <div style={{ fontSize: '14px', color: '#fff' }}>{n.message}</div>
+            <div style={{ fontSize: '12px', color: '#aaa', marginTop: '4px' }}>{new Date(n.createdAt).toLocaleString()}</div>
+          </div>
+        ))
+      )}
+    </div>
+  </div>
+)}
           {/* ── GAME CONTROL TAB ── */}
           {activeTab === 'game' && (
             <div className="admin-game-layout premium-dashboard-layout">

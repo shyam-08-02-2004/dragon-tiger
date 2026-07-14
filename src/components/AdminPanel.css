@@ -3526,6 +3526,42 @@ html, body {
   border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .admin-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    width: 100%;
+    gap: 10px;
+    padding-bottom: 10px;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+  }
+
+  .nav-btn {
+    white-space: nowrap;
+    padding: 12px 20px;
+    flex: 0 0 auto;
+    justify-content: center;
+    font-size: 13px;
+  }
+
+  .block-btn, .unblock-btn {
+    flex: 1 1 45%;
+    min-width: 0;
+    margin-bottom: 6px;
+  }
+
+  .user-card-actions {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .admin-notif-card {
+    width: 100%;
+  }
+}
+
 .premium-user-card .user-card-bottom button {
   flex: 1 1 30% !important;
   min-width: fit-content !important;

@@ -660,23 +660,25 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
         lastLocalBalanceUpdate.current = Date.now();
         syncBalanceToServer(newBalance, currentPrev.balance);
 
-        const betSideStr = Object.entries(currentPrev.bets)
-          .filter(([k, v]) => v && v > 0)
-          .map(([k, v]) => `${k.charAt(0).toUpperCase() + k.slice(1)}`)
-          .join(', ');
+        if (currentPrev.totalBet > 0) {
+          const betSideStr = Object.entries(currentPrev.bets)
+            .filter(([k, v]) => v && v > 0)
+            .map(([k, v]) => `${k.charAt(0).toUpperCase() + k.slice(1)}`)
+            .join(', ');
 
-        fetch('/api/users/bet-history', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            username: currentUserRef.current.id,
-            roundId: roundId,
-            roundNumber: roundId % 2000 + 1,
-            betAmount: currentPrev.totalBet,
-            winAmount: winnings,
-            betSide: betSideStr,
-          }),
-        }).catch(() => {});
+          fetch('/api/users/bet-history', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: currentUserRef.current.id,
+              roundId: roundId,
+              roundNumber: roundId % 2000 + 1,
+              betAmount: currentPrev.totalBet,
+              winAmount: winnings,
+              betSide: betSideStr,
+            }),
+          }).catch(() => {});
+        }
       }
 
       fetch('/api/history/record', {

@@ -40,6 +40,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   const [error, setError] = useState('');
   
   const [showOtpToast, setShowOtpToast] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // -------------------------
   // LOGIN LOGIC
@@ -55,6 +56,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       return;
     }
 
+    setIsLoading(true);
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
@@ -65,11 +67,13 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       
       if (!res.ok) {
         setError(data.error || 'Login failed');
+        setIsLoading(false);
         return;
       }
       onLogin(data);
     } catch (err) {
       setError('Server error during login.');
+      setIsLoading(false);
     }
   };
 
@@ -131,6 +135,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
     const mNum = mobileNumber.trim();
     
+    setIsLoading(true);
     try {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
@@ -141,11 +146,13 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       
       if (!res.ok) {
         setError(data.error || 'Signup failed');
+        setIsLoading(false);
         return;
       }
       onLogin(data);
     } catch (err) {
       setError('Server error during signup.');
+      setIsLoading(false);
     }
   };
 
@@ -199,6 +206,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       return;
     }
     
+    setIsLoading(true);
     try {
       const res = await fetch('/api/auth/reset', {
         method: 'POST',
@@ -209,11 +217,13 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       
       if (!res.ok) {
         setError(data.error || 'Password reset failed');
+        setIsLoading(false);
         return;
       }
       onLogin(data);
     } catch (err) {
       setError('Server error during reset.');
+      setIsLoading(false);
     }
   };
 
@@ -266,6 +276,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   };
 
   const getButtonText = () => {
+    if (isLoading) return 'PROCESSING...';
     if (mode === 'login') return 'LOGIN';
     if (step === 1) return 'SEND OTP';
     if (step === 2) return 'VERIFY OTP';
@@ -486,7 +497,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
             </>
           )}
 
-          <button type="submit" className="main-action-btn auth-submit-btn">
+          <button type="submit" className="main-action-btn auth-submit-btn" disabled={isLoading}>
             <span className="btn-shine" />
             <span className="deal-btn-text">
               {getButtonText()}
