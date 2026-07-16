@@ -288,14 +288,15 @@ const App: React.FC = () => {
   useEffect(() => {
     if (isAuthenticated && currentUser && currentUser.id !== 'babu') {
       const fetchBalance = () => {
-                // Skip fetch if a recent local update has occurred (15s debounce)
-                if (Date.now() - balanceSyncRef.current < 15000) return;
+                // Skip fetch if a recent local update has occurred (30s debounce)
+                if (Date.now() - balanceSyncRef.current < 30000) return;
+                if (Date.now() - lastLocalBalanceUpdate.current < 30000) return;
         fetch(`/api/users/${currentUser.id}`)
           .then(res => res.json())
           .then(user => {
             if (user.balance !== undefined) {
-                      // Also respect recent UI updates (15s debounce)
-                      if (Date.now() - lastLocalBalanceUpdate.current < 15000) return;
+                      // Also respect recent UI updates (30s debounce)
+                      if (Date.now() - lastLocalBalanceUpdate.current < 30000) return;
 
               setCurrentUser(prev => prev ? { ...prev, balance: Number(user.balance), hasDeposited: user.hasDeposited } : null);
               setState(prev => prev.balance !== Number(user.balance) ? { ...prev, balance: Number(user.balance) } : prev);
@@ -515,13 +516,16 @@ const App: React.FC = () => {
 const syncBalanceToServer = async (newBalance: number, previousBalance?: number) => {
   if (currentUser && currentUser.id !== 'babu') {
     const userId = currentUser.id || currentUser.username;
+    // Block polls IMMEDIATELY before the async call to prevent race condition
+    balanceSyncRef.current = Date.now();
+    lastLocalBalanceUpdate.current = Date.now();
     try {
       await fetch(`/api/users/${userId}/balance`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ balance: newBalance, prevBalance: previousBalance })
       });
-      // Record timestamp of successful sync to debounce future polls
+      // Refresh the timestamp after successful sync too
       balanceSyncRef.current = Date.now();
     } catch (e) {
       console.error('Failed to sync balance to server', e);

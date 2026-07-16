@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './Header.css';
 import vipAvatar from '../assets/vip-man.png';
 
@@ -31,6 +31,25 @@ const Header: React.FC<HeaderProps> = ({
   onShowProfile,
   isGameView = false,
 }) => {
+  const prevBalanceRef = useRef<number>(balance);
+  const [balanceChanged, setBalanceChanged] = useState(false);
+
+  useEffect(() => {
+    if (prevBalanceRef.current !== balance) {
+      prevBalanceRef.current = balance;
+      setBalanceChanged(true);
+      const timer = setTimeout(() => setBalanceChanged(false), 700);
+      return () => clearTimeout(timer);
+    }
+  }, [balance]);
+
+  // Format balance: use compact notation for very large numbers
+  const formatBalance = (val: number) => {
+    if (val >= 10000000) return (val / 10000000).toFixed(2) + 'Cr';
+    if (val >= 100000) return (val / 100000).toFixed(2) + 'L';
+    return val.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
   return (
     <header className="premium-header">
       {/* Left: Avatar/Name (Home) or Balance (Game) */}
@@ -39,7 +58,7 @@ const Header: React.FC<HeaderProps> = ({
           <div className="ph-premium-balance" onClick={onShowWallet}>
             <div className="ppb-glow"></div>
             <span className="ppb-currency">₹</span>
-            <span className="ppb-amount">{balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            <span className={`ppb-amount${balanceChanged ? ' balance-changed' : ''}`}>{formatBalance(balance)}</span>
             <button className="ppb-add">+</button>
           </div>
         )}
@@ -68,3 +87,4 @@ const Header: React.FC<HeaderProps> = ({
 };
 
 export default Header;
+
