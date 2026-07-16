@@ -1,18 +1,21 @@
- import express from 'express';
+import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import dotenv from 'dotenv';
 import { User, Transaction, AdminSettings, RoundBet, Notification, RoundHistory, ChatMessage, UserBetHistory } from './models.js';
+
+dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// Use the Atlas URI from Vercel environment variables.
-// Hard-coded fallback ensures connection works even if env var is missing.
-const MONGO_URI = process.env.MONGODB_URI || 'mongodb+srv://shyambabudangi277_db_user:shyam%4075097@cluster1.h8jmgeq.mongodb.net/dragonTiger?retryWrites=true&w=majority';
-
+// Use the Atlas URI from Vercel environment variables or .env file.
+// Fallback ensures connection works even if env var is missing.
 let cachedDb = null;
+
+const MONGO_URI = process.env.MONGODB_URI || 'mongodb://shyambabudangi277_db_user:shyam%4075097@ac-k3bmyx3-shard-00-00.h8jmgeq.mongodb.net:27017,ac-k3bmyx3-shard-00-01.h8jmgeq.mongodb.net:27017,ac-k3bmyx3-shard-00-02.h8jmgeq.mongodb.net:27017/dragon-tiger?ssl=true&replicaSet=atlas-12ixcg-shard-0&authSource=admin&retryWrites=true&w=majority';
 
 async function connectToDatabase() {
   if (cachedDb) return cachedDb;
@@ -21,16 +24,20 @@ async function connectToDatabase() {
   return cachedDb;
 }
 
-// DB connection middleware disabled for login to avoid blocking admin access
-// app.use(async (req, res, next) => {
-//   try {
-//     await connectToDatabase();
-//     next();
-//   } catch (err) {
-//     console.error('Database connection failed', err);
-//     res.status(500).json({ error: 'Database connection failed' });
-//   }
-// });
+// Initialize DB connection at startup
+connectToDatabase()
+  .then(() => console.log('✅ MongoDB connection established'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
+
+app.use(async (req, res, next) => {
+  try {
+    await connectToDatabase();
+    next();
+  } catch (err) {
+    console.error('Database connection failed', err);
+    res.status(500).json({ error: 'Database connection failed' });
+  }
+});
 
 // AUTH ROUTES
 app.post('/api/auth/login', async (req, res) => {

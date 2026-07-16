@@ -1,0 +1,39 @@
+/* responsive-utils.css – design tokens & utility classes */
+:root {
+  /* Color palette */
+  --color-primary: #d4af37; /* Gold */
+  --color-bg: #0a0a0a;
+  --color-bg-dark: #000000;
+  --color-text: #ffffff;
+  --color-muted: #888888;
+  /* Typography */
+  --font-ui: "Inter", sans-serif;
+  --font-display: "Cinzel", serif;
+  --font-tech: "Orbitron", monospace;
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  /* Breakpoints */
+  --bp-sm: 600px;
+  --bp-md: 900px;
+}
+/* Utility helpers */
+.hide-sm { display: block; }
+@media (max-width: var(--bp-sm)) { .hide-sm { display: none; } }
+.show-sm { display: none; }
+@media (max-width: var(--bp-sm)) { .show-sm { display: block; } }
+.hide-md { display: block; }
+@media (max-width: var(--bp-md)) { .hide-md { display: none; } }
+.show-md { display: none; }
+@media (min-width: calc(var(--bp-sm) + 1px)) and (max-width: var(--bp-md)) { .show-md { display: block; } }
+.flex-center { display: flex; justify-content: center; align-items: center; }
+.grid-gap { display: grid; gap: var(--space-2); }
+/* Responsive layout helpers */
+@media (max-width: var(--bp-sm)) {
+  .game-main-content { max-width: 100%; padding: var(--space-2); }
+}
+@media (min-width: var(--bp-sm)) and (max-width: var(--bp-md)) {
+  .game-main-content { max-width: 480px; }
+}

@@ -11,6 +11,20 @@
 }
 
 :root {
+  --color-primary: #d4af37;
+  --color-bg: #0a0a0a;
+  --color-bg-dark: #000000;
+  --color-text: #ffffff;
+  --color-muted: #888888;
+  --font-ui: "Inter", sans-serif;
+  --font-display: "Cinzel", serif;
+  --font-tech: "Orbitron", monospace;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --bp-sm: 600px;
+  --bp-md: 900px;
   --gold: #d4a017;
   --gold-light: #f5c842;
   --red: #c0392b;
@@ -19,14 +33,11 @@
   --green: #27ae60;
   --dark-bg: #000000;
   --text-primary: #ffffff;
-  --font-ui: "Inter", sans-serif;
-  --font-display: "Cinzel", serif;
-  --font-tech: "Orbitron", monospace;
 }
 
 body {
   margin: 0;
-  font-family: var(--font-main), 'Inter', sans-serif;
+  font-family: var(--font-ui), 'Inter', sans-serif;
   background-color: #000;
   color: #fff;
   -webkit-font-smoothing: antialiased;
@@ -38,8 +49,8 @@ body {
 }
 
 #root {
-  min-height: 100vh; height: 100dvh; /* Fallback for older browsers */
-  min-height: 100vh; height: 100dvh;
+  min-height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -67,6 +78,7 @@ body {
   position: relative;
   overflow: hidden;
 }
+
 .premium-round-box {
   animation: luxuryPulse 3s infinite ease-in-out;
   position: relative;
@@ -82,6 +94,7 @@ body {
   animation: goldShimmer 4s infinite linear;
   pointer-events: none;
 }
+
 .global-notification-container {
   position: fixed;
   top: 20px;
@@ -116,9 +129,9 @@ body {
 }
 
 @keyframes unifiedGlowRotate {
-  0% { background-position: 0% 50%; box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
-  50% { background-position: 100% 50%; box-shadow: 0 0 30px rgba(255, 215, 0, 0.7); }
-  100% { background-position: 0% 50%; box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
+  0%   { background-position: 0% 50%;   box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
+  50%  { background-position: 100% 50%; box-shadow: 0 0 30px rgba(255, 215, 0, 0.7); }
+  100% { background-position: 0% 50%;   box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
 }
 
 .vip-unified-img {
@@ -130,28 +143,19 @@ body {
 }
 
 /* Specific Sizes */
-.vip-unified-wrapper.size-lg .vip-unified-ring {
-  width: 90px;
-  height: 90px;
-}
-.vip-unified-wrapper.size-md .vip-unified-ring {
-  width: 50px;
-  height: 50px;
-}
-.vip-unified-wrapper.size-sm .vip-unified-ring {
-  width: 36px;
-  height: 36px;
-}
+.vip-unified-wrapper.size-lg .vip-unified-ring { width: 90px; height: 90px; }
+.vip-unified-wrapper.size-md .vip-unified-ring { width: 50px; height: 50px; }
+.vip-unified-wrapper.size-sm .vip-unified-ring { width: 36px; height: 36px; }
 
 @keyframes luxuryPulse {
-  0% { transform: scale(1); box-shadow: 0 0 10px rgba(212,175,55,0.3), inset 0 0 5px rgba(212,175,55,0.1); }
-  50% { transform: scale(1.02); box-shadow: 0 0 25px rgba(212,175,55,0.6), inset 0 0 15px rgba(212,175,55,0.3); border-color: rgba(255,215,0,0.8); }
-  100% { transform: scale(1); box-shadow: 0 0 10px rgba(212,175,55,0.3), inset 0 0 5px rgba(212,175,55,0.1); }
+  0%   { transform: scale(1);    box-shadow: 0 0 10px rgba(212,175,55,0.3), inset 0 0 5px rgba(212,175,55,0.1); }
+  50%  { transform: scale(1.02); box-shadow: 0 0 25px rgba(212,175,55,0.6), inset 0 0 15px rgba(212,175,55,0.3); border-color: rgba(255,215,0,0.8); }
+  100% { transform: scale(1);    box-shadow: 0 0 10px rgba(212,175,55,0.3), inset 0 0 5px rgba(212,175,55,0.1); }
 }
 
 @keyframes goldShimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
 }
 
 /* Global Chat Action Buttons */
@@ -198,4 +202,18 @@ body {
 .action-hover-btn:hover {
   transform: scale(1.15);
   background: rgba(255, 255, 255, 0.1);
+}
+
+/* ── Responsive Utilities ── */
+@media (max-width: 480px) {
+  .game-main-content {
+    max-width: 100%;
+    padding: 8px;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 900px) {
+  .game-main-content {
+    max-width: 480px;
+  }
 }
