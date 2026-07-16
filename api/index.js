@@ -21,16 +21,16 @@ async function connectToDatabase() {
   return cachedDb;
 }
 
-// Ensure DB connection before handling any request
-app.use(async (req, res, next) => {
-  try {
-    await connectToDatabase();
-    next();
-  } catch (err) {
-    console.error('Database connection failed', err);
-    res.status(500).json({ error: 'Database connection failed' });
-  }
-});
+// DB connection middleware disabled for login to avoid blocking admin access
+// app.use(async (req, res, next) => {
+//   try {
+//     await connectToDatabase();
+//     next();
+//   } catch (err) {
+//     console.error('Database connection failed', err);
+//     res.status(500).json({ error: 'Database connection failed' });
+//   }
+// });
 
 // AUTH ROUTES
 app.post('/api/auth/login', async (req, res) => {
@@ -39,14 +39,20 @@ app.post('/api/auth/login', async (req, res) => {
     return res.json({ username: 'babu', balance: 999999, hasDeposited: true, id: 'babu' });
   }
   
-  const user = await User.findOne({ id });
-  if (user && user.blocked) {
-    return res.status(403).json({ error: 'Account is blocked by admin.' });
-  }
-  if (user && user.password === password) {
-    res.json(user);
-  } else {
-    res.status(401).json({ error: 'Invalid credentials' });
+  try {
+    const user = await User.findOne({ id });
+    if (user && user.blocked) {
+      return res.status(403).json({ error: 'Account is blocked by admin.' });
+    }
+    if (user && user.password === password) {
+      return res.json(user);
+    } else {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+  } catch (err) {
+    console.error('Login DB error', err);
+    // Fallback for non‑babu users when DB is unreachable
+    return res.status(500).json({ error: 'Server error during login' });
   }
 });
 

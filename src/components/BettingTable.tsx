@@ -50,7 +50,7 @@ const BettingTable: React.FC<BettingTableProps> = ({ bets, onBet, phase }) => {
           {renderBetBox('dragon', 'DRAGON', '1:1', 'pt-dragon')}
           
           <div className="pt-center-column">
-            {renderBetBox('tie', 'TIE', '8:1', 'pt-tie')}
+
           </div>
           
           {renderBetBox('tiger', 'TIGER', '1:1', 'pt-tiger')}
