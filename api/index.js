@@ -117,6 +117,10 @@ app.get('/api/time', (req, res) => { res.json({ serverTime: Date.now() }); });
 
 // USER ROUTES
 app.get('/api/users/:id', async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  
   const user = await User.findOne({ id: req.params.id });
   if (user) res.json(user);
   else res.status(404).json({ error: 'User not found' });

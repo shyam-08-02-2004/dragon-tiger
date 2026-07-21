@@ -295,7 +295,7 @@ const App: React.FC = () => {
                   if (Date.now() - balanceSyncRef.current < 30000) return;
                   if (Date.now() - lastLocalBalanceUpdate.current < 30000) return;
                 }
-        fetch(`/api/users/${currentUser.id}`)
+        fetch(`/api/users/${currentUser.id}?t=${Date.now()}`)
           .then(res => {
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             return res.json();
