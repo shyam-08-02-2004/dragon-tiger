@@ -134,21 +134,26 @@ app.get('/api/users/:id/referrals', async (req, res) => {
 });
 
 app.put('/api/users/:id/balance', async (req, res) => {
-  const { balance, prevBalance } = req.body;
-  const numBalance = Number(balance) || 0;
-  
-  // Prevent negative balance
-  if (numBalance < 0) {
-    return res.status(400).json({ error: 'Balance cannot be negative' });
-  }
-  
-  const user = await User.findOne({ id: req.params.id });
-  if (!user) return res.status(404).json({ error: 'Not found' });
-  
+  try {
+    const { balance, prevBalance } = req.body;
+    const numBalance = Number(balance) || 0;
+    
+    // Prevent negative balance
+    if (numBalance < 0) {
+      return res.status(400).json({ error: 'Balance cannot be negative' });
+    }
+    
+    const user = await User.findOne({ id: req.params.id });
+    if (!user) return res.status(404).json({ error: 'Not found' });
+    
     user.balance = numBalance;
-  
-  await user.save();
-  res.json(user);
+    
+    await user.save();
+    res.json({ success: true, balance: user.balance });
+  } catch (err) {
+    console.error('Balance update error:', err);
+    res.status(500).json({ error: 'Failed to update balance' });
+  }
 });
 
 // ADMIN ROUTES

@@ -287,16 +287,23 @@ const App: React.FC = () => {
   // Fetch real balance from DB once on load and poll every 5s
   useEffect(() => {
     if (isAuthenticated && currentUser && currentUser.id !== 'babu') {
+      let isFirstFetch = true;
+
       const fetchBalance = () => {
-                // Skip fetch if a recent local update has occurred (30s debounce)
-                if (Date.now() - balanceSyncRef.current < 30000) return;
-                if (Date.now() - lastLocalBalanceUpdate.current < 30000) return;
+                // Skip debounce for the very first fetch (page load/refresh)
+                if (!isFirstFetch) {
+                  if (Date.now() - balanceSyncRef.current < 30000) return;
+                  if (Date.now() - lastLocalBalanceUpdate.current < 30000) return;
+                }
         fetch(`/api/users/${currentUser.id}`)
-          .then(res => res.json())
+          .then(res => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.json();
+          })
           .then(user => {
             if (user.balance !== undefined) {
-                      // Also respect recent UI updates (30s debounce)
-                      if (Date.now() - lastLocalBalanceUpdate.current < 30000) return;
+                      // For subsequent fetches, respect debounce
+                      if (!isFirstFetch && Date.now() - lastLocalBalanceUpdate.current < 30000) return;
 
               setCurrentUser(prev => prev ? { ...prev, balance: Number(user.balance), hasDeposited: user.hasDeposited } : null);
               setState(prev => prev.balance !== Number(user.balance) ? { ...prev, balance: Number(user.balance) } : prev);
@@ -311,8 +318,12 @@ const App: React.FC = () => {
                 } catch (e) {}
               }
             }
+            isFirstFetch = false;
           })
-          .catch(console.error);
+          .catch(err => {
+            console.error('Balance fetch error:', err);
+            isFirstFetch = false;
+          });
       };
 
       fetchBalance();
@@ -519,17 +530,36 @@ const syncBalanceToServer = async (newBalance: number, previousBalance?: number)
     // Block polls IMMEDIATELY before the async call to prevent race condition
     balanceSyncRef.current = Date.now();
     lastLocalBalanceUpdate.current = Date.now();
-    try {
-      await fetch(`/api/users/${userId}/balance`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ balance: newBalance, prevBalance: previousBalance })
-      });
-      // Refresh the timestamp after successful sync too
-      balanceSyncRef.current = Date.now();
-    } catch (e) {
-      console.error('Failed to sync balance to server', e);
+
+    // Retry up to 3 times to ensure balance is saved
+    let synced = false;
+    for (let attempt = 0; attempt < 3 && !synced; attempt++) {
+      try {
+        const res = await fetch(`/api/users/${userId}/balance`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ balance: newBalance, prevBalance: previousBalance })
+        });
+        if (res.ok) {
+          synced = true;
+          // Refresh the timestamp after successful sync
+          balanceSyncRef.current = Date.now();
+          lastLocalBalanceUpdate.current = Date.now();
+        } else {
+          console.error(`Balance sync attempt ${attempt + 1} failed: HTTP ${res.status}`);
+          // Wait before retry
+          if (attempt < 2) await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+        }
+      } catch (e) {
+        console.error(`Balance sync attempt ${attempt + 1} error:`, e);
+        if (attempt < 2) await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+      }
     }
+
+    if (!synced) {
+      console.error('❌ CRITICAL: Balance sync failed after 3 attempts! Balance may be lost on refresh.');
+    }
+
     setCurrentUser(prev => prev ? { ...prev, balance: newBalance } : prev);
     // Update localStorage immediately so refresh doesn't show stale balance
     const savedStr = localStorage.getItem('dragonTigerCurrentUser');
