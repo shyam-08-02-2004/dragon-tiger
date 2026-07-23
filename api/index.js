@@ -18,8 +18,13 @@ let cachedDb = null;
 const MONGO_URI = process.env.MONGODB_URI || 'mongodb://shyambabudangi277_db_user:shyam%4075097@ac-k3bmyx3-shard-00-00.h8jmgeq.mongodb.net:27017,ac-k3bmyx3-shard-00-01.h8jmgeq.mongodb.net:27017,ac-k3bmyx3-shard-00-02.h8jmgeq.mongodb.net:27017/dragon-tiger?ssl=true&replicaSet=atlas-12ixcg-shard-0&authSource=admin&retryWrites=true&w=majority';
 
 async function connectToDatabase() {
-  if (cachedDb) return cachedDb;
-  const opts = { bufferCommands: false };
+  if (cachedDb && mongoose.connection.readyState === 1) {
+    return cachedDb;
+  }
+  const opts = { 
+    bufferCommands: false,
+    serverSelectionTimeoutMS: 5000,
+  };
   cachedDb = await mongoose.connect(MONGO_URI, opts);
   return cachedDb;
 }
